@@ -84,9 +84,18 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bueiro.cs" />
+    <Compile Include="Class\Disciplina.cs" />
+    <Compile Include="Class\Tunel.cs" />
+    <Compile Include="Class\PN.cs" />
+    <Compile Include="Class\Infraestrutura.cs" />
+    <Compile Include="Class\Contencao.cs" />
+    <Compile Include="Class\Bueiro.cs" />
     <Compile Include="GestaoDefeitos.cs" />
-    <Compile Include="ELayoutExcelBueiro.cs" />
+    <Compile Include="Layout\ELayoutExcelTunel.cs" />
+    <Compile Include="Layout\ELayoutExcelPN.cs" />
+    <Compile Include="Layout\ELayoutExcelInfraestrutura.cs" />
+    <Compile Include="Layout\ELayoutExcelContencao.cs" />
+    <Compile Include="Layout\ELayoutExcelBueiro.cs" />
     <Compile Include="Service1.cs">
       <SubType>Component</SubType>
     </Compile>
