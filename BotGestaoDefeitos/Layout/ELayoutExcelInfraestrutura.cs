@@ -22,7 +22,7 @@
         public const string LONGITUDE_INICIO = "LONGITUDE_INICIO";
         public const string LONGITUDE_FIM = "LONGITUDE_FIM";
         public const string TIPO_TERRENO = "TIPO_TERRENO";
-        public const string LAUDO = "LAUDO";
+        public const string LADO = "LADO";
         public const string DEFEITO = "DEFEITO";
         public const string PRIORIDADE = "PRIORIDADE";
         public const string OBSERVACAO = "OBSERVACAO";

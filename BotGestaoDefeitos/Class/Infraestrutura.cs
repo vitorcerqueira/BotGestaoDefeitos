@@ -15,7 +15,7 @@
         public string LONGITUDE_INICIO { get; set; }
         public string LONGITUDE_FIM { get; set; }
         public string TIPO_TERRENO { get; set; }
-        public string LAUDO { get; set; }
+        public string LADO { get; set; }
         public string DEFEITO { get; set; }
         public string PRIORIDADE { get; set; }
         public string OBSERVACAO { get; set; }

@@ -104,6 +104,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\BaseService.cs" />
+    <Compile Include="Service\BueiroService.cs" />
+    <Compile Include="Service\ContencaoService.cs" />
+    <Compile Include="Service\InfraestruturaService.cs" />
+    <Compile Include="Service\PNService.cs" />
+    <Compile Include="Service\TunelService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
