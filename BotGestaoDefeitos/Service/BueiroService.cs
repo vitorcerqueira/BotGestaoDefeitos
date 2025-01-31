@@ -1,32 +1,48 @@
-﻿using OfficeOpenXml;
+﻿using log4net.Layout;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Media.Media3D;
 
 namespace BotGestaoDefeitos.Service
 {
     public class BueiroService : BaseService
     {
-        public string LeArquivo(ExcelWorksheet planilha, ExcelPackage pacote, int totalLinhas)
+        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             var listBueiros = new List<Bueiro>();
             var itensRemoverBueiro = new List<Bueiro>();
             var itensCopiadosBueiro = new List<Bueiro>();
             var itensEmailBueiros = new List<IGrouping<string, Bueiro>>();
             var layout = LayoutExcel();
 
-            listBueiros = LeArquivoBueiro(totalLinhas, planilha, layout);
-            VerificaRepetidosBueiros(listBueiros, ref itensEmailBueiros, ref itensRemoverBueiro);
-            RemoveItens(itensRemoverBueiro.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            {
+                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+
+                int totalLinhas = planilha.Dimension.Rows;
+
+                listBueiros = LeArquivoBueiro(totalLinhas, planilha, layout);
+                VerificaRepetidosBueiros(listBueiros, ref itensEmailBueiros, ref itensRemoverBueiro);
+                RemoveItens(itensRemoverBueiro.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            }
             var itensBueirosFinal = listBueiros.Where(x => !itensRemoverBueiro.Select(y => y.linha).Contains(x.linha)).ToList();
-            itensCopiadosBueiro = GravaItensBueiros(itensBueirosFinal);
+            itensCopiadosBueiro = GravaItensBueiros(itensBueirosFinal, pathDefeito, pathHistGeral, pathGeral, layout);
             GravaArquivoBueiros(itensEmailBueiros, itensRemoverBueiro, layout);
             return MontaLayoutEmail(itensEmailBueiros, itensRemoverBueiro, itensCopiadosBueiro);
         }
-        private List<Bueiro> GravaItensBueiros(List<Bueiro> itensFinal)
+        private List<Bueiro> GravaItensBueiros(List<Bueiro> itensFinal, string pathDefeito, string pathHistGeral, string pathGeral, Dictionary<string, int> layout)
         {
-            //TODO:
+            var result = new List<Bueiro>();
+
+            result.AddRange(GravaItensDefeitos(itensFinal, pathDefeito,layout));
+            result.AddRange(GravaItensHistorico(itensFinal, pathDefeito));
+            result.AddRange(GravaItensGeral(itensFinal, pathDefeito));
+            return result;
 
             //string caminhoArquivo = "caminho/do/seu/arquivo.xlsx";
 
@@ -54,6 +70,76 @@ namespace BotGestaoDefeitos.Service
             //Console.WriteLine("Linha inserida com sucesso!");
             return new List<Bueiro>();
         }
+
+        private IEnumerable<Bueiro> GravaItensGeral(List<Bueiro> itensFinal, string pathDefeito)
+        {
+            //TODO: Leitura arquivo pathGeral
+            //TODO:  comparar itensfinal com itensHistGeral
+            //TODO: insere itens faltantes
+            return null;
+        }
+
+        private IEnumerable<Bueiro> GravaItensHistorico(List<Bueiro> itensFinal, string pathDefeito)
+        {
+            //TODO: Leitura arquivo pathHistGeral
+            //TODO:  comparar itensfinal com itensHistGeral
+            //TODO: insere itens faltantes
+            return null;
+        }
+
+        private List<Bueiro> GravaItensDefeitos(List<Bueiro> itensFinal, string pathDefeito, Dictionary<string, int> layout)
+        {
+            var listBueirosCopiados = new List<Bueiro>();
+            var listBueiros = new List<string>();
+            using (var pacote = new ExcelPackage(new FileInfo(pathDefeito)))
+            {
+                var planilha = pacote.Workbook.Worksheets[0];
+
+                int totalLinhas = planilha.Dimension.Rows;
+                for (int linha = 2; linha <= totalLinhas; linha++)
+                {
+                    listBueiros.Add(planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Text);
+                }
+
+                //TODO: ver regra ************************
+                //TODO: os itens existentes devem ser atualizados? **************
+                listBueirosCopiados = itensFinal.Where(x => !listBueiros.Contains(x.ID_REGISTRO) && x.STATUS != "Excluido" && x.STATUS != "Reclassificado").ToList();
+
+                totalLinhas++;
+
+                planilha.InsertRow(totalLinhas, listBueirosCopiados.Count());
+
+                foreach (var item in listBueirosCopiados)
+                {
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = item.ID_REGISTRO;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_DEFEITO]].Value = item.ID_DEFEITO;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_RONDA]].Value = item.ID_RONDA;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ATUALIZACAO]].Value = item.ATUALIZACAO;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.TIPO_INSPECAO]].Value = item.TIPO_INSPECAO;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.DATA]].Value = item.DATA;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.RESPONSAVEL]].Value = item.RESPONSAVEL;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.STATUS]].Value = item.STATUS;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.SUB]].Value = item.SUB;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.KM]].Value = item.KM;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.EQUIP_SUPER]].Value = item.EQUIP_SUPER;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.EQUIP]].Value = item.EQUIP;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.LOCAL]].Value = item.LOCAL;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.DEFEITO]].Value = item.DEFEITO;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.PRIORIDADE]].Value = item.PRIORIDADE;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.OBSERVACAO]].Value = item.OBSERVACAO;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.FOTOS]].Value = item.FOTOS;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.OS]].Value = item.OS;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.SUB_TRECHO]].Value = item.SUB_TRECHO;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.POWERAPPSID]].Value = item.POWERAPPSID;
+                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ENG]].Value = item.ENG;
+                    totalLinhas++;
+                }
+
+                pacote.Save();
+            }
+            return listBueirosCopiados;
+        }
+
         private List<Bueiro> LeArquivoBueiro(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
             var listBueiros = new List<Bueiro>();
@@ -89,6 +175,7 @@ namespace BotGestaoDefeitos.Service
             }
             return listBueiros;
         }
+        
         private void VerificaRepetidosBueiros(List<Bueiro> listBueiros, ref List<IGrouping<string, Bueiro>> itensEmail, ref List<Bueiro> itensRemover)
         {
             var itensagrupados = listBueiros.Where(x => !string.IsNullOrEmpty(x.ID_REGISTRO)).GroupBy(x => x.ID_REGISTRO).ToList();
@@ -244,7 +331,7 @@ namespace BotGestaoDefeitos.Service
                         linha++;
                     }
                 }
-                
+
                 pacote.Save();
             }
         }

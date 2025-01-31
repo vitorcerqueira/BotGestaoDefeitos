@@ -8,17 +8,25 @@ namespace BotGestaoDefeitos.Service
 {
     public class InfraestruturaService : BaseService
     {
-        public string LeArquivo(ExcelWorksheet planilha, ExcelPackage pacote, int totalLinhas)
+        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
         {
             var listInfraestrutura = new List<Infraestrutura>();
             var itensRemoverInfraestrutura = new List<Infraestrutura>();
             var itensCopiadosInfraestrutura = new List<Infraestrutura>();
             var itensEmailInfraestrutura = new List<IGrouping<string, Infraestrutura>>();
             var layout = LayoutExcel();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            listInfraestrutura = LeArquivoInfraestrutura(totalLinhas, planilha, layout);
-            VerificaRepetidosInfraestrutura(listInfraestrutura, ref itensEmailInfraestrutura, ref itensRemoverInfraestrutura);
-            RemoveItens(itensRemoverInfraestrutura.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            {
+                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+
+                int totalLinhas = planilha.Dimension.Rows;
+
+                listInfraestrutura = LeArquivoInfraestrutura(totalLinhas, planilha, layout);
+                VerificaRepetidosInfraestrutura(listInfraestrutura, ref itensEmailInfraestrutura, ref itensRemoverInfraestrutura);
+                RemoveItens(itensRemoverInfraestrutura.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            }
             var itensInfraestruturaFinal = listInfraestrutura.Where(x => !itensRemoverInfraestrutura.Select(y => y.linha).Contains(x.linha)).ToList();
             itensCopiadosInfraestrutura = GravaItensInfraestrutura(itensInfraestruturaFinal);
             GravaArquivoInfraestrutura(itensEmailInfraestrutura, itensRemoverInfraestrutura, layout);

@@ -1,5 +1,4 @@
 ﻿using BotGestaoDefeitos.Service;
-using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -38,7 +37,6 @@ namespace BotGestaoDefeitos
         {
             try
             {
-
                 var pathFileSource = Directory.GetFiles(_path, "*.*", SearchOption.AllDirectories).ToList();
                 _itensFiles = new List<Tuple<int, string, string>>();
                 foreach (string path in pathFileSource)
@@ -78,31 +76,21 @@ namespace BotGestaoDefeitos
 
         private string LeArquivo(string path, string type)
         {
-
-
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            var pathDefeito = _itensFiles.FirstOrDefault(x => x.Item1 == 2 && x.Item3 == type).Item2;
+            var pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
+            var pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
+            switch (type)
             {
-                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
-
-                int totalLinhas = planilha.Dimension.Rows;
-                int totalColunas = planilha.Dimension.Columns;
-
-                switch (type)
-                {
-                    case "Bueiros":
-                        return new BueiroService().LeArquivo(planilha, pacote, totalLinhas);
-                    case "Contenções":
-                        return new ContencaoService().LeArquivo(planilha, pacote, totalLinhas);
-                    case "Infraestrutura":
-                        return new InfraestruturaService().LeArquivo(planilha, pacote, totalLinhas);
-                    case "PN":
-                        return new PNService().LeArquivo(planilha, pacote, totalLinhas);
-                    case "Túneis":
-                        return new TunelService().LeArquivo(planilha, pacote, totalLinhas);
-                }
-
+                case "Bueiros":
+                    return new BueiroService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                case "Contenções":
+                    return new ContencaoService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                case "Infraestrutura":
+                    return new InfraestruturaService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                case "PN":
+                    return new PNService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                case "Túneis":
+                    return new TunelService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
             }
             return "";
         }

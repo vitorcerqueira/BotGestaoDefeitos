@@ -8,7 +8,7 @@ namespace BotGestaoDefeitos.Service
 {
     public class ContencaoService : BaseService
     {
-        public string LeArquivo(ExcelWorksheet planilha, ExcelPackage pacote, int totalLinhas)
+        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
         {
 
             var listContencoes = new List<Contencao>();
@@ -16,10 +16,18 @@ namespace BotGestaoDefeitos.Service
             var itensCopiadosContencao = new List<Contencao>();
             var itensEmailContencoes = new List<IGrouping<string, Contencao>>();
             var layout = LayoutExcel();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            listContencoes = LeArquivoContencao(totalLinhas, planilha, layout);
-            VerificaRepetidosContencoes(listContencoes, ref itensEmailContencoes, ref itensRemoverContencao);
-            RemoveItens(itensRemoverContencao.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            {
+                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+
+                int totalLinhas = planilha.Dimension.Rows;
+
+                listContencoes = LeArquivoContencao(totalLinhas, planilha, layout);
+                VerificaRepetidosContencoes(listContencoes, ref itensEmailContencoes, ref itensRemoverContencao);
+                RemoveItens(itensRemoverContencao.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            }
             var itensContacoesFinal = listContencoes.Where(x => !itensRemoverContencao.Select(y => y.linha).Contains(x.linha)).ToList();
             itensCopiadosContencao = GravaItensContencoes(itensContacoesFinal);
             GravaArquivoContencoes(itensEmailContencoes, itensRemoverContencao, layout);

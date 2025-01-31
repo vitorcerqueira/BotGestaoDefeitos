@@ -8,18 +8,26 @@ namespace BotGestaoDefeitos.Service
 {
     public class PNService : BaseService
     {
-        public string LeArquivo(ExcelWorksheet planilha, ExcelPackage pacote, int totalLinhas)
+        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
         {
             var listPN = new List<PN>();
             var itensRemoverPN = new List<PN>();
             var itensCopiadosPN = new List<PN>();
             var itensEmailPN = new List<IGrouping<string, PN>>();
             var layout = LayoutExcel();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            listPN = LeArquivoPN(totalLinhas, planilha, layout);
-            VerificaRepetidosPN(listPN, ref itensEmailPN, ref itensRemoverPN);
-            RemoveItens(itensRemoverPN.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
-            var itensPNFinal = listPN.Where(x => !itensRemoverPN.Select(y => y.linha).Contains(x.linha)).ToList();
+            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            {
+                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+
+                int totalLinhas = planilha.Dimension.Rows;
+
+                listPN = LeArquivoPN(totalLinhas, planilha, layout);
+                VerificaRepetidosPN(listPN, ref itensEmailPN, ref itensRemoverPN);
+                RemoveItens(itensRemoverPN.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            }
+                var itensPNFinal = listPN.Where(x => !itensRemoverPN.Select(y => y.linha).Contains(x.linha)).ToList();
             itensCopiadosPN = GravaItensPN(itensPNFinal);
             GravaArquivoPN(itensEmailPN, itensRemoverPN, layout);
             return MontaLayoutEmail(itensEmailPN, itensRemoverPN, itensCopiadosPN);

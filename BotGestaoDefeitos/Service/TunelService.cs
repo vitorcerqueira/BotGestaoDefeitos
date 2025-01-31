@@ -8,16 +8,25 @@ namespace BotGestaoDefeitos.Service
 {
     public class TunelService : BaseService
     {
-        public string LeArquivo(ExcelWorksheet planilha, ExcelPackage pacote, int totalLinhas)
+        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
         {
             var listTunel = new List<Tunel>();
             var itensRemoverTunel = new List<Tunel>();
             var itensCopiadosTunel = new List<Tunel>();
             var itensEmailTunel = new List<IGrouping<string, Tunel>>();
             var layout = LayoutExcel();
-            listTunel = LeArquivoTunel(totalLinhas, planilha, layout);
-            VerificaRepetidosTunel(listTunel, ref itensEmailTunel, ref itensRemoverTunel);
-            RemoveItens(itensRemoverTunel.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            {
+                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+
+                int totalLinhas = planilha.Dimension.Rows;
+
+                listTunel = LeArquivoTunel(totalLinhas, planilha, layout);
+                VerificaRepetidosTunel(listTunel, ref itensEmailTunel, ref itensRemoverTunel);
+                RemoveItens(itensRemoverTunel.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+            }
             var itensTunelFinal = listTunel.Where(x => !itensRemoverTunel.Select(y => y.linha).Contains(x.linha)).ToList();
             itensCopiadosTunel = GravaItensTunel(itensTunelFinal);
             GravaArquivoTunel(itensEmailTunel, itensRemoverTunel, layout);
