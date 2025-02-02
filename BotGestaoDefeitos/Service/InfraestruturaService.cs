@@ -8,12 +8,11 @@ namespace BotGestaoDefeitos.Service
 {
     public class InfraestruturaService : BaseService
     {
-        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
+        public string LeArquivo(string path, string pathDefeito)
         {
             var listInfraestrutura = new List<Infraestrutura>();
-            var itensRemoverInfraestrutura = new List<Infraestrutura>();
-            var itensCopiadosInfraestrutura = new List<Infraestrutura>();
-            var itensEmailInfraestrutura = new List<IGrouping<string, Infraestrutura>>();
+            var itensRemover = new List<Infraestrutura>();
+            var itensAnalise = new List<IGrouping<long, Infraestrutura>>();
             var layout = LayoutExcel();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -24,30 +23,30 @@ namespace BotGestaoDefeitos.Service
                 int totalLinhas = planilha.Dimension.Rows;
 
                 listInfraestrutura = LeArquivoInfraestrutura(totalLinhas, planilha, layout);
-                VerificaRepetidosInfraestrutura(listInfraestrutura, ref itensEmailInfraestrutura, ref itensRemoverInfraestrutura);
-                RemoveItens(itensRemoverInfraestrutura.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                VerificaRepetidosInfraestrutura(listInfraestrutura, ref itensAnalise, ref itensRemover);
+                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
             }
-            var itensInfraestruturaFinal = listInfraestrutura.Where(x => !itensRemoverInfraestrutura.Select(y => y.linha).Contains(x.linha)).ToList();
-            itensCopiadosInfraestrutura = GravaItensInfraestrutura(itensInfraestruturaFinal);
-            GravaArquivoInfraestrutura(itensEmailInfraestrutura, itensRemoverInfraestrutura, layout);
-            return MontaLayoutEmail(itensEmailInfraestrutura, itensRemoverInfraestrutura, itensCopiadosInfraestrutura);
+            AtualizarPowerQuery(pathDefeito);
+
+            GravaArquivoInfraestrutura(itensAnalise, itensRemover, layout);
+
+            return MontaLayoutEmail(itensAnalise, itensRemover);
         }
-        private List<Infraestrutura> GravaItensInfraestrutura(List<Infraestrutura> itensFinal)
-        {
-            //TODO:
-            return new List<Infraestrutura>();
-        }
-        public List<Infraestrutura> LeArquivoInfraestrutura(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
+
+        private List<Infraestrutura> LeArquivoInfraestrutura(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
             var listInfraestrutura = new List<Infraestrutura>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
-                listInfraestrutura.Add(new Infraestrutura
+                try {
+                    if (string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text))
+                        break;
+                    listInfraestrutura.Add(new Infraestrutura
                 {
                     linha = linha,
-                    ID_REGISTRO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text,
-                    ID_DEFEITO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text,
+                    ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text.Replace(",00", "")),
+                    ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text.Replace(",00", "")),
                     ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_RONDA]].Text,
                     ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ATUALIZACAO]].Text,
                     TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.TIPO_INSPECAO]].Text,
@@ -77,13 +76,18 @@ namespace BotGestaoDefeitos.Service
                     ENG = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ENG]].Text,
                     TIPO_TERRENO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.TIPO_TERRENO]].Text,
                 });
-
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
             }
             return listInfraestrutura;
         }
-        private void VerificaRepetidosInfraestrutura(List<Infraestrutura> listInfraestrutura, ref List<IGrouping<string, Infraestrutura>> itensEmail, ref List<Infraestrutura> itensRemover)
+        
+        private void VerificaRepetidosInfraestrutura(List<Infraestrutura> listInfraestrutura, ref List<IGrouping<long, Infraestrutura>> itensEmail, ref List<Infraestrutura> itensRemover)
         {
-            var itensagrupados = listInfraestrutura.Where(x => !string.IsNullOrEmpty(x.ID_REGISTRO)).GroupBy(x => x.ID_REGISTRO).ToList();
+            var itensagrupados = listInfraestrutura.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
             var repetidos = itensagrupados.Where(x => x.Count() > 1);
 
@@ -113,7 +117,8 @@ namespace BotGestaoDefeitos.Service
             }
 
         }
-        private void GravaArquivoInfraestrutura(List<IGrouping<string, Infraestrutura>> itensEmailInfraestrutura, List<Infraestrutura> itensRemoverInfraestrutura, Dictionary<string, int> layout)
+        
+        private void GravaArquivoInfraestrutura(List<IGrouping<long, Infraestrutura>> itensAnalise, List<Infraestrutura> itensRemover, Dictionary<string, int> layout)
         {
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -128,7 +133,7 @@ namespace BotGestaoDefeitos.Service
                     pacote.Workbook.Worksheets.Delete("Infraestrutura_excluidos");
                 int linha = 2;
 
-                if (itensEmailInfraestrutura.Any())
+                if (itensAnalise.Any())
                 {
                     var planilhaAnalise = pacote.Workbook.Worksheets.Add("Infraestrutura_analise");
 
@@ -164,7 +169,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelInfraestrutura.ENG]].Value = "Eng";
 
 
-                    foreach (var item in itensEmailInfraestrutura.SelectMany(x => x))
+                    foreach (var item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -198,7 +203,7 @@ namespace BotGestaoDefeitos.Service
                         linha++;
                     }
                 }
-                if (itensRemoverInfraestrutura.Any())
+                if (itensRemover.Any())
                 {
 
                     var planilhaExcluidos = pacote.Workbook.Worksheets.Add("Infraestrutura_excluidos");
@@ -235,7 +240,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelInfraestrutura.ENG]].Value = "Eng";
                     linha = 2;
 
-                    foreach (var item in itensRemoverInfraestrutura)
+                    foreach (var item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Value = item.ID_DEFEITO;

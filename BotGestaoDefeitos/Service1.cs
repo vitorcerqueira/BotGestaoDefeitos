@@ -39,6 +39,7 @@ namespace BotGestaoDefeitos
             {
                 try
                 {
+                    
                     log4net.LogManager.GetLogger("Processamento.Geral.Info").Info("Iniciando gestão de defeitos");
                     new GestaoDefeitos().ExecutarGestaoDefeitos();
                 }

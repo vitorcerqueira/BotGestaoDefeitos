@@ -1,144 +1,118 @@
-﻿using log4net.Layout;
+﻿using BotGestaoDefeitos;
+using BotGestaoDefeitos.Service;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows.Media.Media3D;
 
-namespace BotGestaoDefeitos.Service
-{
+namespace BotGestaoDefeitos.Service{
     public class BueiroService : BaseService
     {
-        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
+        public string LeArquivo(string path, string pathDefeito)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            var listBueiros = new List<Bueiro>();
-            var itensRemoverBueiro = new List<Bueiro>();
-            var itensCopiadosBueiro = new List<Bueiro>();
-            var itensEmailBueiros = new List<IGrouping<string, Bueiro>>();
-            var layout = LayoutExcel();
-
-            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            try
             {
-                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                int totalLinhas = planilha.Dimension.Rows;
+                var listBueiros = new List<Bueiro>();
+                var itensRemover = new List<Bueiro>();
+                var itensAnalise = new List<IGrouping<long, Bueiro>>();
+                var layout = LayoutExcel();
 
-                listBueiros = LeArquivoBueiro(totalLinhas, planilha, layout);
-                VerificaRepetidosBueiros(listBueiros, ref itensEmailBueiros, ref itensRemoverBueiro);
-                RemoveItens(itensRemoverBueiro.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                {
+                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+
+                    int totalLinhas = planilha.Dimension.Rows;
+
+                    listBueiros = LeArquivoBueiro(totalLinhas, planilha, layout);
+                    VerificaRepetidosBueiros(listBueiros, ref itensAnalise, ref itensRemover);
+                    RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                }
+                AtualizarPowerQuery(pathDefeito);
+
+                GravaArquivoBueiros(itensAnalise, itensRemover, layout);
+                return MontaLayoutEmail(itensAnalise, itensRemover);
             }
-            var itensBueirosFinal = listBueiros.Where(x => !itensRemoverBueiro.Select(y => y.linha).Contains(x.linha)).ToList();
-            itensCopiadosBueiro = GravaItensBueiros(itensBueirosFinal, pathDefeito, pathHistGeral, pathGeral, layout);
-            GravaArquivoBueiros(itensEmailBueiros, itensRemoverBueiro, layout);
-            return MontaLayoutEmail(itensEmailBueiros, itensRemoverBueiro, itensCopiadosBueiro);
-        }
-        private List<Bueiro> GravaItensBueiros(List<Bueiro> itensFinal, string pathDefeito, string pathHistGeral, string pathGeral, Dictionary<string, int> layout)
-        {
-            var result = new List<Bueiro>();
-
-            result.AddRange(GravaItensDefeitos(itensFinal, pathDefeito,layout));
-            result.AddRange(GravaItensHistorico(itensFinal, pathDefeito));
-            result.AddRange(GravaItensGeral(itensFinal, pathDefeito));
-            return result;
-
-            //string caminhoArquivo = "caminho/do/seu/arquivo.xlsx";
-
-            //// Configura a licença do EPPlus (obrigatório desde a versão 5)
-            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            //using (var pacote = new ExcelPackage(new FileInfo(caminhoArquivo)))
-            //{
-            //    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
-
-            //    int linhaParaInserir = 3; // A posição onde a nova linha será inserida
-
-            //    // Insere uma linha na posição desejada
-            //    planilha.InsertRow(linhaParaInserir, 1);
-
-            //    // Preenche a nova linha com valores
-            //    planilha.Cells[linhaParaInserir, 1].Value = "Novo Dado 1";
-            //    planilha.Cells[linhaParaInserir, 2].Value = "Novo Dado 2";
-            //    planilha.Cells[linhaParaInserir, 3].Value = "Novo Dado 3";
-
-            //    // Salva as alterações no arquivo
-            //    pacote.Save();
-            //}
-
-            //Console.WriteLine("Linha inserida com sucesso!");
-            return new List<Bueiro>();
-        }
-
-        private IEnumerable<Bueiro> GravaItensGeral(List<Bueiro> itensFinal, string pathDefeito)
-        {
-            //TODO: Leitura arquivo pathGeral
-            //TODO:  comparar itensfinal com itensHistGeral
-            //TODO: insere itens faltantes
-            return null;
-        }
-
-        private IEnumerable<Bueiro> GravaItensHistorico(List<Bueiro> itensFinal, string pathDefeito)
-        {
-            //TODO: Leitura arquivo pathHistGeral
-            //TODO:  comparar itensfinal com itensHistGeral
-            //TODO: insere itens faltantes
-            return null;
-        }
-
-        private List<Bueiro> GravaItensDefeitos(List<Bueiro> itensFinal, string pathDefeito, Dictionary<string, int> layout)
-        {
-            var listBueirosCopiados = new List<Bueiro>();
-            var listBueiros = new List<string>();
-            using (var pacote = new ExcelPackage(new FileInfo(pathDefeito)))
+            catch(Exception e)
             {
-                var planilha = pacote.Workbook.Worksheets[0];
-
-                int totalLinhas = planilha.Dimension.Rows;
-                for (int linha = 2; linha <= totalLinhas; linha++)
-                {
-                    listBueiros.Add(planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Text);
-                }
-
-                //TODO: ver regra ************************
-                //TODO: os itens existentes devem ser atualizados? **************
-                listBueirosCopiados = itensFinal.Where(x => !listBueiros.Contains(x.ID_REGISTRO) && x.STATUS != "Excluido" && x.STATUS != "Reclassificado").ToList();
-
-                totalLinhas++;
-
-                planilha.InsertRow(totalLinhas, listBueirosCopiados.Count());
-
-                foreach (var item in listBueirosCopiados)
-                {
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = item.ID_REGISTRO;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_DEFEITO]].Value = item.ID_DEFEITO;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_RONDA]].Value = item.ID_RONDA;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ATUALIZACAO]].Value = item.ATUALIZACAO;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.TIPO_INSPECAO]].Value = item.TIPO_INSPECAO;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.DATA]].Value = item.DATA;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.RESPONSAVEL]].Value = item.RESPONSAVEL;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.STATUS]].Value = item.STATUS;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.SUB]].Value = item.SUB;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.KM]].Value = item.KM;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.EQUIP_SUPER]].Value = item.EQUIP_SUPER;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.EQUIP]].Value = item.EQUIP;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.LOCAL]].Value = item.LOCAL;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.DEFEITO]].Value = item.DEFEITO;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.PRIORIDADE]].Value = item.PRIORIDADE;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.OBSERVACAO]].Value = item.OBSERVACAO;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.FOTOS]].Value = item.FOTOS;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.OS]].Value = item.OS;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.SUB_TRECHO]].Value = item.SUB_TRECHO;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.POWERAPPSID]].Value = item.POWERAPPSID;
-                    planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ENG]].Value = item.ENG;
-                    totalLinhas++;
-                }
-
-                pacote.Save();
+                throw e;
             }
-            return listBueirosCopiados;
         }
+
+        //private List<Bueiro> GravaItensDefeitos(List<Bueiro> historicoBueiroFinal, string pathDefeito, Dictionary<string, int> layout)
+        //{
+
+
+        //    var historicoBueirosCopiados = new List<Bueiro>();
+        //    var defeitoBueirosRemovidos = new List<Bueiro>();
+        //    var defeitoBueiros = new List<Bueiro>();
+
+        //    using (var pacote = new ExcelPackage(new FileInfo(pathDefeito)))
+        //    {
+        //        var planilha = pacote.Workbook.Worksheets[0];
+
+        //        int totalLinhas = planilha.Dimension.Rows;
+        //        for (int linha = 2; linha <= totalLinhas; linha++)
+        //        {
+        //            defeitoBueiros.Add(new Bueiro()
+        //            {
+        //                linha = linha,
+        //                ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Text),
+        //                ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_DEFEITO]].Text)
+        //            });
+        //        }
+
+        //        var historicoBueiroAgrupados = historicoBueiroFinal.Where(x=> x.STATUS != "Excluido" && x.STATUS != "Reclassificado").GroupBy(x => x.ID_DEFEITO)
+        //                                     .Select(x => new Bueiro { ID_REGISTRO = x.Max(y => y.ID_REGISTRO), ID_DEFEITO = x.Key }).ToList();
+
+        //        var idsHistoricoBueiroAgrupados = historicoBueiroAgrupados.Select(y => y.ID_REGISTRO);
+
+        //        historicoBueirosCopiados = historicoBueiroFinal.Where(x=> x.ID_REGISTRO.HasValue && idsHistoricoBueiroAgrupados.Contains(x.ID_REGISTRO) && !defeitoBueiros.Select(y=> y.ID_REGISTRO).Contains(x.ID_REGISTRO.Value) && x.STATUS != "Excluido" && x.STATUS != "Reclassificado").ToList();
+
+        //        defeitoBueirosRemovidos = defeitoBueiros.Where(x => historicoBueiroAgrupados.Select(y => y.ID_DEFEITO).Contains(x.ID_DEFEITO) && !idsHistoricoBueiroAgrupados.Contains(x.ID_REGISTRO)).ToList();
+
+        //        var defeitosRepetidos = defeitoBueiros.GroupBy(x => x.ID_DEFEITO).Where(x => x.Count() > 1);
+
+        //        // listBueirosativos + listBueirosCopiados - listBueirosRemovidos = IdsRegistros
+        //        //tenho a lista ativos agrupada p
+
+
+        //        totalLinhas++;
+
+        //        planilha.InsertRow(totalLinhas, historicoBueirosCopiados.Count());
+
+        //        foreach (var item in historicoBueirosCopiados)
+        //        {
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = item.ID_REGISTRO;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_DEFEITO]].Value = item.ID_DEFEITO;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ID_RONDA]].Value = item.ID_RONDA;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ATUALIZACAO]].Value = item.ATUALIZACAO;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.TIPO_INSPECAO]].Value = item.TIPO_INSPECAO;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.DATA]].Value = item.DATA;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.RESPONSAVEL]].Value = item.RESPONSAVEL;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.STATUS]].Value = item.STATUS;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.SUB]].Value = item.SUB;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.KM]].Value = item.KM;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.EQUIP_SUPER]].Value = item.EQUIP_SUPER;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.EQUIP]].Value = item.EQUIP;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.LOCAL]].Value = item.LOCAL;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.DEFEITO]].Value = item.DEFEITO;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.PRIORIDADE]].Value = item.PRIORIDADE;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.OBSERVACAO]].Value = item.OBSERVACAO;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.FOTOS]].Value = item.FOTOS;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.OS]].Value = item.OS;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.SUB_TRECHO]].Value = item.SUB_TRECHO;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.POWERAPPSID]].Value = item.POWERAPPSID;
+        //            planilha.Cells[totalLinhas, layout[ELayoutExcelBueiro.ENG]].Value = item.ENG;
+        //            totalLinhas++;
+        //        }
+
+        //        pacote.Save();
+        //    }
+        //    return historicoBueirosCopiados;
+        //}
 
         private List<Bueiro> LeArquivoBueiro(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
@@ -146,39 +120,49 @@ namespace BotGestaoDefeitos.Service
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
-                listBueiros.Add(new Bueiro
+                try
                 {
-                    linha = linha,
-                    ID_REGISTRO = planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Text,
-                    ID_DEFEITO = planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_DEFEITO]].Text,
-                    ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_RONDA]].Text,
-                    ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelBueiro.ATUALIZACAO]].Text,
-                    TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelBueiro.TIPO_INSPECAO]].Text,
-                    DATA = planilha.Cells[linha, layout[ELayoutExcelBueiro.DATA]].Text,
-                    RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelBueiro.RESPONSAVEL]].Text,
-                    STATUS = planilha.Cells[linha, layout[ELayoutExcelBueiro.STATUS]].Text,
-                    SUB = planilha.Cells[linha, layout[ELayoutExcelBueiro.SUB]].Text,
-                    KM = planilha.Cells[linha, layout[ELayoutExcelBueiro.KM]].Text,
-                    EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelBueiro.EQUIP_SUPER]].Text,
-                    EQUIP = planilha.Cells[linha, layout[ELayoutExcelBueiro.EQUIP]].Text,
-                    LOCAL = planilha.Cells[linha, layout[ELayoutExcelBueiro.LOCAL]].Text,
-                    DEFEITO = planilha.Cells[linha, layout[ELayoutExcelBueiro.DEFEITO]].Text,
-                    PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelBueiro.PRIORIDADE]].Text,
-                    OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelBueiro.OBSERVACAO]].Text,
-                    FOTOS = planilha.Cells[linha, layout[ELayoutExcelBueiro.FOTOS]].Text,
-                    OS = planilha.Cells[linha, layout[ELayoutExcelBueiro.OS]].Text,
-                    SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelBueiro.SUB_TRECHO]].Text,
-                    POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelBueiro.POWERAPPSID]].Text,
-                    ENG = planilha.Cells[linha, layout[ELayoutExcelBueiro.ENG]].Text,
-                });
+                    if (string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text))
+                        break;
+                    listBueiros.Add(new Bueiro
+                    {
+                        linha = linha,
+                        ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Text.Replace(",00", "")),
+                        ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_DEFEITO]].Text.Replace(",00", "")),
+                        ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelBueiro.ID_RONDA]].Text,
+                        ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelBueiro.ATUALIZACAO]].Text,
+                        TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelBueiro.TIPO_INSPECAO]].Text,
+                        DATA = planilha.Cells[linha, layout[ELayoutExcelBueiro.DATA]].Text,
+                        RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelBueiro.RESPONSAVEL]].Text,
+                        STATUS = planilha.Cells[linha, layout[ELayoutExcelBueiro.STATUS]].Text,
+                        SUB = planilha.Cells[linha, layout[ELayoutExcelBueiro.SUB]].Text,
+                        KM = planilha.Cells[linha, layout[ELayoutExcelBueiro.KM]].Text,
+                        EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelBueiro.EQUIP_SUPER]].Text,
+                        EQUIP = planilha.Cells[linha, layout[ELayoutExcelBueiro.EQUIP]].Text,
+                        LOCAL = planilha.Cells[linha, layout[ELayoutExcelBueiro.LOCAL]].Text,
+                        DEFEITO = planilha.Cells[linha, layout[ELayoutExcelBueiro.DEFEITO]].Text,
+                        PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelBueiro.PRIORIDADE]].Text,
+                        OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelBueiro.OBSERVACAO]].Text,
+                        FOTOS = planilha.Cells[linha, layout[ELayoutExcelBueiro.FOTOS]].Text,
+                        OS = planilha.Cells[linha, layout[ELayoutExcelBueiro.OS]].Text,
+                        SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelBueiro.SUB_TRECHO]].Text,
+                        POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelBueiro.POWERAPPSID]].Text,
+                        ENG = planilha.Cells[linha, layout[ELayoutExcelBueiro.ENG]].Text,
+                    });
+                }
+                catch (Exception e) 
+                {
+                    throw e;
+                }
+
 
             }
             return listBueiros;
         }
         
-        private void VerificaRepetidosBueiros(List<Bueiro> listBueiros, ref List<IGrouping<string, Bueiro>> itensEmail, ref List<Bueiro> itensRemover)
+        private void VerificaRepetidosBueiros(List<Bueiro> listBueiros, ref List<IGrouping<long, Bueiro>> itensAnalise, ref List<Bueiro> itensRemover)
         {
-            var itensagrupados = listBueiros.Where(x => !string.IsNullOrEmpty(x.ID_REGISTRO)).GroupBy(x => x.ID_REGISTRO).ToList();
+            var itensagrupados = listBueiros.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
             var repetidos = itensagrupados.Where(x => x.Count() > 1);
 
@@ -200,15 +184,16 @@ namespace BotGestaoDefeitos.Service
                             itensRemover.Add(item);
                         else
                         {
-                            if (!itensEmail.Contains(rep))
-                                itensEmail.Add(rep);
+                            if (!itensAnalise.Contains(rep))
+                                itensAnalise.Add(rep);
                         }
                     }
                 }
             }
 
         }
-        private void GravaArquivoBueiros(List<IGrouping<string, Bueiro>> itensEmailBueiros, List<Bueiro> itensRemoverBueiro, Dictionary<string, int> layout)
+       
+        private void GravaArquivoBueiros(List<IGrouping<long, Bueiro>> itensAnalise, List<Bueiro> itensRemover, Dictionary<string, int> layout)
         {
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -223,7 +208,7 @@ namespace BotGestaoDefeitos.Service
                     pacote.Workbook.Worksheets.Delete("Bueiros_excluidos");
 
                 int linha = 2;
-                if (itensEmailBueiros.Any())
+                if (itensAnalise.Any())
                 {
                     var planilhaAnalise = pacote.Workbook.Worksheets.Add("Bueiros_analise");
 
@@ -250,7 +235,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelBueiro.POWERAPPSID]].Value = "__PowerAppsId__";
                     planilhaAnalise.Cells[1, layout[ELayoutExcelBueiro.ENG]].Value = "Eng";
 
-                    foreach (var item in itensEmailBueiros.SelectMany(x => x))
+                    foreach (var item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelBueiro.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -277,7 +262,7 @@ namespace BotGestaoDefeitos.Service
                     }
                 }
 
-                if (itensRemoverBueiro.Any())
+                if (itensRemover.Any())
                 {
                     var planilhaExcluidos = pacote.Workbook.Worksheets.Add("Bueiros_excluidos");
 
@@ -305,7 +290,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelBueiro.ENG]].Value = "Eng";
                     linha = 2;
 
-                    foreach (var item in itensRemoverBueiro)
+                    foreach (var item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelBueiro.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -363,5 +348,7 @@ namespace BotGestaoDefeitos.Service
                                     {ELayoutExcelBueiro.ENG, 21 },
                                 };
         }
+       
     }
+
 }

@@ -8,13 +8,12 @@ namespace BotGestaoDefeitos.Service
 {
     public class ContencaoService : BaseService
     {
-        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
+        public string LeArquivo(string path, string pathDefeito)
         {
 
             var listContencoes = new List<Contencao>();
-            var itensRemoverContencao = new List<Contencao>();
-            var itensCopiadosContencao = new List<Contencao>();
-            var itensEmailContencoes = new List<IGrouping<string, Contencao>>();
+            var itensRemover = new List<Contencao>();
+            var itensAnalise = new List<IGrouping<long, Contencao>>();
             var layout = LayoutExcel();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -25,67 +24,74 @@ namespace BotGestaoDefeitos.Service
                 int totalLinhas = planilha.Dimension.Rows;
 
                 listContencoes = LeArquivoContencao(totalLinhas, planilha, layout);
-                VerificaRepetidosContencoes(listContencoes, ref itensEmailContencoes, ref itensRemoverContencao);
-                RemoveItens(itensRemoverContencao.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                VerificaRepetidosContencoes(listContencoes, ref itensAnalise, ref itensRemover);
+                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
             }
-            var itensContacoesFinal = listContencoes.Where(x => !itensRemoverContencao.Select(y => y.linha).Contains(x.linha)).ToList();
-            itensCopiadosContencao = GravaItensContencoes(itensContacoesFinal);
-            GravaArquivoContencoes(itensEmailContencoes, itensRemoverContencao, layout);
-            return MontaLayoutEmail(itensEmailContencoes, itensRemoverContencao, itensCopiadosContencao);
+
+            AtualizarPowerQuery(pathDefeito);
+
+            GravaArquivoContencoes(itensAnalise, itensRemover, layout);
+            return MontaLayoutEmail(itensAnalise, itensRemover);
         }
 
-        private List<Contencao> GravaItensContencoes(List<Contencao> itensFinal)
-        {
-            //TODO:
-            return new List<Contencao>();
-        }
-        public List<Contencao> LeArquivoContencao(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
+        private List<Contencao> LeArquivoContencao(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
             var listContencoes = new List<Contencao>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
-                listContencoes.Add(new Contencao
+                try
                 {
-                    linha = linha,
-                    ID_REGISTRO = planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text,
-                    ID_DEFEITO = planilha.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Text,
-                    ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelContencao.ID_RONDA]].Text,
-                    ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelContencao.ATUALIZACAO]].Text,
-                    TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelContencao.TIPO_INSPECAO]].Text,
-                    DATA = planilha.Cells[linha, layout[ELayoutExcelContencao.DATA]].Text,
-                    RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelContencao.RESPONSAVEL]].Text,
-                    STATUS = planilha.Cells[linha, layout[ELayoutExcelContencao.STATUS]].Text,
-                    SUB = planilha.Cells[linha, layout[ELayoutExcelContencao.SUB]].Text,
-                    KM = planilha.Cells[linha, layout[ELayoutExcelContencao.KM]].Text,
-                    EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelContencao.EQUIP_SUPER]].Text,
-                    EQUIP = planilha.Cells[linha, layout[ELayoutExcelContencao.EQUIP]].Text,
-                    KM_INICIO = planilha.Cells[linha, layout[ELayoutExcelContencao.KM_INICIO]].Text,
-                    KM_FIM = planilha.Cells[linha, layout[ELayoutExcelContencao.KM_FIM]].Text,
-                    EXTENSAO = planilha.Cells[linha, layout[ELayoutExcelContencao.EXTENSAO]].Text,
-                    LATITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelContencao.LATITUDE_INICIO]].Text,
-                    LATITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelContencao.LATITUDE_FIM]].Text,
-                    LONGITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelContencao.LONGITUDE_INICIO]].Text,
-                    LONGITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelContencao.LONGITUDE_FIM]].Text,
-                    LADO = planilha.Cells[linha, layout[ELayoutExcelContencao.LADO]].Text,
-                    DEFEITO = planilha.Cells[linha, layout[ELayoutExcelContencao.DEFEITO]].Text,
-                    IDENT = planilha.Cells[linha, layout[ELayoutExcelContencao.IDENT]].Text,
-                    PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelContencao.PRIORIDADE]].Text,
-                    OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelContencao.OBSERVACAO]].Text,
-                    FOTOS = planilha.Cells[linha, layout[ELayoutExcelContencao.FOTOS]].Text,
-                    OS = planilha.Cells[linha, layout[ELayoutExcelContencao.OS]].Text,
-                    SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelContencao.SUB_TRECHO]].Text,
-                    POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelContencao.POWERAPPSID]].Text,
-                    DATA2 = planilha.Cells[linha, layout[ELayoutExcelContencao.DATA2]].Text,
-                    ENG = planilha.Cells[linha, layout[ELayoutExcelContencao.ENG]].Text,
-                });
+                    if (string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text))
+                        break;
+                    listContencoes.Add(new Contencao
+                    {
+                        linha = linha,
+                        ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text.Replace(",00", "")),
+                        ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Text.Replace(",00", "")),
+                        ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelContencao.ID_RONDA]].Text,
+                        ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelContencao.ATUALIZACAO]].Text,
+                        TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelContencao.TIPO_INSPECAO]].Text,
+                        DATA = planilha.Cells[linha, layout[ELayoutExcelContencao.DATA]].Text,
+                        RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelContencao.RESPONSAVEL]].Text,
+                        STATUS = planilha.Cells[linha, layout[ELayoutExcelContencao.STATUS]].Text,
+                        SUB = planilha.Cells[linha, layout[ELayoutExcelContencao.SUB]].Text,
+                        KM = planilha.Cells[linha, layout[ELayoutExcelContencao.KM]].Text,
+                        EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelContencao.EQUIP_SUPER]].Text,
+                        EQUIP = planilha.Cells[linha, layout[ELayoutExcelContencao.EQUIP]].Text,
+                        KM_INICIO = planilha.Cells[linha, layout[ELayoutExcelContencao.KM_INICIO]].Text,
+                        KM_FIM = planilha.Cells[linha, layout[ELayoutExcelContencao.KM_FIM]].Text,
+                        EXTENSAO = planilha.Cells[linha, layout[ELayoutExcelContencao.EXTENSAO]].Text,
+                        LATITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelContencao.LATITUDE_INICIO]].Text,
+                        LATITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelContencao.LATITUDE_FIM]].Text,
+                        LONGITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelContencao.LONGITUDE_INICIO]].Text,
+                        LONGITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelContencao.LONGITUDE_FIM]].Text,
+                        LADO = planilha.Cells[linha, layout[ELayoutExcelContencao.LADO]].Text,
+                        DEFEITO = planilha.Cells[linha, layout[ELayoutExcelContencao.DEFEITO]].Text,
+                        IDENT = planilha.Cells[linha, layout[ELayoutExcelContencao.IDENT]].Text,
+                        PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelContencao.PRIORIDADE]].Text,
+                        OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelContencao.OBSERVACAO]].Text,
+                        FOTOS = planilha.Cells[linha, layout[ELayoutExcelContencao.FOTOS]].Text,
+                        OS = planilha.Cells[linha, layout[ELayoutExcelContencao.OS]].Text,
+                        SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelContencao.SUB_TRECHO]].Text,
+                        POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelContencao.POWERAPPSID]].Text,
+                        DATA2 = planilha.Cells[linha, layout[ELayoutExcelContencao.DATA2]].Text,
+                        ENG = planilha.Cells[linha, layout[ELayoutExcelContencao.ENG]].Text,
+                    });
 
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
             }
+
             return listContencoes;
         }
-        private void VerificaRepetidosContencoes(List<Contencao> listContencoes, ref List<IGrouping<string, Contencao>> itensEmail, ref List<Contencao> itensRemover)
+
+        private void VerificaRepetidosContencoes(List<Contencao> listContencoes, ref List<IGrouping<long, Contencao>> itensEmail, ref List<Contencao> itensRemover)
         {
-            var itensagrupados = listContencoes.Where(x => !string.IsNullOrEmpty(x.ID_REGISTRO)).GroupBy(x => x.ID_REGISTRO).ToList();
+            var itensagrupados = listContencoes.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
             var repetidos = itensagrupados.Where(x => x.Count() > 1);
 
@@ -116,7 +122,7 @@ namespace BotGestaoDefeitos.Service
 
         }
 
-        private void GravaArquivoContencoes(List<IGrouping<string, Contencao>> itensEmailContencoes, List<Contencao> itensRemoverContencoes, Dictionary<string, int> layout)
+        private void GravaArquivoContencoes(List<IGrouping<long, Contencao>> itensEmailContencoes, List<Contencao> itensRemoverContencoes, Dictionary<string, int> layout)
         {
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;

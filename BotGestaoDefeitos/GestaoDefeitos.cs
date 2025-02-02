@@ -65,6 +65,12 @@ namespace BotGestaoDefeitos
                     email += $"<p>{item.Item3}</p>";
                     email += LeArquivo(item.Item2, item.Item3);
                 }
+                var pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
+                var pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
+               
+                new BaseService().AtualizarPowerQuery(pathGeral);
+                new BaseService().AtualizarPowerQuery(pathHistGeral);
+               
                 EnviarEmail("Itens processados RUMO", email, new string[] { _pathaux });
 
             }
@@ -77,20 +83,20 @@ namespace BotGestaoDefeitos
         private string LeArquivo(string path, string type)
         {
             var pathDefeito = _itensFiles.FirstOrDefault(x => x.Item1 == 2 && x.Item3 == type).Item2;
-            var pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
-            var pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
             switch (type)
             {
                 case "Bueiros":
-                    return new BueiroService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                    return new BueiroService().LeArquivo(path, pathDefeito);
                 case "Contenções":
-                    return new ContencaoService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                    return new ContencaoService().LeArquivo(path, pathDefeito);
                 case "Infraestrutura":
-                    return new InfraestruturaService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                    return new InfraestruturaService().LeArquivo(path, pathDefeito);
                 case "PN":
-                    return new PNService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                    return new PNService().LeArquivo(path, pathDefeito);
                 case "Túneis":
-                    return new TunelService().LeArquivo(path, pathDefeito, pathHistGeral, pathGeral);
+                    return new TunelService().LeArquivo(path, pathDefeito);
+                case "Pontes":
+                    return "";
             }
             return "";
         }

@@ -8,12 +8,11 @@ namespace BotGestaoDefeitos.Service
 {
     public class TunelService : BaseService
     {
-        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
+        public string LeArquivo(string path, string pathDefeito)
         {
             var listTunel = new List<Tunel>();
-            var itensRemoverTunel = new List<Tunel>();
-            var itensCopiadosTunel = new List<Tunel>();
-            var itensEmailTunel = new List<IGrouping<string, Tunel>>();
+            var itensRemover = new List<Tunel>();
+            var itensAnalise = new List<IGrouping<long, Tunel>>();
             var layout = LayoutExcel();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -24,64 +23,70 @@ namespace BotGestaoDefeitos.Service
                 int totalLinhas = planilha.Dimension.Rows;
 
                 listTunel = LeArquivoTunel(totalLinhas, planilha, layout);
-                VerificaRepetidosTunel(listTunel, ref itensEmailTunel, ref itensRemoverTunel);
-                RemoveItens(itensRemoverTunel.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                VerificaRepetidosTunel(listTunel, ref itensAnalise, ref itensRemover);
+                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
             }
-            var itensTunelFinal = listTunel.Where(x => !itensRemoverTunel.Select(y => y.linha).Contains(x.linha)).ToList();
-            itensCopiadosTunel = GravaItensTunel(itensTunelFinal);
-            GravaArquivoTunel(itensEmailTunel, itensRemoverTunel, layout);
-            return MontaLayoutEmail(itensEmailTunel, itensRemoverTunel, itensCopiadosTunel);
+
+            AtualizarPowerQuery(pathDefeito);
+
+            GravaArquivoTunel(itensAnalise, itensRemover, layout);
+            return MontaLayoutEmail(itensAnalise, itensRemover);
         }
-        private List<Tunel> GravaItensTunel(List<Tunel> itensFinal)
-        {
-            //TODO:
-            return new List<Tunel>();
-        }
-        public List<Tunel> LeArquivoTunel(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
+
+        private List<Tunel> LeArquivoTunel(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
             var listTunel = new List<Tunel>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
-                listTunel.Add(new Tunel
+                try
                 {
-                    linha = linha,
-                    ID_REGISTRO = planilha.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Text,
-                    ID_DEFEITO = planilha.Cells[linha, layout[ELayoutExcelTunel.ID_DEFEITO]].Text,
-                    ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelTunel.ID_RONDA]].Text,
-                    ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelTunel.ATUALIZACAO]].Text,
-                    TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelTunel.TIPO_INSPECAO]].Text,
-                    DATA = planilha.Cells[linha, layout[ELayoutExcelTunel.DATA]].Text,
-                    RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelTunel.RESPONSAVEL]].Text,
-                    STATUS = planilha.Cells[linha, layout[ELayoutExcelTunel.STATUS]].Text,
-                    SUB = planilha.Cells[linha, layout[ELayoutExcelTunel.SUB]].Text,
-                    KM = planilha.Cells[linha, layout[ELayoutExcelTunel.KM]].Text,
-                    EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelTunel.EQUIP_SUPER]].Text,
-                    EQUIP = planilha.Cells[linha, layout[ELayoutExcelTunel.EQUIP]].Text,
-                    KM_INICIO = planilha.Cells[linha, layout[ELayoutExcelTunel.KM_INICIO]].Text,
-                    KM_FIM = planilha.Cells[linha, layout[ELayoutExcelTunel.KM_FIM]].Text,
-                    EXTENSAO = planilha.Cells[linha, layout[ELayoutExcelTunel.EXTENSAO]].Text,
-                    LATITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelTunel.LATITUDE_INICIO]].Text,
-                    LATITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelTunel.LATITUDE_FIM]].Text,
-                    LONGITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelTunel.LONGITUDE_INICIO]].Text,
-                    LONGITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelTunel.LONGITUDE_FIM]].Text,
-                    LADO = planilha.Cells[linha, layout[ELayoutExcelTunel.LADO]].Text,
-                    DEFEITO = planilha.Cells[linha, layout[ELayoutExcelTunel.DEFEITO]].Text,
-                    PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelTunel.PRIORIDADE]].Text,
-                    OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelTunel.OBSERVACAO]].Text,
-                    FOTOS = planilha.Cells[linha, layout[ELayoutExcelTunel.FOTOS]].Text,
-                    OS = planilha.Cells[linha, layout[ELayoutExcelTunel.OS]].Text,
-                    SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelTunel.SUB_TRECHO]].Text,
-                    POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelTunel.POWERAPPSID]].Text,
-                    ENG = planilha.Cells[linha, layout[ELayoutExcelTunel.ENG]].Text,
-                });
-
+                    if (string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text))
+                        break;
+                    listTunel.Add(new Tunel
+                    {
+                        linha = linha,
+                        ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Text.Replace(",00", "")),
+                        ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelTunel.ID_DEFEITO]].Text.Replace(",00", "")),
+                        ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelTunel.ID_RONDA]].Text,
+                        ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelTunel.ATUALIZACAO]].Text,
+                        TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelTunel.TIPO_INSPECAO]].Text,
+                        DATA = planilha.Cells[linha, layout[ELayoutExcelTunel.DATA]].Text,
+                        RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelTunel.RESPONSAVEL]].Text,
+                        STATUS = planilha.Cells[linha, layout[ELayoutExcelTunel.STATUS]].Text,
+                        SUB = planilha.Cells[linha, layout[ELayoutExcelTunel.SUB]].Text,
+                        KM = planilha.Cells[linha, layout[ELayoutExcelTunel.KM]].Text,
+                        EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelTunel.EQUIP_SUPER]].Text,
+                        EQUIP = planilha.Cells[linha, layout[ELayoutExcelTunel.EQUIP]].Text,
+                        KM_INICIO = planilha.Cells[linha, layout[ELayoutExcelTunel.KM_INICIO]].Text,
+                        KM_FIM = planilha.Cells[linha, layout[ELayoutExcelTunel.KM_FIM]].Text,
+                        EXTENSAO = planilha.Cells[linha, layout[ELayoutExcelTunel.EXTENSAO]].Text,
+                        LATITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelTunel.LATITUDE_INICIO]].Text,
+                        LATITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelTunel.LATITUDE_FIM]].Text,
+                        LONGITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelTunel.LONGITUDE_INICIO]].Text,
+                        LONGITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelTunel.LONGITUDE_FIM]].Text,
+                        LADO = planilha.Cells[linha, layout[ELayoutExcelTunel.LADO]].Text,
+                        DEFEITO = planilha.Cells[linha, layout[ELayoutExcelTunel.DEFEITO]].Text,
+                        PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelTunel.PRIORIDADE]].Text,
+                        OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelTunel.OBSERVACAO]].Text,
+                        FOTOS = planilha.Cells[linha, layout[ELayoutExcelTunel.FOTOS]].Text,
+                        OS = planilha.Cells[linha, layout[ELayoutExcelTunel.OS]].Text,
+                        SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelTunel.SUB_TRECHO]].Text,
+                        POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelTunel.POWERAPPSID]].Text,
+                        ENG = planilha.Cells[linha, layout[ELayoutExcelTunel.ENG]].Text,
+                    });
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
             }
             return listTunel;
         }
-        private void VerificaRepetidosTunel(List<Tunel> listTunel, ref List<IGrouping<string, Tunel>> itensEmail, ref List<Tunel> itensRemover)
+
+        private void VerificaRepetidosTunel(List<Tunel> listTunel, ref List<IGrouping<long, Tunel>> itensAnalise, ref List<Tunel> itensRemover)
         {
-            var itensagrupados = listTunel.Where(x => !string.IsNullOrEmpty(x.ID_REGISTRO)).GroupBy(x => x.ID_REGISTRO).ToList();
+            var itensagrupados = listTunel.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
             var repetidos = itensagrupados.Where(x => x.Count() > 1);
 
@@ -103,15 +108,16 @@ namespace BotGestaoDefeitos.Service
                             itensRemover.Add(item);
                         else
                         {
-                            if (!itensEmail.Contains(rep))
-                                itensEmail.Add(rep);
+                            if (!itensAnalise.Contains(rep))
+                                itensAnalise.Add(rep);
                         }
                     }
                 }
             }
 
         }
-        private void GravaArquivoTunel(List<IGrouping<string, Tunel>> itensEmailTunel, List<Tunel> itensRemoverTunel, Dictionary<string, int> layout)
+
+        private void GravaArquivoTunel(List<IGrouping<long, Tunel>> itensAnalise, List<Tunel> itensRemover, Dictionary<string, int> layout)
         {
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -127,7 +133,7 @@ namespace BotGestaoDefeitos.Service
 
                 int linha = 2;
 
-                if (itensEmailTunel.Any())
+                if (itensAnalise.Any())
                 {
                     var planilhaAnalise = pacote.Workbook.Worksheets.Add("Tunel_analise");
 
@@ -162,7 +168,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelTunel.ENG]].Value = "Eng";
 
 
-                    foreach (var item in itensEmailTunel.SelectMany(x => x))
+                    foreach (var item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelTunel.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -196,7 +202,7 @@ namespace BotGestaoDefeitos.Service
                     }
                 }
 
-                if (itensRemoverTunel.Any())
+                if (itensRemover.Any())
                 {
                     var planilhaExcluidos = pacote.Workbook.Worksheets.Add("Tunel_excluidos");
 
@@ -232,7 +238,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelTunel.ENG]].Value = "Eng";
                     linha = 2;
 
-                    foreach (var item in itensRemoverTunel)
+                    foreach (var item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelTunel.ID_DEFEITO]].Value = item.ID_DEFEITO;

@@ -8,12 +8,11 @@ namespace BotGestaoDefeitos.Service
 {
     public class PNService : BaseService
     {
-        public string LeArquivo(string path, string pathDefeito, string pathHistGeral, string pathGeral)
+        public string LeArquivo(string path, string pathDefeito)
         {
             var listPN = new List<PN>();
-            var itensRemoverPN = new List<PN>();
-            var itensCopiadosPN = new List<PN>();
-            var itensEmailPN = new List<IGrouping<string, PN>>();
+            var itensRemover = new List<PN>();
+            var itensAnalise = new List<IGrouping<long, PN>>();
             var layout = LayoutExcel();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -24,65 +23,70 @@ namespace BotGestaoDefeitos.Service
                 int totalLinhas = planilha.Dimension.Rows;
 
                 listPN = LeArquivoPN(totalLinhas, planilha, layout);
-                VerificaRepetidosPN(listPN, ref itensEmailPN, ref itensRemoverPN);
-                RemoveItens(itensRemoverPN.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                VerificaRepetidosPN(listPN, ref itensAnalise, ref itensRemover);
+                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
             }
-                var itensPNFinal = listPN.Where(x => !itensRemoverPN.Select(y => y.linha).Contains(x.linha)).ToList();
-            itensCopiadosPN = GravaItensPN(itensPNFinal);
-            GravaArquivoPN(itensEmailPN, itensRemoverPN, layout);
-            return MontaLayoutEmail(itensEmailPN, itensRemoverPN, itensCopiadosPN);
+
+            AtualizarPowerQuery(pathDefeito);
+
+            GravaArquivoPN(itensAnalise, itensRemover, layout);
+            return MontaLayoutEmail(itensAnalise, itensRemover);
         }
 
-        private List<PN> GravaItensPN(List<PN> itensFinal)
-        {
-            //TODO:
-            return new List<PN>();
-        }
-        public List<PN> LeArquivoPN(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
+        private List<PN> LeArquivoPN(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
             var listPN = new List<PN>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
-                listPN.Add(new PN
+                try
                 {
-                    linha = linha,
-                    ID_REGISTRO = planilha.Cells[linha, layout[ELayoutExcelPN.ID_REGISTRO]].Text,
-                    ID_DEFEITO = planilha.Cells[linha, layout[ELayoutExcelPN.ID_DEFEITO]].Text,
-                    ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelPN.ID_RONDA]].Text,
-                    ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelPN.ATUALIZACAO]].Text,
-                    TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelPN.TIPO_INSPECAO]].Text,
-                    DATA = planilha.Cells[linha, layout[ELayoutExcelPN.DATA]].Text,
-                    RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelPN.RESPONSAVEL]].Text,
-                    STATUS = planilha.Cells[linha, layout[ELayoutExcelPN.STATUS]].Text,
-                    SUB = planilha.Cells[linha, layout[ELayoutExcelPN.SUB]].Text,
-                    KM = planilha.Cells[linha, layout[ELayoutExcelPN.KM]].Text,
-                    EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelPN.EQUIP_SUPER]].Text,
-                    EQUIP = planilha.Cells[linha, layout[ELayoutExcelPN.EQUIP]].Text,
-                    KM_INICIO = planilha.Cells[linha, layout[ELayoutExcelPN.KM_INICIO]].Text,
-                    KM_FIM = planilha.Cells[linha, layout[ELayoutExcelPN.KM_FIM]].Text,
-                    EXTENSAO = planilha.Cells[linha, layout[ELayoutExcelPN.EXTENSAO]].Text,
-                    LATITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelPN.LATITUDE_INICIO]].Text,
-                    LONGITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelPN.LONGITUDE_INICIO]].Text,
-                    LADO = planilha.Cells[linha, layout[ELayoutExcelPN.LADO]].Text,
-                    DEFEITO = planilha.Cells[linha, layout[ELayoutExcelPN.DEFEITO]].Text,
-                    PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelPN.PRIORIDADE]].Text,
-                    OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelPN.OBSERVACAO]].Text,
-                    FOTOS = planilha.Cells[linha, layout[ELayoutExcelPN.FOTOS]].Text,
-                    OS = planilha.Cells[linha, layout[ELayoutExcelPN.OS]].Text,
-                    SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelPN.SUB_TRECHO]].Text,
-                    POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelPN.POWERAPPSID]].Text,
-                    ENG = planilha.Cells[linha, layout[ELayoutExcelPN.ENG]].Text,
-                    GRADE = planilha.Cells[linha, layout[ELayoutExcelPN.GRADE]].Text,
-                    TIPO_TERRENO = planilha.Cells[linha, layout[ELayoutExcelPN.TIPO_TERRENO]].Text,
-                });
-
+                    if (string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text))
+                        break;
+                    listPN.Add(new PN
+                    {
+                        linha = linha,
+                        ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelPN.ID_REGISTRO]].Text.Replace(",00", "")),
+                        ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelPN.ID_DEFEITO]].Text.Replace(",00", "")),
+                        ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelPN.ID_RONDA]].Text,
+                        ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelPN.ATUALIZACAO]].Text,
+                        TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelPN.TIPO_INSPECAO]].Text,
+                        DATA = planilha.Cells[linha, layout[ELayoutExcelPN.DATA]].Text,
+                        RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelPN.RESPONSAVEL]].Text,
+                        STATUS = planilha.Cells[linha, layout[ELayoutExcelPN.STATUS]].Text,
+                        SUB = planilha.Cells[linha, layout[ELayoutExcelPN.SUB]].Text,
+                        KM = planilha.Cells[linha, layout[ELayoutExcelPN.KM]].Text,
+                        EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelPN.EQUIP_SUPER]].Text,
+                        EQUIP = planilha.Cells[linha, layout[ELayoutExcelPN.EQUIP]].Text,
+                        KM_INICIO = planilha.Cells[linha, layout[ELayoutExcelPN.KM_INICIO]].Text,
+                        KM_FIM = planilha.Cells[linha, layout[ELayoutExcelPN.KM_FIM]].Text,
+                        EXTENSAO = planilha.Cells[linha, layout[ELayoutExcelPN.EXTENSAO]].Text,
+                        LATITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelPN.LATITUDE_INICIO]].Text,
+                        LONGITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelPN.LONGITUDE_INICIO]].Text,
+                        LADO = planilha.Cells[linha, layout[ELayoutExcelPN.LADO]].Text,
+                        DEFEITO = planilha.Cells[linha, layout[ELayoutExcelPN.DEFEITO]].Text,
+                        PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelPN.PRIORIDADE]].Text,
+                        OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelPN.OBSERVACAO]].Text,
+                        FOTOS = planilha.Cells[linha, layout[ELayoutExcelPN.FOTOS]].Text,
+                        OS = planilha.Cells[linha, layout[ELayoutExcelPN.OS]].Text,
+                        SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelPN.SUB_TRECHO]].Text,
+                        POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelPN.POWERAPPSID]].Text,
+                        ENG = planilha.Cells[linha, layout[ELayoutExcelPN.ENG]].Text,
+                        GRADE = planilha.Cells[linha, layout[ELayoutExcelPN.GRADE]].Text,
+                        TIPO_TERRENO = planilha.Cells[linha, layout[ELayoutExcelPN.TIPO_TERRENO]].Text,
+                    });
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
             }
             return listPN;
         }
-        private void VerificaRepetidosPN(List<PN> listPN, ref List<IGrouping<string, PN>> itensEmail, ref List<PN> itensRemover)
+
+        private void VerificaRepetidosPN(List<PN> listPN, ref List<IGrouping<long, PN>> itensAnalise, ref List<PN> itensRemover)
         {
-            var itensagrupados = listPN.Where(x => !string.IsNullOrEmpty(x.ID_REGISTRO)).GroupBy(x => x.ID_REGISTRO).ToList();
+            var itensagrupados = listPN.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
             var repetidos = itensagrupados.Where(x => x.Count() > 1);
 
@@ -104,8 +108,8 @@ namespace BotGestaoDefeitos.Service
                             itensRemover.Add(item);
                         else
                         {
-                            if (!itensEmail.Contains(rep))
-                                itensEmail.Add(rep);
+                            if (!itensAnalise.Contains(rep))
+                                itensAnalise.Add(rep);
                         }
                     }
                 }
@@ -113,7 +117,7 @@ namespace BotGestaoDefeitos.Service
 
         }
 
-        private void GravaArquivoPN(List<IGrouping<string, PN>> itensEmailPN, List<PN> itensRemoverPN, Dictionary<string, int> layout)
+        private void GravaArquivoPN(List<IGrouping<long, PN>> itensAnalise, List<PN> itensRemover, Dictionary<string, int> layout)
         {
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -126,10 +130,10 @@ namespace BotGestaoDefeitos.Service
                 var planilha2 = pacote.Workbook.Worksheets["PN_excluidos"];
                 if (planilha2 != null)
                     pacote.Workbook.Worksheets.Delete("PN_excluidos");
-                
+
                 int linha = 2;
 
-                if (itensEmailPN.Any())
+                if (itensAnalise.Any())
                 {
                     var planilhaAnalise = pacote.Workbook.Worksheets.Add("PN_analise");
 
@@ -164,7 +168,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelPN.GRADE]].Value = "Grade";
 
 
-                    foreach (var item in itensEmailPN.SelectMany(x => x))
+                    foreach (var item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelPN.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelPN.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -198,7 +202,7 @@ namespace BotGestaoDefeitos.Service
                     }
                 }
 
-                if (itensRemoverPN.Any())
+                if (itensRemover.Any())
                 {
                     var planilhaExcluidos = pacote.Workbook.Worksheets.Add("PN_excluidos");
 
@@ -233,7 +237,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelPN.GRADE]].Value = "Grade";
                     linha = 2;
 
-                    foreach (var item in itensRemoverPN)
+                    foreach (var item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelPN.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelPN.ID_DEFEITO]].Value = item.ID_DEFEITO;
