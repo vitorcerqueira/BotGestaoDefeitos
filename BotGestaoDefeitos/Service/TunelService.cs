@@ -46,8 +46,8 @@ namespace BotGestaoDefeitos.Service
                     listTunel.Add(new Tunel
                     {
                         linha = linha,
-                        ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Text.Replace(",00", "")),
-                        ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelTunel.ID_DEFEITO]].Text.Replace(",00", "")),
+                        ID_REGISTRO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Text.Replace(",00", "")),
+                        ID_DEFEITO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelPN.ID_DEFEITO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelTunel.ID_DEFEITO]].Text.Replace(",00", "")),
                         ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelTunel.ID_RONDA]].Text,
                         ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelTunel.ATUALIZACAO]].Text,
                         TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelTunel.TIPO_INSPECAO]].Text,

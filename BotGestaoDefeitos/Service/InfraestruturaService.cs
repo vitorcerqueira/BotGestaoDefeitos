@@ -45,8 +45,8 @@ namespace BotGestaoDefeitos.Service
                     listInfraestrutura.Add(new Infraestrutura
                 {
                     linha = linha,
-                    ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text.Replace(",00", "")),
-                    ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text.Replace(",00", "")),
+                    ID_REGISTRO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text.Replace(",00", "")),
+                    ID_DEFEITO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text.Replace(",00", "")),
                     ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_RONDA]].Text,
                     ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ATUALIZACAO]].Text,
                     TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.TIPO_INSPECAO]].Text,

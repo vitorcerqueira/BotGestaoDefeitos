@@ -47,8 +47,8 @@ namespace BotGestaoDefeitos.Service
                     listContencoes.Add(new Contencao
                     {
                         linha = linha,
-                        ID_REGISTRO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text.Replace(",00", "")),
-                        ID_DEFEITO = Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Text.Replace(",00", "")),
+                        ID_REGISTRO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text.Replace(",00", "")),
+                        ID_DEFEITO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Text.Replace(",00", "")),
                         ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelContencao.ID_RONDA]].Text,
                         ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelContencao.ATUALIZACAO]].Text,
                         TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelContencao.TIPO_INSPECAO]].Text,

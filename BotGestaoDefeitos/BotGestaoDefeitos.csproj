@@ -89,12 +89,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class\Disciplina.cs" />
+    <Compile Include="Class\Ponte.cs" />
     <Compile Include="Class\Tunel.cs" />
     <Compile Include="Class\PN.cs" />
     <Compile Include="Class\Infraestrutura.cs" />
     <Compile Include="Class\Contencao.cs" />
     <Compile Include="Class\Bueiro.cs" />
     <Compile Include="GestaoDefeitos.cs" />
+    <Compile Include="Layout\ELayoutExcelPonte.cs" />
     <Compile Include="Layout\ELayoutExcelTunel.cs" />
     <Compile Include="Layout\ELayoutExcelPN.cs" />
     <Compile Include="Layout\ELayoutExcelInfraestrutura.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Service\ContencaoService.cs" />
     <Compile Include="Service\InfraestruturaService.cs" />
     <Compile Include="Service\PNService.cs" />
+    <Compile Include="Service\PonteService.cs" />
     <Compile Include="Service\TunelService.cs" />
   </ItemGroup>
   <ItemGroup>

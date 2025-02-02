@@ -44,7 +44,7 @@ namespace BotGestaoDefeitos
                     string[] pathFilePart = path.Split('\\');
                     string fileName = pathFilePart[pathFilePart.Length - 1];
                     string type = fileName.Split('_').Last().Substring(0, fileName.Split('_').Last().IndexOf("."));
-                    if (fileName.StartsWith("Histórico"))
+                    if (fileName.StartsWith("Histórico") || fileName.StartsWith("Historico"))
                     {
                         if (fileName.Contains("Geral"))
                             _itensFiles.Add(new Tuple<int, string, string>(3, path, type));
@@ -96,7 +96,7 @@ namespace BotGestaoDefeitos
                 case "Túneis":
                     return new TunelService().LeArquivo(path, pathDefeito);
                 case "Pontes":
-                    return "";
+                    return new PonteService().LeArquivo(path, pathDefeito);
             }
             return "";
         }
