@@ -272,7 +272,8 @@ namespace BotGestaoDefeitos.Service
                 }
 
                 // Salva o arquivo no disco
-                pacote.Save();
+                if (itensRemover.Any() || itensAnalise.Any())
+                    pacote.Save();
             }
         }
 

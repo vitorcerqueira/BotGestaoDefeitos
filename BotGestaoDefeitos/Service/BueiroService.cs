@@ -244,7 +244,8 @@ namespace BotGestaoDefeitos.Service{
                     }
                 }
 
-                pacote.Save();
+                if (itensRemover.Any() || itensAnalise.Any())
+                    pacote.Save();
             }
         }
 

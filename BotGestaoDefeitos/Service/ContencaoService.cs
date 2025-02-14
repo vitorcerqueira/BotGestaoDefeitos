@@ -122,7 +122,7 @@ namespace BotGestaoDefeitos.Service
 
         }
 
-        private void GravaArquivoContencoes(List<IGrouping<long, Contencao>> itensEmailContencoes, List<Contencao> itensRemoverContencoes, Dictionary<string, int> layout)
+        private void GravaArquivoContencoes(List<IGrouping<long, Contencao>> itensAnalise, List<Contencao> itensRemover, Dictionary<string, int> layout)
         {
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -138,7 +138,7 @@ namespace BotGestaoDefeitos.Service
 
                 int linha = 2;
 
-                if (itensEmailContencoes.Any())
+                if (itensAnalise.Any())
                 {
                     var planilhaAnalise = pacote.Workbook.Worksheets.Add("Contencoes_analise");
 
@@ -174,7 +174,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelContencao.DATA2]].Value = "Data2";
                     planilhaAnalise.Cells[1, layout[ELayoutExcelContencao.ENG]].Value = "Eng";
 
-                    foreach (var item in itensEmailContencoes.SelectMany(x => x))
+                    foreach (var item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -210,7 +210,7 @@ namespace BotGestaoDefeitos.Service
                     }
                 }
 
-                if (itensRemoverContencoes.Any())
+                if (itensRemover.Any())
                 {
                     var planilhaExcluidos = pacote.Workbook.Worksheets.Add("Contencoes_excluidos");
 
@@ -247,7 +247,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelContencao.ENG]].Value = "Eng";
                     linha = 2;
 
-                    foreach (var item in itensRemoverContencoes)
+                    foreach (var item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -284,7 +284,9 @@ namespace BotGestaoDefeitos.Service
                 }
 
                 // Salva o arquivo no disco
-                pacote.Save();
+
+                if (itensRemover.Any() || itensAnalise.Any())
+                    pacote.Save();
             }
         }
 
