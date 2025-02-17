@@ -39,9 +39,11 @@ namespace BotGestaoDefeitos
             {
                 try
                 {
-                    
-                    log4net.LogManager.GetLogger("Processamento.Geral.Info").Info("Iniciando gestão de defeitos");
-                    new GestaoDefeitos().ExecutarGestaoDefeitos();
+                    if (DateTime.Now.Hour == 0 && DateTime.Now.Minute <= 10)
+                    {
+                        log4net.LogManager.GetLogger("Processamento.Geral.Info").Info("Iniciando gestão de defeitos");
+                        new GestaoDefeitos().ExecutarGestaoDefeitos();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -49,7 +51,7 @@ namespace BotGestaoDefeitos
                 }
                 finally
                 {
-                    System.Threading.Thread.Sleep(6000);
+                    System.Threading.Thread.Sleep(600000);
                 }
             }
         }
