@@ -107,7 +107,12 @@ namespace BotGestaoDefeitos
             {
                 MailMessage mensagem = new MailMessage();
                 mensagem.From = new MailAddress(_user);
-                mensagem.To.Add(_destinatario);
+
+                foreach (var email in _destinatario.Split(';'))
+                {
+                    mensagem.To.Add(email);
+                }
+
                 mensagem.Subject = assunto;
                 mensagem.Body = corpo;
                 mensagem.IsBodyHtml = true;

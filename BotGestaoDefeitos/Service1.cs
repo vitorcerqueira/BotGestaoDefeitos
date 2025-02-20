@@ -39,11 +39,11 @@ namespace BotGestaoDefeitos
             {
                 try
                 {
-                    if (DateTime.Now.Hour == 0 && DateTime.Now.Minute <= 10)
-                    {
+                    //if (DateTime.Now.Hour == 0 && DateTime.Now.Minute <= 10)
+                    //{
                         log4net.LogManager.GetLogger("Processamento.Geral.Info").Info("Iniciando gestão de defeitos");
                         new GestaoDefeitos().ExecutarGestaoDefeitos();
-                    }
+                    //}
                 }
                 catch (Exception ex)
                 {
