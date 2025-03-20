@@ -10,27 +10,35 @@ namespace BotGestaoDefeitos.Service
     {
         public string LeArquivo(string path, string pathDefeito)
         {
-            var listInfraestrutura = new List<Infraestrutura>();
-            var itensRemover = new List<Infraestrutura>();
-            var itensAnalise = new List<IGrouping<long, Infraestrutura>>();
-            var layout = LayoutExcel();
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            try
             {
-                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                var listInfraestrutura = new List<Infraestrutura>();
+                var itensRemover = new List<Infraestrutura>();
+                var itensAnalise = new List<IGrouping<long, Infraestrutura>>();
+                var layout = LayoutExcel();
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                int totalLinhas = planilha.Dimension.Rows;
+                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                {
+                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
-                listInfraestrutura = LeArquivoInfraestrutura(totalLinhas, planilha, layout);
-                VerificaRepetidosInfraestrutura(listInfraestrutura, ref itensAnalise, ref itensRemover);
-                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                    int totalLinhas = planilha.Dimension.Rows;
+
+                    listInfraestrutura = LeArquivoInfraestrutura(totalLinhas, planilha, layout);
+                    VerificaRepetidosInfraestrutura(listInfraestrutura, ref itensAnalise, ref itensRemover);
+                    RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                }
+                AtualizarPowerQuery(pathDefeito);
+
+                GravaArquivoInfraestrutura(itensAnalise, itensRemover, layout);
+
+                return MontaLayoutEmail(itensAnalise, itensRemover);
             }
-            AtualizarPowerQuery(pathDefeito);
-
-            GravaArquivoInfraestrutura(itensAnalise, itensRemover, layout);
-
-            return MontaLayoutEmail(itensAnalise, itensRemover);
+            catch (Exception e)
+            {
+                logErro.Error($"Erro ao ler arquivo - LeArquivo {path}", e);
+                throw e;
+            }
         }
 
         private List<Infraestrutura> LeArquivoInfraestrutura(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
@@ -39,52 +47,54 @@ namespace BotGestaoDefeitos.Service
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
-                try {
+                try
+                {
                     if (string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Text))
                         break;
                     listInfraestrutura.Add(new Infraestrutura
-                {
-                    linha = linha,
-                    ID_REGISTRO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text.Replace(",00", "")),
-                    ID_DEFEITO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text.Replace(",00", "")),
-                    ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_RONDA]].Text,
-                    ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ATUALIZACAO]].Text,
-                    TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.TIPO_INSPECAO]].Text,
-                    DATA = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.DATA]].Text,
-                    RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.RESPONSAVEL]].Text,
-                    STATUS = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.STATUS]].Text,
-                    SUB = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.SUB]].Text,
-                    KM = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.KM]].Text,
-                    EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.EQUIP_SUPER]].Text,
-                    EQUIP = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.EQUIP]].Text,
-                    KM_INICIO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.KM_INICIO]].Text,
-                    KM_FIM = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.KM_FIM]].Text,
-                    EXTENSAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.EXTENSAO]].Text,
-                    LATITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LATITUDE_INICIO]].Text,
-                    LATITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LATITUDE_FIM]].Text,
-                    LONGITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LONGITUDE_INICIO]].Text,
-                    LONGITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LONGITUDE_FIM]].Text,
-                    LADO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LADO]].Text,
-                    DEFEITO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.DEFEITO]].Text,
-                    PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.PRIORIDADE]].Text,
-                    OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.OBSERVACAO]].Text,
-                    FOTOS = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.FOTOS]].Text,
-                    OS = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.OS]].Text,
-                    SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.SUB_TRECHO]].Text,
-                    IDENT = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.IDENT]].Text,
-                    POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.POWERAPPSID]].Text,
-                    ENG = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ENG]].Text,
-                    TIPO_TERRENO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.TIPO_TERRENO]].Text,
-                });
+                    {
+                        linha = linha,
+                        ID_REGISTRO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Text.Replace(",00", "")),
+                        ID_DEFEITO = string.IsNullOrEmpty(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text) ? (long?)null : Convert.ToInt64(planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Text.Replace(",00", "")),
+                        ID_RONDA = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_RONDA]].Text,
+                        ATUALIZACAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ATUALIZACAO]].Text,
+                        TIPO_INSPECAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.TIPO_INSPECAO]].Text,
+                        DATA = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.DATA]].Text,
+                        RESPONSAVEL = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.RESPONSAVEL]].Text,
+                        STATUS = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.STATUS]].Text,
+                        SUB = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.SUB]].Text,
+                        KM = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.KM]].Text,
+                        EQUIP_SUPER = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.EQUIP_SUPER]].Text,
+                        EQUIP = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.EQUIP]].Text,
+                        KM_INICIO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.KM_INICIO]].Text,
+                        KM_FIM = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.KM_FIM]].Text,
+                        EXTENSAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.EXTENSAO]].Text,
+                        LATITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LATITUDE_INICIO]].Text,
+                        LATITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LATITUDE_FIM]].Text,
+                        LONGITUDE_INICIO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LONGITUDE_INICIO]].Text,
+                        LONGITUDE_FIM = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LONGITUDE_FIM]].Text,
+                        LADO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.LADO]].Text,
+                        DEFEITO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.DEFEITO]].Text,
+                        PRIORIDADE = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.PRIORIDADE]].Text,
+                        OBSERVACAO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.OBSERVACAO]].Text,
+                        FOTOS = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.FOTOS]].Text,
+                        OS = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.OS]].Text,
+                        SUB_TRECHO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.SUB_TRECHO]].Text,
+                        IDENT = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.IDENT]].Text,
+                        POWERAPPSID = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.POWERAPPSID]].Text,
+                        ENG = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.ENG]].Text,
+                        TIPO_TERRENO = planilha.Cells[linha, layout[ELayoutExcelInfraestrutura.TIPO_TERRENO]].Text,
+                    });
                 }
                 catch (Exception e)
                 {
+                    logErro.Error($"Erro ao ler linha {linha} - LeArquivoInfraestrutura", e);
                     throw e;
                 }
             }
             return listInfraestrutura;
         }
-        
+
         private void VerificaRepetidosInfraestrutura(List<Infraestrutura> listInfraestrutura, ref List<IGrouping<long, Infraestrutura>> itensEmail, ref List<Infraestrutura> itensRemover)
         {
             var itensagrupados = listInfraestrutura.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
@@ -117,9 +127,10 @@ namespace BotGestaoDefeitos.Service
             }
 
         }
-        
+
         private void GravaArquivoInfraestrutura(List<IGrouping<long, Infraestrutura>> itensAnalise, List<Infraestrutura> itensRemover, Dictionary<string, int> layout)
         {
+            logInfo.Info("Gravando arquivo Infraestrutura");
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -277,7 +288,15 @@ namespace BotGestaoDefeitos.Service
 
                 // Salva o arquivo no disco
                 if (itensRemover.Any() || itensAnalise.Any())
-                    pacote.Save();
+                    try
+                    {
+                        pacote.Save();
+                    }
+                    catch (Exception e)
+                    {
+                        logErro.Error("Erro ao salvar arquivo - GravaArquivoInfraestrutura", e);
+                        throw e;
+                    }
             }
         }
 

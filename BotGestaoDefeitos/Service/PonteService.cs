@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using log4net;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -12,6 +13,8 @@ namespace BotGestaoDefeitos.Service
     public class PonteService
     {
         public readonly string _pathaux;
+        public static readonly ILog logInfo = LogManager.GetLogger("Processamento.Geral.Info");
+        public static readonly ILog logErro = LogManager.GetLogger("Processamento.Geral.Erro");
         public PonteService()
         {
 
@@ -19,7 +22,9 @@ namespace BotGestaoDefeitos.Service
         }
         public string LeArquivo(string path, string pathDefeito)
         {
-            var listPonte = new List<Ponte>();
+            try
+            {
+                var listPonte = new List<Ponte>();
             var itensRemover = new List<Ponte>();
             var itensAnalise = new List<IGrouping<long, Ponte>>();
             var layout = LayoutExcel();
@@ -40,6 +45,12 @@ namespace BotGestaoDefeitos.Service
 
             GravaArquivoPonte(itensAnalise, itensRemover, layout);
             return MontaLayoutEmail(itensAnalise, itensRemover);
+            }
+            catch (Exception e)
+            {
+                logErro.Error($"Erro ao ler arquivo - LeArquivo {path}", e);
+                throw e;
+            }
         }
 
         private List<Ponte> LeArquivoPonte(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
@@ -89,6 +100,7 @@ namespace BotGestaoDefeitos.Service
                 }
                 catch (Exception e)
                 {
+                    logErro.Error($"Erro ao ler linha {linha} - LeArquivoPonte", e);
                     throw e;
                 }
             }
@@ -128,6 +140,7 @@ namespace BotGestaoDefeitos.Service
 
         private void GravaArquivoPonte(List<IGrouping<long, Ponte>> itensAnalise, List<Ponte> itensRemover, Dictionary<string, int> layout)
         {
+            logInfo.Info("Gravando arquivo Ponte");
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -291,7 +304,15 @@ namespace BotGestaoDefeitos.Service
 
                 // Salva o arquivo no disco
                 if (itensRemover.Any() || itensAnalise.Any())
-                    pacote.Save();
+                    try
+                    {
+                        pacote.Save();
+                    }
+                    catch (Exception e)
+                    {
+                        logErro.Error("Erro ao salvar arquivo - GravaArquivoPonte", e);
+                        throw e;
+                    }
             }
         }
 
@@ -343,7 +364,14 @@ namespace BotGestaoDefeitos.Service
                         planilha.DeleteRow(rep);
                     }
                 }
-                pacote.Save(); // Salva as alterações no arquivo original
+                try// Salva as alterações no arquivo original
+                {
+                    pacote.Save();
+                }
+                catch (Exception ex)
+                {
+                    logErro.Error($"Erro ao salvar arquivo - RemoveItens: {ex.Message}", ex);
+                }
             }
         }
 
@@ -355,17 +383,15 @@ namespace BotGestaoDefeitos.Service
 
         public void AtualizarPowerQuery(string caminhoArquivo)
         {
-            Excel.Application excelApp = null;
-            Excel.Workbook workbook = null;
 
             try
             {
                 // Inicia o Excel
-                excelApp = new Excel.Application();
+               var excelApp = new Excel.Application();
                 excelApp.Visible = false; // Mantém o Excel em segundo plano
 
                 // Abre a planilha
-                workbook = excelApp.Workbooks.Open(caminhoArquivo);
+                var workbook = excelApp.Workbooks.Open(caminhoArquivo);
 
                 // Atualiza todas as consultas do Power Query
                 foreach (Excel.QueryTable query in workbook.Sheets[1].QueryTables)
@@ -381,18 +407,18 @@ namespace BotGestaoDefeitos.Service
                 }
 
                 // Salva e fecha a planilha
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    workbook.Save();
+                    workbook.Close();
+                }
+                catch (Exception ex) {
+                    logErro.Error($"Erro ao salvar arquivo - AtualizarPowerQuery: {ex.Message}", ex);
+                    throw ex;
+                }
 
-                log4net.LogManager.GetLogger("Processamento.Geral.Info").Info($"Atualização concluída com sucesso. Arquivo {caminhoArquivo}");
+                logInfo.Info($"Atualização concluída com sucesso. Arquivo {caminhoArquivo}");
 
-            }
-            catch (Exception ex)
-            {
-                log4net.LogManager.GetLogger("Processamento.Geral.Erro").Error($"Erro ao atualizar (arquivo : {caminhoArquivo}): {ex.Message}");
-            }
-            finally
-            {
                 // Fecha o Excel e libera os recursos
                 if (workbook != null) Marshal.ReleaseComObject(workbook);
                 if (excelApp != null)
@@ -402,6 +428,14 @@ namespace BotGestaoDefeitos.Service
                 }
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
+            }
+            catch (Exception ex)
+            {
+                logErro.Error($"Erro ao atualizar (arquivo : {caminhoArquivo}): {ex.Message}");
+                    throw ex;
+            }
+            finally
+            {
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using BotGestaoDefeitos.Service;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Web.UI.WebControls;
 
 namespace BotGestaoDefeitos
 {
@@ -19,6 +21,8 @@ namespace BotGestaoDefeitos
         private readonly int _port;
         private readonly string _destinatario;
         private List<Tuple<int, string, string>> _itensFiles;
+        private static readonly ILog logInfo = LogManager.GetLogger("Processamento.Geral.Info");
+        private static readonly ILog logErro = LogManager.GetLogger("Processamento.Geral.Erro");
         public GestaoDefeitos()
         {
             _path = ConfigurationManager.AppSettings["path"];
@@ -31,6 +35,8 @@ namespace BotGestaoDefeitos
         }
         public void ExecutarGestaoDefeitos()
         {
+            //EnviarEmail("Itens processados RUMO", "testeeee");
+
             ListaDocumentos();
         }
         public void ListaDocumentos()
@@ -62,21 +68,22 @@ namespace BotGestaoDefeitos
                 var email = "";
                 foreach (var item in _itensFiles.Where(x => x.Item1 == 1))
                 {
+                    logInfo.Info($"Iniciando arquivo: {item}");
                     email += $"<p>{item.Item3}</p>";
                     email += LeArquivo(item.Item2, item.Item3);
                 }
                 var pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
                 var pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
                
-                new BaseService().AtualizarPowerQuery(pathGeral);
-                new BaseService().AtualizarPowerQuery(pathHistGeral);
+          //      new BaseService().AtualizarPowerQuery(pathGeral);
+            //    new BaseService().AtualizarPowerQuery(pathHistGeral);
                
                 EnviarEmail("Itens processados RUMO", email, new string[] { _pathaux });
 
             }
             catch (Exception ex)
             {
-                log4net.LogManager.GetLogger("Processamento.Geral.Erro").Error($"Falha ao realizar gestão de defeitos.", ex);
+                logErro.Error($"Falha ao realizar gestão de defeitos.", ex);
             }
         }
 
@@ -134,7 +141,7 @@ namespace BotGestaoDefeitos
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
+                logErro.Error($"Erro ao enviar e-mail: {ex.Message}",ex);
             }
         }
     }

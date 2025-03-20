@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
@@ -9,6 +10,7 @@ namespace BotGestaoDefeitos
 {
     internal static class Program
     {
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

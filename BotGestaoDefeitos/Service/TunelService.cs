@@ -10,27 +10,35 @@ namespace BotGestaoDefeitos.Service
     {
         public string LeArquivo(string path, string pathDefeito)
         {
-            var listTunel = new List<Tunel>();
-            var itensRemover = new List<Tunel>();
-            var itensAnalise = new List<IGrouping<long, Tunel>>();
-            var layout = LayoutExcel();
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            try
             {
-                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                var listTunel = new List<Tunel>();
+                var itensRemover = new List<Tunel>();
+                var itensAnalise = new List<IGrouping<long, Tunel>>();
+                var layout = LayoutExcel();
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                int totalLinhas = planilha.Dimension.Rows;
+                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                {
+                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
-                listTunel = LeArquivoTunel(totalLinhas, planilha, layout);
-                VerificaRepetidosTunel(listTunel, ref itensAnalise, ref itensRemover);
-                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                    int totalLinhas = planilha.Dimension.Rows;
+
+                    listTunel = LeArquivoTunel(totalLinhas, planilha, layout);
+                    VerificaRepetidosTunel(listTunel, ref itensAnalise, ref itensRemover);
+                    RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                }
+
+                AtualizarPowerQuery(pathDefeito);
+
+                GravaArquivoTunel(itensAnalise, itensRemover, layout);
+                return MontaLayoutEmail(itensAnalise, itensRemover);
             }
-
-            AtualizarPowerQuery(pathDefeito);
-
-            GravaArquivoTunel(itensAnalise, itensRemover, layout);
-            return MontaLayoutEmail(itensAnalise, itensRemover);
+            catch (Exception e)
+            {
+                logErro.Error($"Erro ao ler arquivo - LeArquivo {path}", e);
+                throw e;
+            }
         }
 
         private List<Tunel> LeArquivoTunel(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
@@ -78,6 +86,7 @@ namespace BotGestaoDefeitos.Service
                 }
                 catch (Exception e)
                 {
+                    logErro.Error($"Erro ao ler linha {linha} - LeArquivoTunel", e);
                     throw e;
                 }
             }
@@ -119,6 +128,7 @@ namespace BotGestaoDefeitos.Service
 
         private void GravaArquivoTunel(List<IGrouping<long, Tunel>> itensAnalise, List<Tunel> itensRemover, Dictionary<string, int> layout)
         {
+            logInfo.Info("Gravando arquivo Tunel");
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -274,7 +284,15 @@ namespace BotGestaoDefeitos.Service
 
                 // Salva o arquivo no disco
                 if (itensRemover.Any() || itensAnalise.Any())
-                    pacote.Save();
+                    try
+                    {
+                        pacote.Save();
+                    }
+                    catch (Exception e)
+                    {
+                        logErro.Error("Erro ao salvar arquivo - GravaArquivoTunel", e);
+                        throw e;
+                    }
             }
         }
 

@@ -10,28 +10,35 @@ namespace BotGestaoDefeitos.Service
     {
         public string LeArquivo(string path, string pathDefeito)
         {
-
-            var listContencoes = new List<Contencao>();
-            var itensRemover = new List<Contencao>();
-            var itensAnalise = new List<IGrouping<long, Contencao>>();
-            var layout = LayoutExcel();
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            try
             {
-                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                var listContencoes = new List<Contencao>();
+                var itensRemover = new List<Contencao>();
+                var itensAnalise = new List<IGrouping<long, Contencao>>();
+                var layout = LayoutExcel();
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                int totalLinhas = planilha.Dimension.Rows;
+                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                {
+                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
-                listContencoes = LeArquivoContencao(totalLinhas, planilha, layout);
-                VerificaRepetidosContencoes(listContencoes, ref itensAnalise, ref itensRemover);
-                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                    int totalLinhas = planilha.Dimension.Rows;
+
+                    listContencoes = LeArquivoContencao(totalLinhas, planilha, layout);
+                    VerificaRepetidosContencoes(listContencoes, ref itensAnalise, ref itensRemover);
+                    RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                }
+
+                AtualizarPowerQuery(pathDefeito);
+
+                GravaArquivoContencoes(itensAnalise, itensRemover, layout);
+                return MontaLayoutEmail(itensAnalise, itensRemover);
             }
-
-            AtualizarPowerQuery(pathDefeito);
-
-            GravaArquivoContencoes(itensAnalise, itensRemover, layout);
-            return MontaLayoutEmail(itensAnalise, itensRemover);
+            catch (Exception e)
+            {
+                logErro.Error($"Erro ao ler arquivo - LeArquivo {path}", e);
+                throw e;
+            }
         }
 
         private List<Contencao> LeArquivoContencao(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
@@ -82,6 +89,7 @@ namespace BotGestaoDefeitos.Service
                 }
                 catch (Exception e)
                 {
+                    logErro.Error($"Erro ao ler linha {linha} - LeArquivoContencao", e);
                     throw e;
                 }
             }
@@ -124,6 +132,7 @@ namespace BotGestaoDefeitos.Service
 
         private void GravaArquivoContencoes(List<IGrouping<long, Contencao>> itensAnalise, List<Contencao> itensRemover, Dictionary<string, int> layout)
         {
+            logInfo.Info("Gravando arquivo de Contenções");
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -286,7 +295,15 @@ namespace BotGestaoDefeitos.Service
                 // Salva o arquivo no disco
 
                 if (itensRemover.Any() || itensAnalise.Any())
-                    pacote.Save();
+                    try
+                    {
+                        pacote.Save();
+                    }
+                    catch (Exception e)
+                    {
+                        logErro.Error("Erro ao salvar arquivo - GravaArquivoContencoes", e);
+                        throw e;
+                    }
             }
         }
 

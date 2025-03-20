@@ -37,6 +37,7 @@ namespace BotGestaoDefeitos.Service{
             }
             catch(Exception e)
             {
+                logErro.Error($"Erro ao ler arquivo - LeArquivo {path}", e);
                 throw e;
             }
         }
@@ -79,6 +80,7 @@ namespace BotGestaoDefeitos.Service{
                 }
                 catch (Exception e) 
                 {
+                    logErro.Error($"Erro ao ler linha {linha} - LeArquivoBueiro", e);
                     throw e;
                 }
 
@@ -122,6 +124,7 @@ namespace BotGestaoDefeitos.Service{
        
         private void GravaArquivoBueiros(List<IGrouping<long, Bueiro>> itensAnalise, List<Bueiro> itensRemover, Dictionary<string, int> layout)
         {
+            logInfo.Info("Gravando arquivo Bueiros");
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -245,7 +248,14 @@ namespace BotGestaoDefeitos.Service{
                 }
 
                 if (itensRemover.Any() || itensAnalise.Any())
-                    pacote.Save();
+                    try { 
+                        pacote.Save(); 
+                    }
+                    catch (Exception e)
+                    {
+                        logErro.Error("Erro ao salvar arquivo - GravaArquivoBueiros", e);
+                        throw e;
+                    }
             }
         }
 

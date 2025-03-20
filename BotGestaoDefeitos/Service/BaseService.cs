@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using log4net;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -11,6 +12,8 @@ namespace BotGestaoDefeitos.Service
     public class BaseService
     {
         public readonly string _pathaux;
+        public static readonly ILog logInfo = LogManager.GetLogger("Processamento.Geral.Info");
+        public static readonly ILog logErro = LogManager.GetLogger("Processamento.Geral.Erro");
         public BaseService()
         {
 
@@ -27,7 +30,14 @@ namespace BotGestaoDefeitos.Service
                         planilha.DeleteRow(rep);
                     }
                 }
-                pacote.Save(); // Salva as alterações no arquivo original
+                try// Salva as alterações no arquivo original
+                {
+                    pacote.Save();
+                }
+                catch (Exception ex)
+                {
+                    logErro.Error($"Erro ao salvar arquivo - RemoveItens: {ex.Message}", ex);
+                }
             }
         }
 
@@ -65,15 +75,19 @@ namespace BotGestaoDefeitos.Service
                 }
 
                 // Salva e fecha a planilha
-                workbook.Save();
-                workbook.Close();
+                try
+                {
+                    workbook.Save();
+                    workbook.Close();
+                }
+                catch (Exception ex) { logErro.Error($"Erro ao salvar arquivo - AtualizarPowerQuery: {ex.Message}", ex); }
 
-                log4net.LogManager.GetLogger("Processamento.Geral.Info").Info($"Atualização concluída com sucesso. Arquivo {caminhoArquivo}");
+                logInfo.Info($"Atualização concluída com sucesso. Arquivo {caminhoArquivo}");
 
             }
             catch (Exception ex)
             {
-                log4net.LogManager.GetLogger("Processamento.Geral.Erro").Error($"Erro ao atualizar (arquivo : {caminhoArquivo}): {ex.Message}");
+                logErro.Error($"Erro ao atualizar (arquivo : {caminhoArquivo}): {ex.Message}");
             }
             finally
             {

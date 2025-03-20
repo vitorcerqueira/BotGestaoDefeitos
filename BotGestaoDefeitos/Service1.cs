@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.ServiceProcess;
 using System.Threading;
 
@@ -8,6 +9,9 @@ namespace BotGestaoDefeitos
     {
         private ManualResetEvent _shutdownEvent = new ManualResetEvent(false);
         private Thread _thread;
+
+        private static readonly ILog logInfo = LogManager.GetLogger("Processamento.Geral.Info");
+        private static readonly ILog logErro = LogManager.GetLogger("Processamento.Geral.Erro");
         public Service1()
         {
             InitializeComponent();
@@ -15,6 +19,8 @@ namespace BotGestaoDefeitos
 
         protected override void OnStart(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure();
+
             _thread = new Thread(StartBackGround);
 
             _thread.Name = "Background";
@@ -41,17 +47,18 @@ namespace BotGestaoDefeitos
                 {
                     //if (DateTime.Now.Hour == 0 && DateTime.Now.Minute <= 10)
                     //{
-                        log4net.LogManager.GetLogger("Processamento.Geral.Info").Info("Iniciando gestão de defeitos");
+
+                    logInfo.Info("Iniciando gestão de defeitos");
                         new GestaoDefeitos().ExecutarGestaoDefeitos();
                     //}
                 }
                 catch (Exception ex)
                 {
-                    log4net.LogManager.GetLogger("Processamento.Geral.Erro").Error($"Falha ao realizar gestão de defeitos.", ex);
+                    logErro.Error($"Falha ao realizar gestão de defeitos.", ex);
                 }
                 finally
                 {
-                    System.Threading.Thread.Sleep(600000);
+                  //  System.Threading.Thread.Sleep(600000);
                 }
             }
         }

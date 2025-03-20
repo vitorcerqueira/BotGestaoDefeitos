@@ -10,27 +10,35 @@ namespace BotGestaoDefeitos.Service
     {
         public string LeArquivo(string path, string pathDefeito)
         {
-            var listPN = new List<PN>();
-            var itensRemover = new List<PN>();
-            var itensAnalise = new List<IGrouping<long, PN>>();
-            var layout = LayoutExcel();
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            using (var pacote = new ExcelPackage(new FileInfo(path)))
+            try
             {
-                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                var listPN = new List<PN>();
+                var itensRemover = new List<PN>();
+                var itensAnalise = new List<IGrouping<long, PN>>();
+                var layout = LayoutExcel();
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                int totalLinhas = planilha.Dimension.Rows;
+                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                {
+                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
-                listPN = LeArquivoPN(totalLinhas, planilha, layout);
-                VerificaRepetidosPN(listPN, ref itensAnalise, ref itensRemover);
-                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                    int totalLinhas = planilha.Dimension.Rows;
+
+                    listPN = LeArquivoPN(totalLinhas, planilha, layout);
+                    VerificaRepetidosPN(listPN, ref itensAnalise, ref itensRemover);
+                    RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+                }
+
+                AtualizarPowerQuery(pathDefeito);
+
+                GravaArquivoPN(itensAnalise, itensRemover, layout);
+                return MontaLayoutEmail(itensAnalise, itensRemover);
             }
-
-            AtualizarPowerQuery(pathDefeito);
-
-            GravaArquivoPN(itensAnalise, itensRemover, layout);
-            return MontaLayoutEmail(itensAnalise, itensRemover);
+            catch (Exception e)
+            {
+                logErro.Error($"Erro ao ler arquivo - LeArquivo {path}", e);
+                throw e;
+            }
         }
 
         private List<PN> LeArquivoPN(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
@@ -78,6 +86,7 @@ namespace BotGestaoDefeitos.Service
                 }
                 catch (Exception e)
                 {
+                    logErro.Error($"Erro ao ler linha {linha} - LeArquivoPN", e);
                     throw e;
                 }
             }
@@ -119,6 +128,7 @@ namespace BotGestaoDefeitos.Service
 
         private void GravaArquivoPN(List<IGrouping<long, PN>> itensAnalise, List<PN> itensRemover, Dictionary<string, int> layout)
         {
+            logInfo.Info("Gravando arquivo PN");
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -273,7 +283,15 @@ namespace BotGestaoDefeitos.Service
 
                 // Salva o arquivo no disco
                 if (itensRemover.Any() || itensAnalise.Any())
-                    pacote.Save();
+                    try
+                    {
+                        pacote.Save();
+                    }
+                    catch (Exception e)
+                    {
+                        logErro.Error("Erro ao salvar arquivo - GravaArquivoPN", e);
+                        throw e;
+                    }
             }
         }
 
