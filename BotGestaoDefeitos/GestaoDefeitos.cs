@@ -74,10 +74,10 @@ namespace BotGestaoDefeitos
                 }
                 var pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
                 var pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
-               
-          //      new BaseService().AtualizarPowerQuery(pathGeral);
-            //    new BaseService().AtualizarPowerQuery(pathHistGeral);
-               
+
+                new BaseService().AtualizarPowerQuery(pathGeral);
+                new BaseService().AtualizarPowerQuery(pathHistGeral);
+
                 EnviarEmail("Itens processados RUMO", email, new string[] { _pathaux });
 
             }
