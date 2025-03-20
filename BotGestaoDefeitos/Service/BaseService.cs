@@ -49,6 +49,8 @@ namespace BotGestaoDefeitos.Service
 
         public void AtualizarPowerQuery(string caminhoArquivo)
         {
+            logInfo.Info($"Iniciando AtualizarPowerQuery. Arquivo {caminhoArquivo}");
+
             Excel.Application excelApp = null;
             Excel.Workbook workbook = null;
 
@@ -77,12 +79,15 @@ namespace BotGestaoDefeitos.Service
                 // Salva e fecha a planilha
                 try
                 {
+                    logInfo.Info($"AtualizarPowerQuery [Save]. Arquivo {caminhoArquivo}");
                     workbook.Save();
+
+                    logInfo.Info($"AtualizarPowerQuery [Close]. Arquivo {caminhoArquivo}");
                     workbook.Close();
                 }
                 catch (Exception ex) { logErro.Error($"Erro ao salvar arquivo - AtualizarPowerQuery: {ex.Message}", ex); }
 
-                logInfo.Info($"Atualização concluída com sucesso. Arquivo {caminhoArquivo}");
+                logInfo.Info($"Atualização AtualizarPowerQuery concluída com sucesso. Arquivo {caminhoArquivo}");
 
             }
             catch (Exception ex)
