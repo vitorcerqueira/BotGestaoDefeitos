@@ -132,12 +132,16 @@ namespace BotGestaoDefeitos
                     }
                 }
 
+                logInfo.Info("Enviando e-mail");
+
                 using (SmtpClient smtp = new SmtpClient(_host, _port))
                 {
                     smtp.Credentials = new NetworkCredential(_user, _password);
                     smtp.EnableSsl = true;
                     smtp.Send(mensagem);
                 }
+
+                logInfo.Info("E-mail enviado");
             }
             catch (Exception ex)
             {

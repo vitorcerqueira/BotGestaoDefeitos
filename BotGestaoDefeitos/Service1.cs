@@ -50,6 +50,7 @@ namespace BotGestaoDefeitos
 
                     logInfo.Info("Iniciando gestão de defeitos");
                         new GestaoDefeitos().ExecutarGestaoDefeitos();
+                    logInfo.Info("Finalizando gestão de defeitos");
                     //}
                 }
                 catch (Exception ex)
