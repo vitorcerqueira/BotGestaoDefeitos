@@ -72,8 +72,12 @@ namespace BotGestaoDefeitos.Service
                 // Atualiza todas as conexões de dados (incluindo Power Query)
                 foreach (Excel.WorkbookConnection connection in workbook.Connections)
                 {
+                    logInfo.Info($"AtualizarPowerQuery [Refresh Inicio]. Arquivo {caminhoArquivo}");
+
                     connection.OLEDBConnection.BackgroundQuery = false;
                     connection.Refresh();
+
+                    logInfo.Info($"AtualizarPowerQuery [Refresh Fim]. Arquivo {caminhoArquivo}");
                 }
 
                 // Salva e fecha a planilha
