@@ -27,6 +27,8 @@ namespace BotGestaoDefeitos.Service
                     listTunel = LeArquivoTunel(totalLinhas, planilha, layout);
                     VerificaRepetidosTunel(listTunel, ref itensAnalise, ref itensRemover);
                     RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+
+                    pacote.Dispose();
                 }
 
                 AtualizarPowerQuery(pathDefeito);

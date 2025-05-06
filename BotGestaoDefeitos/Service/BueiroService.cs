@@ -29,6 +29,8 @@ namespace BotGestaoDefeitos.Service{
                     listBueiros = LeArquivoBueiro(totalLinhas, planilha, layout);
                     VerificaRepetidosBueiros(listBueiros, ref itensAnalise, ref itensRemover);
                     RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+
+                    pacote.Dispose();
                 }
                 AtualizarPowerQuery(pathDefeito);
 

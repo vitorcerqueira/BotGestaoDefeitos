@@ -25,26 +25,28 @@ namespace BotGestaoDefeitos.Service
             try
             {
                 var listPonte = new List<Ponte>();
-            var itensRemover = new List<Ponte>();
-            var itensAnalise = new List<IGrouping<long, Ponte>>();
-            var layout = LayoutExcel();
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                var itensRemover = new List<Ponte>();
+                var itensAnalise = new List<IGrouping<long, Ponte>>();
+                var layout = LayoutExcel();
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            using (var pacote = new ExcelPackage(new FileInfo(path)))
-            {
-                var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                {
+                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
-                int totalLinhas = planilha.Dimension.Rows;
+                    int totalLinhas = planilha.Dimension.Rows;
 
-                listPonte = LeArquivoPonte(totalLinhas, planilha, layout);
-                VerificaRepetidosPonte(listPonte, ref itensAnalise, ref itensRemover);
-                RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
-            }
+                    listPonte = LeArquivoPonte(totalLinhas, planilha, layout);
+                    VerificaRepetidosPonte(listPonte, ref itensAnalise, ref itensRemover);
+                    RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
 
-            AtualizarPowerQuery(pathDefeito);
+                    pacote.Dispose();
+                }
 
-            GravaArquivoPonte(itensAnalise, itensRemover, layout);
-            return MontaLayoutEmail(itensAnalise, itensRemover);
+                AtualizarPowerQuery(pathDefeito);
+
+                GravaArquivoPonte(itensAnalise, itensRemover, layout);
+                return MontaLayoutEmail(itensAnalise, itensRemover);
             }
             catch (Exception e)
             {

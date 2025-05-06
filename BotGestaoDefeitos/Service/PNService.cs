@@ -27,6 +27,8 @@ namespace BotGestaoDefeitos.Service
                     listPN = LeArquivoPN(totalLinhas, planilha, layout);
                     VerificaRepetidosPN(listPN, ref itensAnalise, ref itensRemover);
                     RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+
+                    pacote.Dispose();
                 }
 
                 AtualizarPowerQuery(pathDefeito);

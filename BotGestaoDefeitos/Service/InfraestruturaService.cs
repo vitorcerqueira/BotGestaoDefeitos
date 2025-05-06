@@ -27,6 +27,8 @@ namespace BotGestaoDefeitos.Service
                     listInfraestrutura = LeArquivoInfraestrutura(totalLinhas, planilha, layout);
                     VerificaRepetidosInfraestrutura(listInfraestrutura, ref itensAnalise, ref itensRemover);
                     RemoveItens(itensRemover.Select(y => y.linha).OrderByDescending(x => x).ToList(), planilha, pacote);
+
+                    pacote.Dispose();
                 }
                 AtualizarPowerQuery(pathDefeito);
 
