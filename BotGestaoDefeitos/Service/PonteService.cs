@@ -43,7 +43,7 @@ namespace BotGestaoDefeitos.Service
                     pacote.Dispose();
                 }
 
-                AtualizarPowerQuery(pathDefeito);
+                new BaseService().AtualizarPowerQuery(pathDefeito);
 
                 GravaArquivoPonte(itensAnalise, itensRemover, layout);
                 return MontaLayoutEmail(itensAnalise, itensRemover);
@@ -383,13 +383,12 @@ namespace BotGestaoDefeitos.Service
                         <p>Itens que foram removidos: {itensRemover.Count()}</p>";
         }
 
-        public void AtualizarPowerQuery(string caminhoArquivo)
+        public void AtualizarPowerQueryOld(string caminhoArquivo)
         {
-
             try
             {
                 // Inicia o Excel
-               var excelApp = new Excel.Application();
+                var excelApp = new Excel.Application();
                 excelApp.Visible = false; // Mantém o Excel em segundo plano
 
                 // Abre a planilha
@@ -414,7 +413,8 @@ namespace BotGestaoDefeitos.Service
                     workbook.Save();
                     workbook.Close();
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     logErro.Error($"Erro ao salvar arquivo - AtualizarPowerQuery: {ex.Message}", ex);
                     throw ex;
                 }
@@ -434,7 +434,7 @@ namespace BotGestaoDefeitos.Service
             catch (Exception ex)
             {
                 logErro.Error($"Erro ao atualizar (arquivo : {caminhoArquivo}): {ex.Message}");
-                    throw ex;
+                throw ex;
             }
             finally
             {

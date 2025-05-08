@@ -3,22 +3,41 @@ using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Excel = Microsoft.Office.Interop.Excel;
+using Microsoft.Office.Interop.Excel;
 
 namespace BotGestaoDefeitos.Service
 {
     public class BaseService
     {
-        public readonly string _pathaux;
+        private readonly string _path;
+        private readonly string _pathaux;
+        private readonly string _user;
+        private readonly string _password;
+        private readonly string _host;
+        private readonly int _port;
+        private readonly string _destinatario;
+
         public static readonly ILog logInfo = LogManager.GetLogger("Processamento.Geral.Info");
         public static readonly ILog logErro = LogManager.GetLogger("Processamento.Geral.Erro");
+
         public BaseService()
         {
-
+            _path = ConfigurationManager.AppSettings["path"];
             _pathaux = ConfigurationManager.AppSettings["pathaux"];
+            _user = ConfigurationManager.AppSettings["user"];
+            _password = ConfigurationManager.AppSettings["password"];
+            _host = ConfigurationManager.AppSettings["host"];
+            _port = Convert.ToInt32(ConfigurationManager.AppSettings["port"]);
+            _destinatario = ConfigurationManager.AppSettings["destinatario"];
         }
+
         public void RemoveItens(List<int> itensRemover, ExcelWorksheet planilha, ExcelPackage pacote)
         {
             if (itensRemover.Any())
@@ -60,39 +79,46 @@ namespace BotGestaoDefeitos.Service
                 excelApp = new Excel.Application();
                 excelApp.Visible = false; // Mantém o Excel em segundo plano
 
-                // Abre a planilha
-                workbook = excelApp.Workbooks.Open(caminhoArquivo);
-
-                // Atualiza todas as consultas do Power Query
-                foreach (Excel.QueryTable query in workbook.Sheets[1].QueryTables)
+                if (EsperarArquivoLiberado(caminhoArquivo, 15)) // espera até 15 segundos
                 {
-                    query.Refresh(false);
+                    // Abre a planilha
+                    workbook = excelApp.Workbooks.Open(caminhoArquivo);
+
+                    // Atualiza todas as consultas do Power Query
+                    foreach (Excel.QueryTable query in workbook.Sheets[1].QueryTables)
+                    {
+                        query.Refresh(false);
+                    }
+
+                    // Atualiza todas as conexões de dados (incluindo Power Query)
+                    foreach (Excel.WorkbookConnection connection in workbook.Connections)
+                    {
+                        logInfo.Info($"AtualizarPowerQuery [Refresh Inicio]. Arquivo {caminhoArquivo}");
+
+                        connection.OLEDBConnection.BackgroundQuery = false;
+                        connection.Refresh();
+
+                        logInfo.Info($"AtualizarPowerQuery [Refresh Fim]. Arquivo {caminhoArquivo}");
+                    }
+
+                    // Salva e fecha a planilha
+                    try
+                    {
+                        logInfo.Info($"AtualizarPowerQuery [Save]. Arquivo {caminhoArquivo}");
+                        workbook.Save();
+
+                        logInfo.Info($"AtualizarPowerQuery [Close]. Arquivo {caminhoArquivo}");
+                        workbook.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        logErro.Error($"Erro ao salvar arquivo - AtualizarPowerQuery: {ex.Message}", ex);
+                    }
+                    finally
+                    {
+                        logInfo.Info($"Atualização AtualizarPowerQuery concluída com sucesso. Arquivo {caminhoArquivo}");
+                    }
                 }
-
-                // Atualiza todas as conexões de dados (incluindo Power Query)
-                foreach (Excel.WorkbookConnection connection in workbook.Connections)
-                {
-                    logInfo.Info($"AtualizarPowerQuery [Refresh Inicio]. Arquivo {caminhoArquivo}");
-
-                    connection.OLEDBConnection.BackgroundQuery = false;
-                    connection.Refresh();
-
-                    logInfo.Info($"AtualizarPowerQuery [Refresh Fim]. Arquivo {caminhoArquivo}");
-                }
-
-                // Salva e fecha a planilha
-                try
-                {
-                    logInfo.Info($"AtualizarPowerQuery [Save]. Arquivo {caminhoArquivo}");
-                    workbook.Save();
-
-                    logInfo.Info($"AtualizarPowerQuery [Close]. Arquivo {caminhoArquivo}");
-                    workbook.Close();
-                }
-                catch (Exception ex) { logErro.Error($"Erro ao salvar arquivo - AtualizarPowerQuery: {ex.Message}", ex); }
-
-                logInfo.Info($"Atualização AtualizarPowerQuery concluída com sucesso. Arquivo {caminhoArquivo}");
-
             }
             catch (Exception ex)
             {
@@ -109,6 +135,112 @@ namespace BotGestaoDefeitos.Service
                 }
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
+            }
+        }
+
+        public static bool EsperarArquivoLiberado(string caminhoArquivo, int timeoutSegundos = 10, int intervaloMs = 500)
+        {
+            var tempoLimite = DateTime.Now.AddSeconds(timeoutSegundos);
+
+            while (DateTime.Now < tempoLimite)
+            {
+                if (EstaEmUso(caminhoArquivo))
+                {
+                    logInfo.Info($"EsperarArquivoLiberado [Arquivo em uso]. Arquivo {caminhoArquivo}");
+                }
+                else
+                {
+                    return true; // Arquivo disponível
+                }
+
+                Thread.Sleep(intervaloMs); // Espera antes de tentar novamente
+            }
+
+            new BaseService().EnviarEmail("Arquivo em uso", caminhoArquivo);
+
+            logInfo.Error($"AtualizarPowerQuery [Arquivo em uso]. Arquivo {caminhoArquivo}");
+
+            return false; // Timeout atingido
+        }
+
+        private static bool EstaEmUso(string caminhoArquivo)
+        {
+            try
+            {
+                using (FileStream stream = new FileStream(caminhoArquivo, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                {
+                    return false; // Está disponível
+                }
+            }
+            catch (IOException)
+            {
+                return true; // Está em uso
+            }
+        }
+
+        public static bool ObterContaExcelConectada()
+        {
+            try
+            {
+                var excelApp = (Excel.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application");
+                var userName = excelApp.UserName;
+                var userEmail = excelApp.Application.DisplayFullScreen; // Não existe forma direta de pegar email
+
+                if (userName.Length > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    logInfo.Error($"ObterContaExcelConectada -> Excel não conectado!");
+                }
+            }
+            catch (Exception e)
+            {
+                logInfo.Error($"ObterContaExcelConectada -> Erro: {e.Message}");
+            }
+
+            return false;
+        }
+
+        public void EnviarEmail(string assunto, string corpo, string[] anexos = null)
+        {
+            try
+            {
+                MailMessage mensagem = new MailMessage();
+                mensagem.From = new MailAddress(_user);
+
+                foreach (var email in _destinatario.Split(';'))
+                {
+                    mensagem.To.Add(email);
+                }
+
+                mensagem.Subject = assunto;
+                mensagem.Body = corpo;
+                mensagem.IsBodyHtml = true;
+
+                if (anexos != null)
+                {
+                    foreach (var anexo in anexos)
+                    {
+                        mensagem.Attachments.Add(new Attachment(anexo));
+                    }
+                }
+
+                logInfo.Info("Enviando e-mail");
+
+                using (SmtpClient smtp = new SmtpClient(_host, _port))
+                {
+                    smtp.Credentials = new NetworkCredential(_user, _password);
+                    smtp.EnableSsl = true;
+                    smtp.Send(mensagem);
+                }
+
+                logInfo.Info("E-mail enviado");
+            }
+            catch (Exception ex)
+            {
+                logErro.Error($"Erro ao enviar e-mail: {ex.Message}", ex);
             }
         }
     }

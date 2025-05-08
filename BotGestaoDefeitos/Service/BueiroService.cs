@@ -1,14 +1,23 @@
 ﻿using BotGestaoDefeitos;
 using BotGestaoDefeitos.Service;
+using Microsoft.Office.Interop.Excel;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 
 namespace BotGestaoDefeitos.Service{
     public class BueiroService : BaseService
     {
+        private readonly string _pathaux;
+
+        public BueiroService()
+        {
+            _pathaux = ConfigurationManager.AppSettings["pathaux"];
+        }
+
         public string LeArquivo(string path, string pathDefeito)
         {
             try
@@ -32,9 +41,11 @@ namespace BotGestaoDefeitos.Service{
 
                     pacote.Dispose();
                 }
+
                 AtualizarPowerQuery(pathDefeito);
 
                 GravaArquivoBueiros(itensAnalise, itensRemover, layout);
+
                 return MontaLayoutEmail(itensAnalise, itensRemover);
             }
             catch(Exception e)

@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 
@@ -8,6 +9,13 @@ namespace BotGestaoDefeitos.Service
 {
     public class TunelService : BaseService
     {
+        private readonly string _pathaux;
+
+        public TunelService()
+        {
+            _pathaux = ConfigurationManager.AppSettings["pathaux"];
+        }
+
         public string LeArquivo(string path, string pathDefeito)
         {
             try
