@@ -19,10 +19,10 @@ namespace BotGestaoDefeitos
 #if DEBUG
             Service1 service = new Service1();
             service.Start();
-            while (true)
-            {
-                System.Threading.Thread.Sleep(50000);
-            }
+            //while (true)
+            //{
+            //    System.Threading.Thread.Sleep(50000);
+            //}
 #else
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]

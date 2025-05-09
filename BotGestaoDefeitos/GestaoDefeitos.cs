@@ -68,18 +68,23 @@ namespace BotGestaoDefeitos
                 var email = "";
                 foreach (var item in _itensFiles.Where(x => x.Item1 == 1))
                 {
+                    logInfo.Info(new string('-', 200));
+
                     logInfo.Info($"Iniciando arquivo: {item}");
+                    
                     email += $"<p>{item.Item3}</p>";
                     email += LeArquivo(item.Item2, item.Item3);
                 }
+
                 var pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
                 var pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
 
+                logInfo.Info(new string('-', 200));
                 new BaseService().AtualizarPowerQuery(pathGeral);
                 new BaseService().AtualizarPowerQuery(pathHistGeral);
 
                 new BaseService().EnviarEmail("Itens processados RUMO", email, new string[] { _pathaux });
-
+                logInfo.Info(new string('-', 200));
             }
             catch (Exception ex)
             {
@@ -112,6 +117,8 @@ namespace BotGestaoDefeitos
                     case "Pontes":
                         return new PonteService().LeArquivo(path, pathDefeito);
                 }
+
+                logInfo.Info(new string('-', 200));
             }
 
             return "";

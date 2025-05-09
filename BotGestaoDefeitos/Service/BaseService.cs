@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Excel = Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Excel;
+using System.Diagnostics;
 
 namespace BotGestaoDefeitos.Service
 {
@@ -70,26 +71,54 @@ namespace BotGestaoDefeitos.Service
         {
             logInfo.Info($"Iniciando AtualizarPowerQuery. Arquivo {caminhoArquivo}");
 
-            Excel.Application excelApp = null;
-            Excel.Workbook workbook = null;
-
             try
             {
+                Excel.Application excelApp = null;
+                Excel.Workbook workbook = null;
+
                 // Inicia o Excel
                 excelApp = new Excel.Application();
                 excelApp.Visible = false; // Mantém o Excel em segundo plano
+                excelApp.DisplayAlerts = false; // Evita janelas de alerta que possam travar o processo
 
                 if (EsperarArquivoLiberado(caminhoArquivo, 15)) // espera até 15 segundos
                 {
                     // Abre a planilha
                     workbook = excelApp.Workbooks.Open(caminhoArquivo);
 
-                    // Atualiza todas as consultas do Power Query
-                    foreach (Excel.QueryTable query in workbook.Sheets[1].QueryTables)
+                    // Aguarda Excel estar pronto
+                    while (!excelApp.Ready)
                     {
-                        logInfo.Info($"AtualizarPowerQuery [query.Refresh(false)]. Arquivo {caminhoArquivo}");
+                        Thread.Sleep(200);
 
-                        query.Refresh(false);
+                        logInfo.Info($"AtualizarPowerQuery [Aguardando excel ficar pronto]. Arquivo {caminhoArquivo}");
+                    }
+
+                    // Atualiza todas as consultas do Power Query
+                    Excel.Worksheet sheet = workbook.Sheets[1];
+                    int retryCount = 0;
+                    const int maxRetries = 5;
+
+                    while (retryCount < maxRetries)
+                    {
+                        try
+                        {
+                            logInfo.Info($"AtualizarPowerQuery [Iniciando query.Refresh(false)]. Arquivo {caminhoArquivo}");
+
+                            foreach (Excel.QueryTable query in sheet.QueryTables)
+                            {
+                                logInfo.Info($"AtualizarPowerQuery [query.Refresh(false)]. Arquivo {caminhoArquivo}");
+                                query.BackgroundQuery = false;
+                                query.Refresh(false);
+                            }
+                            break; // se deu certo, sai do loop
+                        }
+                        catch (Exception ex) //when ((uint)ex.ErrorCode == 0x8001010A)
+                        {
+                            retryCount++;
+                            logInfo.Warn($"Excel ocupado (tentativa {retryCount}). Aguardando antes de tentar novamente..." + ex.Message, ex);
+                            Thread.Sleep(1000); // aguarda 1 segundo
+                        }
                     }
 
                     // Atualiza todas as conexões de dados (incluindo Power Query)
@@ -103,36 +132,29 @@ namespace BotGestaoDefeitos.Service
                         logInfo.Info($"AtualizarPowerQuery [Refresh Fim]. Arquivo {caminhoArquivo}");
                     }
 
-                    // Salva e fecha a planilha
-                    try
+                    logInfo.Info($"AtualizarPowerQuery [Save]. Arquivo {caminhoArquivo}");
+                    workbook.Save();
+
+                    logInfo.Info($"AtualizarPowerQuery [Close]. Arquivo {caminhoArquivo}");
+                    workbook.Close(false); // Fecha sem perguntar (pois já salvou)
+
+                    // Fecha o Excel e libera os recursos
+                    if (workbook != null) Marshal.ReleaseComObject(workbook);
+                    if (excelApp != null)
                     {
-                        logInfo.Info($"AtualizarPowerQuery [Save]. Arquivo {caminhoArquivo}");
-                        workbook.Save();
-
-                        logInfo.Info($"AtualizarPowerQuery [Close]. Arquivo {caminhoArquivo}");
-                        workbook.Close();
-
-                        // Fecha o Excel e libera os recursos
-                        if (workbook != null) Marshal.ReleaseComObject(workbook);
-                        if (excelApp != null)
-                        {
-                            excelApp.Quit();
-                            Marshal.ReleaseComObject(excelApp);
-                        }
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-
-                        logInfo.Info($"Atualização AtualizarPowerQuery concluída com sucesso. Arquivo {caminhoArquivo}");
+                        excelApp.Quit();
+                        Marshal.ReleaseComObject(excelApp);
                     }
-                    catch (Exception ex)
-                    {
-                        logErro.Error($"Erro ao salvar arquivo - AtualizarPowerQuery: {ex.Message}", ex);
-                    }
+
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+
+                    logInfo.Info($"Atualização AtualizarPowerQuery concluída. Arquivo {caminhoArquivo}");
                 }
             }
             catch (Exception ex)
             {
-                logErro.Error($"Erro ao atualizar (arquivo : {caminhoArquivo}): {ex.Message}");
+                logErro.Error("Erro ao salvar arquivo - AtualizarPowerQuery [Erro]....: " + ex.Message, ex);
             }
         }
 

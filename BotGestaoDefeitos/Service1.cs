@@ -37,27 +37,29 @@ namespace BotGestaoDefeitos
             //ThreadPool.QueueUserWorkItem(a => GestaoDefeitos());
             Thread threadGestaoDefeitos = new Thread(GestaoDefeitos);
             threadGestaoDefeitos.Start();
+
+            //GestaoDefeitos();
         }
 
         protected void GestaoDefeitos()
         {
-            while (true)
+            //while (true)
+            //{
+            try
             {
-                try
-                {
-                    //if (DateTime.Now.Hour == 0 && DateTime.Now.Minute <= 10)
-                    //{
+                //if (DateTime.Now.Hour == 0 && DateTime.Now.Minute <= 10)
+                //{
 
-                    logInfo.Info("Iniciando gestão de defeitos");
-                        new GestaoDefeitos().ExecutarGestaoDefeitos();
-                    logInfo.Info("Finalizando gestão de defeitos");
-                    //}
-                }
-                catch (Exception ex)
-                {
-                    logErro.Error($"Falha ao realizar gestão de defeitos.", ex);
-                }
+                logInfo.Info("Iniciando gestão de defeitos");
+                new GestaoDefeitos().ExecutarGestaoDefeitos();
+                logInfo.Info("Finalizando gestão de defeitos");
+                //}
             }
+            catch (Exception ex)
+            {
+                logErro.Error($"Falha ao realizar gestão de defeitos.", ex);
+            }
+            //}
         }
 
         protected override void OnStop()
