@@ -29,6 +29,11 @@ namespace BotGestaoDefeitos
 
         public void ExecutarGestaoDefeitos()
         {
+            if (!Directory.Exists(Path.GetDirectoryName(_pathaux)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(_pathaux));
+            }
+
             //EnviarEmail("Itens processados RUMO", "testeeee");
 
             ListaDocumentos();
@@ -88,6 +93,10 @@ namespace BotGestaoDefeitos
 
             if (BaseService.EsperarArquivoLiberado(path) && BaseService.EsperarArquivoLiberado(pathDefeito))
             {
+                ExcelBackupHelper.FazerBackupExcel(path);
+
+                ExcelBackupHelper.FazerBackupExcel(pathDefeito);
+
                 switch (type)
                 {
                     case "Bueiros":

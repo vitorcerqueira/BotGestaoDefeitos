@@ -141,6 +141,7 @@
     <Compile Include="Service\BaseService.cs" />
     <Compile Include="Service\BueiroService.cs" />
     <Compile Include="Service\ContencaoService.cs" />
+    <Compile Include="Service\ExcelBackupHelper.cs" />
     <Compile Include="Service\InfraestruturaService.cs" />
     <Compile Include="Service\PNService.cs" />
     <Compile Include="Service\PonteService.cs" />

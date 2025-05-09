@@ -10,8 +10,8 @@ namespace BotGestaoDefeitos
         private ManualResetEvent _shutdownEvent = new ManualResetEvent(false);
         private Thread _thread;
 
-        private static readonly ILog logInfo = LogManager.GetLogger("Processamento.Geral.Info");
-        private static readonly ILog logErro = LogManager.GetLogger("Processamento.Geral.Erro");
+        private static readonly ILog logInfo = LogManager.GetLogger(typeof(Program));
+        private static readonly ILog logErro = LogManager.GetLogger(typeof(Program));
         public Service1()
         {
             InitializeComponent();
@@ -56,10 +56,6 @@ namespace BotGestaoDefeitos
                 catch (Exception ex)
                 {
                     logErro.Error($"Falha ao realizar gestão de defeitos.", ex);
-                }
-                finally
-                {
-                  //  System.Threading.Thread.Sleep(600000);
                 }
             }
         }

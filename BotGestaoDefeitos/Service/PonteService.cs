@@ -436,9 +436,6 @@ namespace BotGestaoDefeitos.Service
                 logErro.Error($"Erro ao atualizar (arquivo : {caminhoArquivo}): {ex.Message}");
                 throw ex;
             }
-            finally
-            {
-            }
         }
     }
 }

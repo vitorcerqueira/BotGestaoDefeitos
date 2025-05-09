@@ -87,6 +87,8 @@ namespace BotGestaoDefeitos.Service
                     // Atualiza todas as consultas do Power Query
                     foreach (Excel.QueryTable query in workbook.Sheets[1].QueryTables)
                     {
+                        logInfo.Info($"AtualizarPowerQuery [query.Refresh(false)]. Arquivo {caminhoArquivo}");
+
                         query.Refresh(false);
                     }
 
@@ -109,14 +111,22 @@ namespace BotGestaoDefeitos.Service
 
                         logInfo.Info($"AtualizarPowerQuery [Close]. Arquivo {caminhoArquivo}");
                         workbook.Close();
+
+                        // Fecha o Excel e libera os recursos
+                        if (workbook != null) Marshal.ReleaseComObject(workbook);
+                        if (excelApp != null)
+                        {
+                            excelApp.Quit();
+                            Marshal.ReleaseComObject(excelApp);
+                        }
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+
+                        logInfo.Info($"Atualização AtualizarPowerQuery concluída com sucesso. Arquivo {caminhoArquivo}");
                     }
                     catch (Exception ex)
                     {
                         logErro.Error($"Erro ao salvar arquivo - AtualizarPowerQuery: {ex.Message}", ex);
-                    }
-                    finally
-                    {
-                        logInfo.Info($"Atualização AtualizarPowerQuery concluída com sucesso. Arquivo {caminhoArquivo}");
                     }
                 }
             }
@@ -124,29 +134,21 @@ namespace BotGestaoDefeitos.Service
             {
                 logErro.Error($"Erro ao atualizar (arquivo : {caminhoArquivo}): {ex.Message}");
             }
-            finally
-            {
-                // Fecha o Excel e libera os recursos
-                if (workbook != null) Marshal.ReleaseComObject(workbook);
-                if (excelApp != null)
-                {
-                    excelApp.Quit();
-                    Marshal.ReleaseComObject(excelApp);
-                }
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
         }
 
         public static bool EsperarArquivoLiberado(string caminhoArquivo, int timeoutSegundos = 10, int intervaloMs = 500)
         {
             var tempoLimite = DateTime.Now.AddSeconds(timeoutSegundos);
 
+            var tentativa = 0;
+
             while (DateTime.Now < tempoLimite)
             {
+                tentativa++;
+
                 if (EstaEmUso(caminhoArquivo))
                 {
-                    logInfo.Info($"EsperarArquivoLiberado [Arquivo em uso]. Arquivo {caminhoArquivo}");
+                    logInfo.Info($"EsperarArquivoLiberado [Arquivo em uso]. Tentativa: {tentativa} - Arquivo {caminhoArquivo}");
                 }
                 else
                 {
