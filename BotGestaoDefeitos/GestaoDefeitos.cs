@@ -65,14 +65,15 @@ namespace BotGestaoDefeitos
                             _itensFiles.Add(new Tuple<int, string, string>(2, path, type));
                     }
                 }
-                var email = "";
+                var email = $"<p>As seguintes bases foram atualizadas com sucesso:</p>";
+
                 foreach (var item in _itensFiles.Where(x => x.Item1 == 1))
                 {
                     logInfo.Info(new string('-', 200));
 
                     logInfo.Info($"Iniciando arquivo: {item}");
-                    
-                    email += $"<p>{item.Item3}</p>";
+                                        
+                    email += $"<p><b>{item.Item3}</b></p>";
                     email += LeArquivo(item.Item2, item.Item3);
                 }
 
@@ -83,7 +84,7 @@ namespace BotGestaoDefeitos
                 new BaseService().AtualizarPowerQuery(pathGeral);
                 new BaseService().AtualizarPowerQuery(pathHistGeral);
 
-                new BaseService().EnviarEmail("Itens processados RUMO", email, new string[] { _pathaux });
+                new BaseService().EnviarEmail("Bot - Base Defeitos", email, new string[] { _pathaux });
                 logInfo.Info(new string('-', 200));
             }
             catch (Exception ex)
