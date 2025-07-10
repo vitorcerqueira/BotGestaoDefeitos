@@ -20,15 +20,15 @@ namespace BotGestaoDefeitos.Service
         {
             try
             {
-                var listPN = new List<PN>();
-                var itensRemover = new List<PN>();
-                var itensAnalise = new List<IGrouping<long, PN>>();
-                var layout = LayoutExcel();
+                List<PN> listPN = new List<PN>();
+                List<PN> itensRemover = new List<PN>();
+                List<IGrouping<long, PN>> itensAnalise = new List<IGrouping<long, PN>>();
+                Dictionary<string, int> layout = LayoutExcel();
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                using (ExcelPackage pacote = new ExcelPackage(new FileInfo(path)))
                 {
-                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                    ExcelWorksheet planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
                     int totalLinhas = planilha.Dimension.Rows;
 
@@ -53,7 +53,7 @@ namespace BotGestaoDefeitos.Service
 
         private List<PN> LeArquivoPN(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
-            var listPN = new List<PN>();
+            List<PN> listPN = new List<PN>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
@@ -105,14 +105,14 @@ namespace BotGestaoDefeitos.Service
 
         private void VerificaRepetidosPN(List<PN> listPN, ref List<IGrouping<long, PN>> itensAnalise, ref List<PN> itensRemover)
         {
-            var itensagrupados = listPN.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
+            List<IGrouping<long, PN>> itensagrupados = listPN.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
-            var repetidos = itensagrupados.Where(x => x.Count() > 1);
+            IEnumerable<IGrouping<long, PN>> repetidos = itensagrupados.Where(x => x.Count() > 1);
 
-            foreach (var rep in repetidos)
+            foreach (IGrouping<long, PN> rep in repetidos)
             {
                 PN pNInicial = null;
-                foreach (var item in rep)
+                foreach (PN item in rep)
                 {
                     if (pNInicial == null)
                         pNInicial = item;
@@ -142,12 +142,12 @@ namespace BotGestaoDefeitos.Service
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            using (var pacote = new ExcelPackage(new FileInfo(_pathaux)))
+            using (ExcelPackage pacote = new ExcelPackage(new FileInfo(_pathaux)))
             {
-                var planilha = pacote.Workbook.Worksheets["PN_analise"];
+                ExcelWorksheet planilha = pacote.Workbook.Worksheets["PN_analise"];
                 if (planilha != null)
                     pacote.Workbook.Worksheets.Delete("PN_analise");
-                var planilha2 = pacote.Workbook.Worksheets["PN_excluidos"];
+                ExcelWorksheet planilha2 = pacote.Workbook.Worksheets["PN_excluidos"];
                 if (planilha2 != null)
                     pacote.Workbook.Worksheets.Delete("PN_excluidos");
 
@@ -155,7 +155,7 @@ namespace BotGestaoDefeitos.Service
 
                 if (itensAnalise.Any())
                 {
-                    var planilhaAnalise = pacote.Workbook.Worksheets.Add("PN_analise");
+                    ExcelWorksheet planilhaAnalise = pacote.Workbook.Worksheets.Add("PN_analise");
 
                     // Preenche os cabeçalhos
                     planilhaAnalise.Cells[1, layout[ELayoutExcelPN.ID_REGISTRO]].Value = "ID_Registro";
@@ -188,7 +188,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelPN.GRADE]].Value = "Grade";
 
 
-                    foreach (var item in itensAnalise.SelectMany(x => x))
+                    foreach (PN item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelPN.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelPN.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -224,7 +224,7 @@ namespace BotGestaoDefeitos.Service
 
                 if (itensRemover.Any())
                 {
-                    var planilhaExcluidos = pacote.Workbook.Worksheets.Add("PN_excluidos");
+                    ExcelWorksheet planilhaExcluidos = pacote.Workbook.Worksheets.Add("PN_excluidos");
 
                     // Preenche os cabeçalhos
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelPN.ID_REGISTRO]].Value = "ID_Registro";
@@ -257,7 +257,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelPN.GRADE]].Value = "Grade";
                     linha = 2;
 
-                    foreach (var item in itensRemover)
+                    foreach (PN item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelPN.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelPN.ID_DEFEITO]].Value = item.ID_DEFEITO;

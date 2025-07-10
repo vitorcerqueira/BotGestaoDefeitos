@@ -20,15 +20,15 @@ namespace BotGestaoDefeitos.Service
         {
             try
             {
-                var listContencoes = new List<Contencao>();
-                var itensRemover = new List<Contencao>();
-                var itensAnalise = new List<IGrouping<long, Contencao>>();
-                var layout = LayoutExcel();
+                List<Contencao> listContencoes = new List<Contencao>();
+                List<Contencao> itensRemover = new List<Contencao>();
+                List<IGrouping<long, Contencao>> itensAnalise = new List<IGrouping<long, Contencao>>();
+                Dictionary<string, int> layout = LayoutExcel();
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                using (ExcelPackage pacote = new ExcelPackage(new FileInfo(path)))
                 {
-                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                    ExcelWorksheet planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
                     int totalLinhas = planilha.Dimension.Rows;
 
@@ -53,7 +53,7 @@ namespace BotGestaoDefeitos.Service
 
         private List<Contencao> LeArquivoContencao(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
-            var listContencoes = new List<Contencao>();
+            List<Contencao> listContencoes = new List<Contencao>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
@@ -109,14 +109,14 @@ namespace BotGestaoDefeitos.Service
 
         private void VerificaRepetidosContencoes(List<Contencao> listContencoes, ref List<IGrouping<long, Contencao>> itensEmail, ref List<Contencao> itensRemover)
         {
-            var itensagrupados = listContencoes.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
+            List<IGrouping<long, Contencao>> itensagrupados = listContencoes.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
-            var repetidos = itensagrupados.Where(x => x.Count() > 1);
+            IEnumerable<IGrouping<long, Contencao>> repetidos = itensagrupados.Where(x => x.Count() > 1);
 
-            foreach (var rep in repetidos)
+            foreach (IGrouping<long, Contencao> rep in repetidos)
             {
                 Contencao contencaoInicial = null;
-                foreach (var item in rep)
+                foreach (Contencao item in rep)
                 {
                     if (contencaoInicial == null)
                         contencaoInicial = item;
@@ -146,12 +146,12 @@ namespace BotGestaoDefeitos.Service
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            using (var pacote = new ExcelPackage(new FileInfo(_pathaux)))
+            using (ExcelPackage pacote = new ExcelPackage(new FileInfo(_pathaux)))
             {
-                var planilha = pacote.Workbook.Worksheets["Contencoes_analise"];
+                ExcelWorksheet planilha = pacote.Workbook.Worksheets["Contencoes_analise"];
                 if (planilha != null)
                     pacote.Workbook.Worksheets.Delete("Contencoes_analise");
-                var planilha2 = pacote.Workbook.Worksheets["Contencoes_excluidos"];
+                ExcelWorksheet planilha2 = pacote.Workbook.Worksheets["Contencoes_excluidos"];
                 if (planilha2 != null)
                     pacote.Workbook.Worksheets.Delete("Contencoes_excluidos");
 
@@ -159,7 +159,7 @@ namespace BotGestaoDefeitos.Service
 
                 if (itensAnalise.Any())
                 {
-                    var planilhaAnalise = pacote.Workbook.Worksheets.Add("Contencoes_analise");
+                    ExcelWorksheet planilhaAnalise = pacote.Workbook.Worksheets.Add("Contencoes_analise");
 
                     // Preenche os cabeçalhos
                     planilhaAnalise.Cells[1, layout[ELayoutExcelContencao.ID_REGISTRO]].Value = "ID_Registro";
@@ -193,7 +193,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelContencao.DATA2]].Value = "Data2";
                     planilhaAnalise.Cells[1, layout[ELayoutExcelContencao.ENG]].Value = "Eng";
 
-                    foreach (var item in itensAnalise.SelectMany(x => x))
+                    foreach (Contencao item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -231,7 +231,7 @@ namespace BotGestaoDefeitos.Service
 
                 if (itensRemover.Any())
                 {
-                    var planilhaExcluidos = pacote.Workbook.Worksheets.Add("Contencoes_excluidos");
+                    ExcelWorksheet planilhaExcluidos = pacote.Workbook.Worksheets.Add("Contencoes_excluidos");
 
                     // Preenche os cabeçalhos
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelContencao.ID_REGISTRO]].Value = "ID_Registro";
@@ -266,7 +266,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelContencao.ENG]].Value = "Eng";
                     linha = 2;
 
-                    foreach (var item in itensRemover)
+                    foreach (Contencao item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelContencao.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelContencao.ID_DEFEITO]].Value = item.ID_DEFEITO;

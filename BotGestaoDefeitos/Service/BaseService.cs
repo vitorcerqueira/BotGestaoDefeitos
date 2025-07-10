@@ -43,7 +43,7 @@ namespace BotGestaoDefeitos.Service
         {
             if (itensRemover.Any())
             {
-                foreach (var rep in itensRemover)
+                foreach (int rep in itensRemover)
                 {
                     if (rep > 0 && rep <= planilha.Dimension.Rows)
                     {
@@ -160,9 +160,9 @@ namespace BotGestaoDefeitos.Service
 
         public static bool EsperarArquivoLiberado(string caminhoArquivo, int timeoutSegundos = 10, int intervaloMs = 500)
         {
-            var tempoLimite = DateTime.Now.AddSeconds(timeoutSegundos);
+            DateTime tempoLimite = DateTime.Now.AddSeconds(timeoutSegundos);
 
-            var tentativa = 0;
+            int tentativa = 0;
 
             while (DateTime.Now < tempoLimite)
             {
@@ -206,9 +206,9 @@ namespace BotGestaoDefeitos.Service
         {
             try
             {
-                var excelApp = (Excel.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application");
-                var userName = excelApp.UserName;
-                var userEmail = excelApp.Application.DisplayFullScreen; // Não existe forma direta de pegar email
+                Application excelApp = (Excel.Application)System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application");
+                string userName = excelApp.UserName;
+                bool userEmail = excelApp.Application.DisplayFullScreen; // Não existe forma direta de pegar email
 
                 if (userName.Length > 0)
                 {
@@ -234,7 +234,7 @@ namespace BotGestaoDefeitos.Service
                 MailMessage mensagem = new MailMessage();
                 mensagem.From = new MailAddress(_user);
 
-                foreach (var email in _destinatario.Split(';'))
+                foreach (string email in _destinatario.Split(';'))
                 {
                     mensagem.To.Add(email);
                 }
@@ -245,7 +245,7 @@ namespace BotGestaoDefeitos.Service
 
                 if (anexos != null)
                 {
-                    foreach (var anexo in anexos)
+                    foreach (string anexo in anexos)
                     {
                         mensagem.Attachments.Add(new Attachment(anexo));
                     }

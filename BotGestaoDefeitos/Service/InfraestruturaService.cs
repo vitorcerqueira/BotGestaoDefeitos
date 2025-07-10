@@ -20,15 +20,15 @@ namespace BotGestaoDefeitos.Service
         {
             try
             {
-                var listInfraestrutura = new List<Infraestrutura>();
-                var itensRemover = new List<Infraestrutura>();
-                var itensAnalise = new List<IGrouping<long, Infraestrutura>>();
-                var layout = LayoutExcel();
+                List<Infraestrutura> listInfraestrutura = new List<Infraestrutura>();
+                List<Infraestrutura> itensRemover = new List<Infraestrutura>();
+                List<IGrouping<long, Infraestrutura>> itensAnalise = new List<IGrouping<long, Infraestrutura>>();
+                Dictionary<string, int> layout = LayoutExcel();
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                using (ExcelPackage pacote = new ExcelPackage(new FileInfo(path)))
                 {
-                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                    ExcelWorksheet planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
                     int totalLinhas = planilha.Dimension.Rows;
 
@@ -53,7 +53,7 @@ namespace BotGestaoDefeitos.Service
 
         private List<Infraestrutura> LeArquivoInfraestrutura(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
-            var listInfraestrutura = new List<Infraestrutura>();
+            List<Infraestrutura> listInfraestrutura = new List<Infraestrutura>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
@@ -107,14 +107,14 @@ namespace BotGestaoDefeitos.Service
 
         private void VerificaRepetidosInfraestrutura(List<Infraestrutura> listInfraestrutura, ref List<IGrouping<long, Infraestrutura>> itensEmail, ref List<Infraestrutura> itensRemover)
         {
-            var itensagrupados = listInfraestrutura.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
+            List<IGrouping<long, Infraestrutura>> itensagrupados = listInfraestrutura.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
-            var repetidos = itensagrupados.Where(x => x.Count() > 1);
+            IEnumerable<IGrouping<long, Infraestrutura>> repetidos = itensagrupados.Where(x => x.Count() > 1);
 
-            foreach (var rep in repetidos)
+            foreach (IGrouping<long, Infraestrutura> rep in repetidos)
             {
                 Infraestrutura InfraestruturaInicial = null;
-                foreach (var item in rep)
+                foreach (Infraestrutura item in rep)
                 {
                     if (InfraestruturaInicial == null)
                         InfraestruturaInicial = item;
@@ -144,19 +144,19 @@ namespace BotGestaoDefeitos.Service
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            using (var pacote = new ExcelPackage(new FileInfo(_pathaux)))
+            using (ExcelPackage pacote = new ExcelPackage(new FileInfo(_pathaux)))
             {
-                var planilha = pacote.Workbook.Worksheets["Infraestrutura_analise"];
+                ExcelWorksheet planilha = pacote.Workbook.Worksheets["Infraestrutura_analise"];
                 if (planilha != null)
                     pacote.Workbook.Worksheets.Delete("Infraestrutura_analise");
-                var planilha2 = pacote.Workbook.Worksheets["Infraestrutura_excluidos"];
+                ExcelWorksheet planilha2 = pacote.Workbook.Worksheets["Infraestrutura_excluidos"];
                 if (planilha2 != null)
                     pacote.Workbook.Worksheets.Delete("Infraestrutura_excluidos");
                 int linha = 2;
 
                 if (itensAnalise.Any())
                 {
-                    var planilhaAnalise = pacote.Workbook.Worksheets.Add("Infraestrutura_analise");
+                    ExcelWorksheet planilhaAnalise = pacote.Workbook.Worksheets.Add("Infraestrutura_analise");
 
                     // Preenche os cabeçalhos
                     planilhaAnalise.Cells[1, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Value = "ID_Registro";
@@ -190,7 +190,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelInfraestrutura.ENG]].Value = "Eng";
 
 
-                    foreach (var item in itensAnalise.SelectMany(x => x))
+                    foreach (Infraestrutura item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -227,7 +227,7 @@ namespace BotGestaoDefeitos.Service
                 if (itensRemover.Any())
                 {
 
-                    var planilhaExcluidos = pacote.Workbook.Worksheets.Add("Infraestrutura_excluidos");
+                    ExcelWorksheet planilhaExcluidos = pacote.Workbook.Worksheets.Add("Infraestrutura_excluidos");
 
                     // Preenche os cabeçalhos
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Value = "ID_Registro";
@@ -261,7 +261,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelInfraestrutura.ENG]].Value = "Eng";
                     linha = 2;
 
-                    foreach (var item in itensRemover)
+                    foreach (Infraestrutura item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelInfraestrutura.ID_DEFEITO]].Value = item.ID_DEFEITO;

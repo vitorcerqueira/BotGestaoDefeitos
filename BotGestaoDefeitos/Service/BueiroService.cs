@@ -24,14 +24,14 @@ namespace BotGestaoDefeitos.Service{
             {
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                var listBueiros = new List<Bueiro>();
-                var itensRemover = new List<Bueiro>();
-                var itensAnalise = new List<IGrouping<long, Bueiro>>();
-                var layout = LayoutExcel();
+                List<Bueiro> listBueiros = new List<Bueiro>();
+                List<Bueiro> itensRemover = new List<Bueiro>();
+                List<IGrouping<long, Bueiro>> itensAnalise = new List<IGrouping<long, Bueiro>>();
+                Dictionary<string, int> layout = LayoutExcel();
 
-                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                using (ExcelPackage pacote = new ExcelPackage(new FileInfo(path)))
                 {
-                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                    ExcelWorksheet planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
                     int totalLinhas = planilha.Dimension.Rows;
 
@@ -57,7 +57,7 @@ namespace BotGestaoDefeitos.Service{
 
         private List<Bueiro> LeArquivoBueiro(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
-            var listBueiros = new List<Bueiro>();
+            List<Bueiro> listBueiros = new List<Bueiro>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
@@ -104,14 +104,14 @@ namespace BotGestaoDefeitos.Service{
         
         private void VerificaRepetidosBueiros(List<Bueiro> listBueiros, ref List<IGrouping<long, Bueiro>> itensAnalise, ref List<Bueiro> itensRemover)
         {
-            var itensagrupados = listBueiros.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
+            List<IGrouping<long, Bueiro>> itensagrupados = listBueiros.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
-            var repetidos = itensagrupados.Where(x => x.Count() > 1);
+            IEnumerable<IGrouping<long, Bueiro>> repetidos = itensagrupados.Where(x => x.Count() > 1);
 
-            foreach (var rep in repetidos)
+            foreach (IGrouping<long, Bueiro> rep in repetidos)
             {
                 Bueiro bueiroInicial = null;
-                foreach (var item in rep)
+                foreach (Bueiro item in rep)
                 {
                     if (bueiroInicial == null)
                         bueiroInicial = item;
@@ -141,19 +141,19 @@ namespace BotGestaoDefeitos.Service{
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            using (var pacote = new ExcelPackage(new FileInfo(_pathaux)))
+            using (ExcelPackage pacote = new ExcelPackage(new FileInfo(_pathaux)))
             {
-                var planilha = pacote.Workbook.Worksheets["Bueiros_analise"];
+                ExcelWorksheet planilha = pacote.Workbook.Worksheets["Bueiros_analise"];
                 if (planilha != null)
                     pacote.Workbook.Worksheets.Delete("Bueiros_analise");
-                var planilha2 = pacote.Workbook.Worksheets["Bueiros_excluidos"];
+                ExcelWorksheet planilha2 = pacote.Workbook.Worksheets["Bueiros_excluidos"];
                 if (planilha2 != null)
                     pacote.Workbook.Worksheets.Delete("Bueiros_excluidos");
 
                 int linha = 2;
                 if (itensAnalise.Any())
                 {
-                    var planilhaAnalise = pacote.Workbook.Worksheets.Add("Bueiros_analise");
+                    ExcelWorksheet planilhaAnalise = pacote.Workbook.Worksheets.Add("Bueiros_analise");
 
                     // Preenche os cabeçalhos
                     planilhaAnalise.Cells[1, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = "ID_Registro";
@@ -178,7 +178,7 @@ namespace BotGestaoDefeitos.Service{
                     planilhaAnalise.Cells[1, layout[ELayoutExcelBueiro.POWERAPPSID]].Value = "__PowerAppsId__";
                     planilhaAnalise.Cells[1, layout[ELayoutExcelBueiro.ENG]].Value = "Eng";
 
-                    foreach (var item in itensAnalise.SelectMany(x => x))
+                    foreach (Bueiro item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelBueiro.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -207,7 +207,7 @@ namespace BotGestaoDefeitos.Service{
 
                 if (itensRemover.Any())
                 {
-                    var planilhaExcluidos = pacote.Workbook.Worksheets.Add("Bueiros_excluidos");
+                    ExcelWorksheet planilhaExcluidos = pacote.Workbook.Worksheets.Add("Bueiros_excluidos");
 
                     // Preenche os cabeçalhos
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = "ID_Registro";
@@ -233,7 +233,7 @@ namespace BotGestaoDefeitos.Service{
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelBueiro.ENG]].Value = "Eng";
                     linha = 2;
 
-                    foreach (var item in itensRemover)
+                    foreach (Bueiro item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelBueiro.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelBueiro.ID_DEFEITO]].Value = item.ID_DEFEITO;

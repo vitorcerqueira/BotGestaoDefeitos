@@ -34,7 +34,7 @@ namespace BotGestaoDefeitos
                 Directory.CreateDirectory(Path.GetDirectoryName(_pathaux));
             }
 
-            //EnviarEmail("Itens processados RUMO", "testeeee");
+            //new BaseService().EnviarEmail("Itens processados RUMO", "testeeee");
 
             ListaDocumentos();
         }
@@ -43,7 +43,7 @@ namespace BotGestaoDefeitos
         {
             try
             {
-                var pathFileSource = Directory.GetFiles(_path, "*.*", SearchOption.AllDirectories).ToList();
+                List<string> pathFileSource = Directory.GetFiles(_path, "*.*", SearchOption.AllDirectories).ToList();
                 _itensFiles = new List<Tuple<int, string, string>>();
                 foreach (string path in pathFileSource)
                 {
@@ -65,9 +65,9 @@ namespace BotGestaoDefeitos
                             _itensFiles.Add(new Tuple<int, string, string>(2, path, type));
                     }
                 }
-                var email = $"<p>As seguintes bases foram atualizadas com sucesso:</p>";
+                string email = $"<p>As seguintes bases foram atualizadas com sucesso:</p>";
 
-                foreach (var item in _itensFiles.Where(x => x.Item1 == 1))
+                foreach (Tuple<int, string, string> item in _itensFiles.Where(x => x.Item1 == 1))
                 {
                     logInfo.Info(new string('-', 200));
 
@@ -77,8 +77,8 @@ namespace BotGestaoDefeitos
                     email += LeArquivo(item.Item2, item.Item3);
                 }
 
-                var pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
-                var pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
+                string pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
+                string pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
 
                 logInfo.Info(new string('-', 200));
                 new BaseService().AtualizarPowerQuery(pathGeral);
@@ -95,7 +95,7 @@ namespace BotGestaoDefeitos
 
         private string LeArquivo(string path, string type)
         {
-            var pathDefeito = _itensFiles.FirstOrDefault(x => x.Item1 == 2 && x.Item3 == type).Item2;
+            string pathDefeito = _itensFiles.FirstOrDefault(x => x.Item1 == 2 && x.Item3 == type).Item2;
 
             if (BaseService.EsperarArquivoLiberado(path) && BaseService.EsperarArquivoLiberado(pathDefeito))
             {

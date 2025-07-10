@@ -20,15 +20,15 @@ namespace BotGestaoDefeitos.Service
         {
             try
             {
-                var listTunel = new List<Tunel>();
-                var itensRemover = new List<Tunel>();
-                var itensAnalise = new List<IGrouping<long, Tunel>>();
-                var layout = LayoutExcel();
+                List<Tunel> listTunel = new List<Tunel>();
+                List<Tunel> itensRemover = new List<Tunel>();
+                List<IGrouping<long, Tunel>> itensAnalise = new List<IGrouping<long, Tunel>>();
+                Dictionary<string, int> layout = LayoutExcel();
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                using (var pacote = new ExcelPackage(new FileInfo(path)))
+                using (ExcelPackage pacote = new ExcelPackage(new FileInfo(path)))
                 {
-                    var planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
+                    ExcelWorksheet planilha = pacote.Workbook.Worksheets[0]; // Obtém a primeira planilha
 
                     int totalLinhas = planilha.Dimension.Rows;
 
@@ -53,7 +53,7 @@ namespace BotGestaoDefeitos.Service
 
         private List<Tunel> LeArquivoTunel(int totalLinhas, ExcelWorksheet planilha, Dictionary<string, int> layout)
         {
-            var listTunel = new List<Tunel>();
+            List<Tunel> listTunel = new List<Tunel>();
 
             for (int linha = 2; linha <= totalLinhas; linha++)
             {
@@ -105,14 +105,14 @@ namespace BotGestaoDefeitos.Service
 
         private void VerificaRepetidosTunel(List<Tunel> listTunel, ref List<IGrouping<long, Tunel>> itensAnalise, ref List<Tunel> itensRemover)
         {
-            var itensagrupados = listTunel.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
+            List<IGrouping<long, Tunel>> itensagrupados = listTunel.Where(x => x.ID_REGISTRO.HasValue).GroupBy(x => x.ID_REGISTRO.Value).ToList();
 
-            var repetidos = itensagrupados.Where(x => x.Count() > 1);
+            IEnumerable<IGrouping<long, Tunel>> repetidos = itensagrupados.Where(x => x.Count() > 1);
 
-            foreach (var rep in repetidos)
+            foreach (IGrouping<long, Tunel> rep in repetidos)
             {
                 Tunel tunelInicial = null;
-                foreach (var item in rep)
+                foreach (Tunel item in rep)
                 {
                     if (tunelInicial == null)
                         tunelInicial = item;
@@ -142,12 +142,12 @@ namespace BotGestaoDefeitos.Service
             // Configura a licença do EPPlus (obrigatório desde a versão 5)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            using (var pacote = new ExcelPackage(new FileInfo(_pathaux)))
+            using (ExcelPackage pacote = new ExcelPackage(new FileInfo(_pathaux)))
             {
-                var planilha = pacote.Workbook.Worksheets["Tunel_analise"];
+                ExcelWorksheet planilha = pacote.Workbook.Worksheets["Tunel_analise"];
                 if (planilha != null)
                     pacote.Workbook.Worksheets.Delete("Tunel_analise");
-                var planilha2 = pacote.Workbook.Worksheets["Tunel_excluidos"];
+                ExcelWorksheet planilha2 = pacote.Workbook.Worksheets["Tunel_excluidos"];
                 if (planilha2 != null)
                     pacote.Workbook.Worksheets.Delete("Tunel_excluidos");
 
@@ -155,7 +155,7 @@ namespace BotGestaoDefeitos.Service
 
                 if (itensAnalise.Any())
                 {
-                    var planilhaAnalise = pacote.Workbook.Worksheets.Add("Tunel_analise");
+                    ExcelWorksheet planilhaAnalise = pacote.Workbook.Worksheets.Add("Tunel_analise");
 
                     // Preenche os cabeçalhos
                     planilhaAnalise.Cells[1, layout[ELayoutExcelTunel.ID_REGISTRO]].Value = "ID_Registro";
@@ -188,7 +188,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaAnalise.Cells[1, layout[ELayoutExcelTunel.ENG]].Value = "Eng";
 
 
-                    foreach (var item in itensAnalise.SelectMany(x => x))
+                    foreach (Tunel item in itensAnalise.SelectMany(x => x))
                     {
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaAnalise.Cells[linha, layout[ELayoutExcelTunel.ID_DEFEITO]].Value = item.ID_DEFEITO;
@@ -224,7 +224,7 @@ namespace BotGestaoDefeitos.Service
 
                 if (itensRemover.Any())
                 {
-                    var planilhaExcluidos = pacote.Workbook.Worksheets.Add("Tunel_excluidos");
+                    ExcelWorksheet planilhaExcluidos = pacote.Workbook.Worksheets.Add("Tunel_excluidos");
 
                     // Preenche os cabeçalhos
 
@@ -258,7 +258,7 @@ namespace BotGestaoDefeitos.Service
                     planilhaExcluidos.Cells[1, layout[ELayoutExcelTunel.ENG]].Value = "Eng";
                     linha = 2;
 
-                    foreach (var item in itensRemover)
+                    foreach (Tunel item in itensRemover)
                     {
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelTunel.ID_REGISTRO]].Value = item.ID_REGISTRO;
                         planilhaExcluidos.Cells[linha, layout[ELayoutExcelTunel.ID_DEFEITO]].Value = item.ID_DEFEITO;
