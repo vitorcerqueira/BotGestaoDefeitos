@@ -47,9 +47,14 @@ namespace BotGestaoDefeitos
                 _itensFiles = new List<Tuple<int, string, string>>();
                 foreach (string path in pathFileSource)
                 {
+                    logErro.Info($"Lendo planilha {path}");
+
                     string[] pathFilePart = path.Split('\\');
                     string fileName = pathFilePart[pathFilePart.Length - 1];
                     string type = fileName.Split('_').Last().Substring(0, fileName.Split('_').Last().IndexOf("."));
+
+                    ExcelBackupHelper.FazerBackupExcel(path);
+
                     if (fileName.StartsWith("Histórico") || fileName.StartsWith("Historico"))
                     {
                         if (fileName.Contains("Geral"))
@@ -99,10 +104,6 @@ namespace BotGestaoDefeitos
 
             if (BaseService.EsperarArquivoLiberado(path) && BaseService.EsperarArquivoLiberado(pathDefeito))
             {
-                ExcelBackupHelper.FazerBackupExcel(path);
-
-                ExcelBackupHelper.FazerBackupExcel(pathDefeito);
-
                 switch (type)
                 {
                     case "Bueiros":
