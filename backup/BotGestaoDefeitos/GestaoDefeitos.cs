@@ -1,0 +1,129 @@
+﻿using BotGestaoDefeitos.Service;
+using log4net;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Web.UI.WebControls;
+
+namespace BotGestaoDefeitos
+{
+    public class GestaoDefeitos
+    {
+        private readonly string _path;
+        private readonly string _pathaux;
+
+        private List<Tuple<int, string, string>> _itensFiles;
+
+        private static readonly ILog logInfo = LogManager.GetLogger("Processamento.Geral.Info");
+        private static readonly ILog logErro = LogManager.GetLogger("Processamento.Geral.Erro");
+
+        public GestaoDefeitos()
+        {
+            _path = ConfigurationManager.AppSettings["path"];
+            _pathaux = ConfigurationManager.AppSettings["pathaux"];
+        }
+
+        public void ExecutarGestaoDefeitos()
+        {
+            if (!Directory.Exists(Path.GetDirectoryName(_pathaux)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(_pathaux));
+            }
+
+            //new BaseService().EnviarEmail("Itens processados RUMO", "testeeee");
+
+            ListaDocumentos();
+        }
+
+        public void ListaDocumentos()
+        {
+            try
+            {
+                List<string> pathFileSource = Directory.GetFiles(_path, "*.*", SearchOption.AllDirectories).ToList();
+                _itensFiles = new List<Tuple<int, string, string>>();
+                foreach (string path in pathFileSource)
+                {
+                    logErro.Info($"Lendo planilha {path}");
+
+                    string[] pathFilePart = path.Split('\\');
+                    string fileName = pathFilePart[pathFilePart.Length - 1];
+                    string type = fileName.Split('_').Last().Substring(0, fileName.Split('_').Last().IndexOf("."));
+
+                    ExcelBackupHelper.FazerBackupExcel(path);
+
+                    if (fileName.StartsWith("Histórico") || fileName.StartsWith("Historico"))
+                    {
+                        if (fileName.Contains("Geral"))
+                            _itensFiles.Add(new Tuple<int, string, string>(3, path, type));
+                        else
+                            _itensFiles.Add(new Tuple<int, string, string>(1, path, type));
+                    }
+                    if (fileName.StartsWith("Defeitos"))
+                    {
+                        if (fileName.Contains("Geral"))
+                            _itensFiles.Add(new Tuple<int, string, string>(4, path, type));
+                        else
+                            _itensFiles.Add(new Tuple<int, string, string>(2, path, type));
+                    }
+                }
+                string email = $"<p>As seguintes bases foram atualizadas com sucesso:</p>";
+
+                foreach (Tuple<int, string, string> item in _itensFiles.Where(x => x.Item1 == 1))
+                {
+                    logInfo.Info(new string('-', 200));
+
+                    logInfo.Info($"Iniciando arquivo: {item}");
+                                        
+                    email += $"<p><b>{item.Item3}</b></p>";
+                    email += LeArquivo(item.Item2, item.Item3);
+                }
+
+                string pathGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 4).Item2;
+                string pathHistGeral = _itensFiles.FirstOrDefault(x => x.Item1 == 3).Item2;
+
+                logInfo.Info(new string('-', 200));
+                new BaseService().AtualizarPowerQuery(pathGeral);
+                new BaseService().AtualizarPowerQuery(pathHistGeral);
+
+                new BaseService().EnviarEmail("Bot - Base Defeitos", email, new string[] { _pathaux });
+                logInfo.Info(new string('-', 200));
+            }
+            catch (Exception ex)
+            {
+                logErro.Error($"Falha ao realizar gestão de defeitos.", ex);
+            }
+        }
+
+        private string LeArquivo(string path, string type)
+        {
+            string pathDefeito = _itensFiles.FirstOrDefault(x => x.Item1 == 2 && x.Item3 == type).Item2;
+
+            if (BaseService.EsperarArquivoLiberado(path) && BaseService.EsperarArquivoLiberado(pathDefeito))
+            {
+                switch (type)
+                {
+                    case "Bueiros":
+                        return new BueiroService().LeArquivo(path, pathDefeito);
+                    case "Contenções":
+                        return new ContencaoService().LeArquivo(path, pathDefeito);
+                    case "Infraestrutura":
+                        return new InfraestruturaService().LeArquivo(path, pathDefeito);
+                    case "PN":
+                        return new PNService().LeArquivo(path, pathDefeito);
+                    case "Túneis":
+                        return new TunelService().LeArquivo(path, pathDefeito);
+                    case "Pontes":
+                        return new PonteService().LeArquivo(path, pathDefeito);
+                }
+
+                logInfo.Info(new string('-', 200));
+            }
+
+            return "";
+        }
+    }
+}

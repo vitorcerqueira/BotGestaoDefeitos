@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mural de Aniversariantes</title>
+<style>
+  :root{
+    --bg:#0c1e4a; --card:#122a66; --borda:rgba(255,255,255,.08);
+    --azul:#2e7ad3; --texto:#ffffff; --texto2:#9ec3ff; --verde:#3ee27b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:Segoe UI,Arial,sans-serif}
+  .wrap{padding:18px 22px;max-width:1200px;margin:0 auto}
+  .top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  .titulo{color:var(--texto);margin:0;font-weight:700}
+  .filtros{display:flex;flex-wrap:wrap;gap:10px}
+  select,input{background:#0c1e4a;color:#fff;border:1px solid var(--borda);
+               border-radius:8px;padding:8px 10px;font-size:14px;min-width:180px}
+  #mural{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin-top:16px}
+  .card{width:100%;text-align:center;padding:14px;background:var(--card);
+        border-radius:14px;border:1px solid var(--borda);box-shadow:0 2px 10px rgba(0,0,0,.25);position:relative}
+  .card img{width:110px;height:110px;border-radius:50%;object-fit:cover;border:2px solid var(--azul);background:#0c1e4a}
+  .nome{color:var(--texto);margin:10px 0 4px 0;font-size:15px;font-weight:600;line-height:1.2}
+  .data{color:var(--texto2);margin:0;font-size:12px}
+  .dep{color:#cfe0ff;margin:6px 0 0 0;font-size:11px;opacity:.9}
+  .email a{color:#cfe0ff;text-decoration:none;font-size:11px;word-break:break-all}
+  .empty{color:#c8d6ff;opacity:.9;margin-top:8px}
+  .hoje{outline:2px solid var(--verde); box-shadow:0 0 0 3px rgba(62,226,123,.25)}
+  .pill{position:absolute;top:8px;right:8px;background:rgba(62,226,123,.14);color:#b9ffcf;border:1px solid rgba(62,226,123,.55);font-size:11px;padding:3px 8px;border-radius:999px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h2 class="titulo">🎉 Aniversariantes</h2>
+      <div class="filtros">
+        <select id="mesSel" title="Selecionar mês">
+          <option value="all">(todos os meses)</option>
+          <option value="">(mês atual)</option>
+          <option value="1">Jan</option><option value="2">Fev</option><option value="3">Mar</option>
+          <option value="4">Abr</option><option value="5">Mai</option><option value="6">Jun</option>
+          <option value="7">Jul</option><option value="8">Ago</option><option value="9">Set</option>
+          <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+        </select>
+        <input id="busca" type="search" placeholder="🔍 Buscar por nome, e-mail ou gerência…" />
+      </div>
+    </div>
+
+    <div id="mural"></div>
+    <p id="vazio" class="empty" style="display:none">Sem aniversariantes para os filtros selecionados.</p>
+  </div>
+
+<script>
+/* ===================== CONFIG DA PASTA DE FOTOS ===================== */
+const BASE_FOTOS =
+  "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87%C3%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/Fotos%20Aniversariantes";
+
+/* ======================== DADOS (exemplo) =========================== */
+const PESSOAS_RAW = [
+  { nome:"Thalita Cristina Santos Jocojaco", data:"07/ago", dep:"Planejamento", email:"thalita.jacojaco@rumolog.com" },
+  { nome:"Matias Alejandro Aduco",           data:"21/fev", dep:"Institucional e Faixa de Domínio", email:"matias.aduco@rumolog.com" },
+  { nome:"Priscyla Oliveira de Mello",       data:"23/fev", dep:"Engenharia", email:"priscyla.mello@rumolog.com" },
+  { nome:"Priscila de Christan",             data:"04/fev", dep:"OAE's", email:"priscila.christan@rumolog.com" },
+  { nome:"Rafael Robert Nahra",              data:"05/jan", dep:"Execução CN", email:"rafael.nahra@rumolog.com" },
+  { nome:"Hevellyn Cristina de Oliveira Alves", data:"15/jan", dep:"Planejamento", email:"hevellyn.alves@rumolog.com" },
+  { nome:"Ricardo Assumpcao Junior",         data:"01/jul", dep:"Institucional e Faixa de Domínio", email:"ricardoaj@rumolog.com" },
+  { nome:"Thaina de Fatima Rosa Lopes",      data:"06/jul", dep:"Execução CS", email:"Thaina.Lopes@rumolog.com" },
+  { nome:"Israel Riegel",                    data:"24/jul", dep:"Execução RS", email:"Israel.Riegel@ext.rumolog.com" },
+  { nome:"Roberto Benedito Antunes",         data:"21/jun", dep:"OBRAS", email:"roberto.antunes@rumolog.com" },
+  { nome:"Helder da Silva Barbosa",          data:"04/jun", dep:"OAE's", email:"Helder.Barbosa@rumolog.com" },
+  { nome:"Vitor Cerqueira dos Santos",       data:"05/jun", dep:"Planejamento", email:"vitor.cerqueira@rumolog.com" },
+  { nome:"Vitor Cerqueira dos Santos",       data:"18/set", dep:"Planejamento", email:"vitor.cerqueira@rumolog.com" }, /* duplicado */
+  { nome:"Luis Felipe Martinelli Martins",   data:"03/mai", dep:"Execução RS", email:"luis.martins@rumolog.com" },
+  { nome:"Luciano Frederico Stelle",         data:"02/nov", dep:"OBRAS", email:"luciano.stelle@rumolog.com" },
+  { nome:"Victor Hugo Santos Miranda de Souza", data:"07/nov", dep:"Planejamento", email:"victor.miranda@rumolog.com" },
+  { nome:"Vitoria Araujo dos Santos",        data:"12/nov", dep:"Planejamento", email:"vitoria.santos@rumolog.com" },
+  { nome:"Nicholas Matheus Bachaus Stein",   data:"15/nov", dep:"Engenharia", email:"nicholas.stein@rumolog.com" },
+  { nome:"Vitor Hugo Tonini",                data:"29/nov", dep:"Execução CN", email:"Vitor.Tonini@rumolog.com" },
+  { nome:"Derick Leonardo da Silva Lisboa",  data:"28/out", dep:"OAE's", email:"derick.lisboa@rumolog.com" },
+  { nome:"Jennifer Desiree M Cavalheiro Cúnico", data:"02/out", dep:"Planejamento", email:"jennifer.cunico@rumolog.com" },
+  { nome:"Livia Cristina Guimaraes Oliveira", data:"29/out", dep:"Institucional e Faixa de Domínio", email:"Livia.Oliveira@ext.rumolog.com" },
+  { nome:"Francisco Antonio Ramos de Faria Filho", data:"07/set", dep:"Execução CS", email:"francisco.filho@rumolog.com" },
+  { nome:"Thalita Iachitzki da Cruz",        data:"23/set", dep:"Planejamento", email:"thalita.cruz@rumolog.com" },
+  { nome:"Kaue Ciesielski Stinglin",         data:"22/jan", dep:"Institucional e Faixa de Domínio", email:"Kaue.Stinglin@rumolog.com" },
+  { nome:"Sergio Alves Neves Junior",        data:"13/mai", dep:"Engenharia", email:"Sergio.Junior@rumolog.com" }
+];
+
+/* ====== DEDUP por (nome+email) ====== */
+const PESSOAS = (() => {
+  const norm = s => String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"").toLowerCase().trim();
+  const seen = new Set();
+  const out = [];
+  for (const p of PESSOAS_RAW) {
+    const key = norm(p.nome) + "|" + norm(p.email);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(p);
+  }
+  return out;
+})();
+
+/* ==================== DATAS (PT-BR) ==================== */
+const MAP_MES = {
+  jan:1, janeiro:1, fev:2, fevereiro:2, mar:3, marco:3,
+  abr:4, abril:4, mai:5, maio:5, jun:6, junho:6, jul:7, julho:7,
+  ago:8, agosto:8, set:9, setembro:9, out:10, outubro:10, nov:11, novembro:11,
+  dez:12, dezembro:12
+};
+function parseDM(dm){
+  if(!dm) return {dia:NaN, mes:NaN};
+  const [d, m] = String(dm).trim().split("/");
+  const dia = parseInt(d,10);
+  if(!m) return {dia, mes:NaN};
+  const mm = m.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu,"");
+  const mes = /^\d+$/.test(mm) ? parseInt(mm,10) : (MAP_MES[mm] || NaN);
+  return {dia, mes};
+}
+function formatDiaMes(d, m){
+  if(!Number.isFinite(d) || !Number.isFinite(m)) return "--/--";
+  return String(d).padStart(2,'0') + "/" + String(m).padStart(2,'0');
+}
+
+/* ===================== FOTOS ===================== */
+const EXTS = [".jpeg",".jpg",".png",".webp"];
+const ICON_DEFAULT = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+function semAcento(s){ return String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,""); }
+function trim1(s){ return String(s||"").trim().replace(/\s+/g,' '); }
+
+/* Variações a partir do nome (com e sem acento) */
+function variantesDeBase(nome){
+  const withAccents = trim1(nome);
+  const noAccents   = trim1(semAcento(nome));
+  const lowers = [withAccents.toLowerCase(), noAccents.toLowerCase()];
+  const set = new Set();
+  for (const b of lowers){
+    set.add(b);
+    set.add(b.replace(/\s+/g,'.'));
+    set.add(b.replace(/\s+/g,'-'));
+    set.add(b.replace(/\s+/g,''));
+  }
+  return Array.from(set);
+}
+
+/* Variações a partir do usuário do e-mail */
+function variantesDoUsuario(email){
+  if(!email) return [];
+  const u = email.split('@')[0];
+  const cand = [
+    u, u.toLowerCase(),
+    u.replace(/\./g,'-'), u.replace(/\./g,''), u.replace(/\./g,' '),
+    u.replace(/-/g,'.'), u.replace(/-/g,'')
+  ];
+  const set = new Set(cand.map(x=>x.toLowerCase()));
+  return Array.from(set);
+}
+
+/* Para cada filename, crio:
+   1) URL direta
+   2) Fallback via download.aspx (SharePoint) */
+function montarURLs(filename){
+  const pasta = BASE_FOTOS.replace(/\/$/,'');
+  const full = `${pasta}/${encodeURIComponent(filename)}`;
+  const down = `https://rumolog.sharepoint.com/_layouts/15/download.aspx?SourceUrl=${encodeURIComponent(full)}`;
+  return [full, down];
+}
+
+function construirListaCandidatos(p){
+  const urls = [];
+  for(const v of variantesDeBase(p.nome||"")){
+    for(const e of EXTS) urls.push(...montarURLs(v+e));
+  }
+  for(const u of variantesDoUsuario(p.email||"")){
+    for(const e of EXTS) urls.push(...montarURLs(u+e));
+  }
+  /* cache-busting leve */
+  return urls.map((u,i)=> u + (u.includes('?') ? '&' : '?') + 'v=' + (i%5));
+}
+
+function avatarIniciais(nome){
+  const ini=(nome||"").split(/\s+/).filter(Boolean).map(w=>w[0].toUpperCase()).slice(0,3).join('');
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="110" height="110">
+    <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2e7ad3"/><stop offset="100%" stop-color="#0c1e4a"/>
+    </linearGradient></defs>
+    <rect width="110" height="110" rx="55" fill="url(#g)"/>
+    <text x="50%" y="55%" text-anchor="middle" font-family="Segoe UI, Arial" font-size="40" fill="#fff" font-weight="700">${ini}</text>
+  </svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+function getFotoUrl(p){
+  const cand = construirListaCandidatos(p);
+  cand.push(avatarIniciais(p.nome));
+  cand.push(ICON_DEFAULT);
+  p.__fotos = cand.slice(1);      // fila de fallbacks
+  return cand[0];                 // primeira tentativa
+}
+
+function aplicarOnError(img,p){
+  img.onerror=function(){
+    const fila=p.__fotos||[];
+    while(fila.length){
+      const prox=fila.shift();
+      if(prox && prox!==this.src){ this.src=prox; return; }
+    }
+    this.onerror=null;
+  };
+}
+
+/* ======================= RENDER ======================= */
+function render(){
+  const mural=document.getElementById("mural");
+  const vazio=document.getElementById("vazio");
+  const mesSel=document.getElementById("mesSel").value;
+  const busca=document.getElementById("busca").value;
+
+  mural.innerHTML="";
+  const hoje=new Date();
+  const mesAtual=hoje.getMonth()+1, diaHoje=hoje.getDate();
+  const alvoMes = (mesSel==="all") ? "all" : (mesSel==="" ? mesAtual : parseInt(mesSel,10));
+
+  const norm = s => String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"").toLowerCase();
+  const termo = norm(busca);
+
+  let lista = PESSOAS
+    .filter(p => {
+      const {mes} = parseDM(p.data);
+      if(alvoMes==="all") return true;
+      return mes === alvoMes;
+    })
+    .filter(p => {
+      if(!termo) return true;
+      return norm(p.nome).includes(termo) ||
+             (p.email && p.email.toLowerCase().includes(termo)) ||
+             norm(p.dep||p.gerencia||"").includes(termo);
+    })
+    .sort((a,b)=>{
+      const aa=parseDM(a.data), bb=parseDM(b.data);
+      if(alvoMes==="all") return (aa.mes||99)-(bb.mes||99) || (aa.dia||99)-(bb.dia||99);
+      return (aa.dia||99)-(bb.dia||99);
+    });
+
+  if(!lista.length){ vazio.style.display="block"; return; }
+  vazio.style.display="none";
+
+  for(const p of lista){
+    const {dia, mes} = parseDM(p.data);
+    const ehHoje = (dia===diaHoje && mes===mesAtual);
+
+    const card=document.createElement("div");
+    card.className="card"+(ehHoje?" hoje":"");
+    if(ehHoje){
+      const pill=document.createElement("div");
+      pill.className="pill"; pill.textContent="Hoje 🎂";
+      card.appendChild(pill);
+    }
+
+    const img=document.createElement("img");
+    img.alt=p.nome;
+    img.loading="lazy";
+    img.decoding="async";
+    img.referrerPolicy="no-referrer";
+    img.src=getFotoUrl(p);
+    aplicarOnError(img,p);
+
+    card.appendChild(img);
+    card.insertAdjacentHTML("beforeend",
+      `<div class="nome">${p.nome}</div>
+       <p class="data">${formatDiaMes(dia, mes)}</p>
+       <p class="dep">${p.dep||""}</p>
+       <p class="email"><a href="mailto:${p.email}">${p.email}</a></p>`
+    );
+    mural.appendChild(card);
+  }
+}
+
+/* ====================== CONTROLES ====================== */
+document.getElementById("mesSel").addEventListener("change", render);
+document.getElementById("busca").addEventListener("input", ()=>{
+  clearTimeout(window.__deb);
+  window.__deb=setTimeout(render,150);
+});
+render();
+</script>
+</body>
+</html>
