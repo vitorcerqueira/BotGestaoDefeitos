@@ -1,190 +1,1443 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Treinamentos a Vencer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/pt-br.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
-  <script>dayjs.extend(dayjs_plugin_customParseFormat); dayjs.locale('pt-br');</script>
-  <style>html{scroll-behavior:smooth}</style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Portal de Treinamentos</title>
+<style>
+  :root{
+    --roxo-header: #6b2fbf;
+    --roxo-escuro: #51238f;
+    --roxo-claro: #ede7ff;
+    --roxo-chip: #f3e9ff;
+    --texto-principal: #1f2933;
+    --texto-sec: #6b7280;
+    --borda: #e5e7eb;
+    --bg: #f6f5fb;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--texto-principal);
+  }
+
+  /* HEADER */
+  .top-bar{
+    background: linear-gradient(90deg, var(--roxo-header), var(--roxo-escuro));
+    color:#fff;
+    padding:14px 26px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .top-title{
+    font-size:20px;
+    font-weight:600;
+    margin:0;
+  }
+  .top-sub{
+    margin:2px 0 0 0;
+    font-size:12px;
+    opacity:.9;
+  }
+  .logo-rumo{
+    height:40px;
+    max-width:140px;
+    object-fit:contain;
+  }
+
+  .wrap{
+    max-width:1300px;
+    margin:0 auto;
+    padding:18px 20px 28px 20px;
+  }
+
+  /* FILTROS */
+  .filtros-box{
+    background:#fff;
+    border-radius:16px;
+    border:1px solid var(--borda);
+    padding:12px 14px 14px 14px;
+    box-shadow:0 2px 8px rgba(15,23,42,.05);
+    margin-bottom:16px;
+  }
+  .filtros-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .filtros-titulo{
+    font-size:13px;
+    font-weight:600;
+    color:var(--texto-sec);
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .filtros-titulo span.icon{
+    width:18px; height:18px; border-radius:999px;
+    background:var(--roxo-claro);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px;
+  }
+  .btn-clear{
+    border:1px solid #e5e7eb;
+    background:#fff;
+    color:#6b21a8;
+    font-size:11px;
+    font-weight:600;
+    padding:4px 10px;
+    border-radius:999px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .btn-clear:hover{
+    background:#f9fafb;
+  }
+
+  .filtros-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:8px 10px;
+  }
+  .filtro-label{
+    font-size:11px;
+    color:var(--texto-sec);
+    margin-bottom:2px;
+  }
+  .filtros-grid input,
+  .filtros-grid select{
+    width:100%;
+    padding:6px 8px;
+    border-radius:8px;
+    border:1px solid var(--borda);
+    font-size:13px;
+    color:var(--texto-principal);
+    background:#fff;
+  }
+  .filtros-grid input::placeholder{
+    color:#9ca3af;
+    font-size:12px;
+  }
+
+  /* LISTA DE CARDS */
+  #mural{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:14px;
+  }
+  .card{
+    background:#fff;
+    border-radius:16px;
+    border:1px solid #e5e7eb;
+    padding:12px 12px;
+    display:flex;
+    gap:10px;
+    position:relative;
+    box-shadow:0 2px 8px rgba(15,23,42,.04);
+  }
+  .card-hoje{
+    border-color:#f97316;
+    box-shadow:0 0 0 2px rgba(249,115,22,.25);
+  }
+  .pill-hoje{
+    position:absolute;
+    top:8px; right:8px;
+    background:#fff7ed;
+    color:#c2410c;
+    border-radius:999px;
+    border:1px solid #fed7aa;
+    padding:2px 8px;
+    font-size:10px;
+    font-weight:600;
+  }
+  .card img{
+    width:72px; height:72px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid var(--roxo-claro);
+    flex-shrink:0;
+    background:#f3f4f6;
+  }
+  .info{
+    flex:1;
+    min-width:0;
+  }
+  .linha-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+  }
+  .nome{
+    margin:0;
+    font-size:14px;
+    font-weight:600;
+    color:var(--texto-principal);
+  }
+  .cs-tag{
+    font-size:11px;
+    color:#6b21a8;
+    background:var(--roxo-chip);
+    border-radius:999px;
+    padding:1px 8px;
+    border:1px solid #e9d5ff;
+    white-space:nowrap;
+  }
+  .linha-sub{
+    margin:2px 0 0 0;
+    font-size:11px;
+    color:var(--texto-sec);
+  }
+  .treino{
+    margin:6px 0 0 0;
+    font-size:12px;
+    color:var(--roxo-escuro);
+    font-weight:500;
+  }
+  .datas{
+    margin:4px 0 0 0;
+    font-size:11px;
+    color:#4b5563;
+  }
+
+  .status-badge{
+    display:inline-block;
+    margin-top:6px;
+    font-size:10px;
+    padding:3px 9px;
+    border-radius:999px;
+    border:1px solid transparent;
+    font-weight:600;
+  }
+  .st-valido{
+    background:#ecfdf3;
+    color:#15803d;
+    border-color:#bbf7d0;
+  }
+  .st-a-vencer{
+    background:#fefce8;
+    color:#854d0e;
+    border-color:#fef08a;
+  }
+  .st-vencido{
+    background:#fef2f2;
+    color:#b91c1c;
+    border-color:#fecaca;
+  }
+  .st-nao-concluido{
+    background:#eff6ff;
+    color:#1d4ed8;
+    border-color:#bfdbfe;
+  }
+
+  .empty{
+    margin-top:12px;
+    font-size:13px;
+    color:var(--texto-sec);
+  }
+
+  @media (max-width:640px){
+    .top-bar{padding:12px 16px}
+    .wrap{padding-inline:14px}
+    .logo-rumo{height:30px;}
+  }
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800">
-  <header class="sticky top-0 z-30 backdrop-blur bg-white/80 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
-      <div class="shrink-0 w-10 h-10 rounded-2xl bg-slate-900 text-white grid place-content-center font-semibold">TR</div>
-      <div class="flex-1">
-        <h1 class="text-xl md:text-2xl font-bold leading-tight">Treinamentos a Vencer</h1>
-        <p class="text-sm text-slate-500">XLSX direto do SharePoint e fotos .jpeg por nome completo.</p>
-      </div>
-      <div class="flex items-center gap-2">
-        <button id="btnExport" class="px-3 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-sm">Exportar CSV</button>
-        <a id="rawLink" href="https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87%C3%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/TreinamentosR0.xlsx" target="_blank" class="px-3 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-sm">Fonte XLSX</a>
-      </div>
+<body>
+
+  <!-- HEADER ROXO COM LOGO -->
+  <header class="top-bar">
+    <div>
+      <h1 class="top-title">Treinamentos – Tecnologia Rumo</h1>
+      <p class="top-sub">
+        Visualize os treinamentos por colaborador, status e datas de formação e vencimento.
+      </p>
     </div>
+    <!-- AJUSTE A URL DA LOGO EM LOGO_RUMO (no script) -->
+    <img id="logoRumo" class="logo-rumo" alt="Rumo">
   </header>
 
-  <section class="max-w-7xl mx-auto px-4 py-4 grid gap-4 md:grid-cols-12">
-    <div class="md:col-span-4 lg:col-span-3">
-      <label class="block text-xs font-medium text-slate-500">Buscar por nome</label>
-      <input id="fNome" type="text" placeholder="Digite o nome" class="w-full mt-1 px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-300" />
-    </div>
-    <div class="md:col-span-4 lg:col-span-3">
-      <label class="block text-xs font-medium text-slate-500">Formação</label>
-      <select id="fFormacao" class="w-full mt-1 px-3 py-2 border rounded-xl bg-white"></select>
-    </div>
-    <div class="md:col-span-4 lg:col-span-3">
-      <label class="block text-xs font-medium text-slate-500">Coordenação/Setor</label>
-      <input id="fSetor" type="text" placeholder="Ex.: Infra, PDM..." class="w-full mt-1 px-3 py-2 border rounded-xl" />
-    </div>
-    <div class="md:col-span-12 lg:col-span-3">
-      <label class="block text-xs font-medium text-slate-500">Janela de vencimento</label>
-      <select id="fJanela" class="w-full mt-1 px-3 py-2 border rounded-xl bg-white">
-        <option value="all">Todos</option>
-        <option value="overdue">Vencidos</option>
-        <option value="7">Até 7 dias</option>
-        <option value="30">Até 30 dias</option>
-        <option value="60">Até 60 dias</option>
-        <option value="90">Até 90 dias</option>
-        <option value="year">Este ano</option>
-      </select>
-    </div>
-  </section>
+  <main class="wrap">
 
-  <section class="max-w-7xl mx-auto px-4 pb-2">
-    <div id="chips" class="flex flex-wrap gap-2 text-xs"></div>
-  </section>
+    <!-- FILTROS POR COLUNA -->
+    <section class="filtros-box">
+      <div class="filtros-header">
+        <p class="filtros-titulo">
+          <span class="icon">🔍</span>
+          Filtros por coluna
+        </p>
+        <button type="button" id="btnLimpar" class="btn-clear">
+          ⟲ Limpar filtros
+        </button>
+      </div>
 
-  <section class="max-w-7xl mx-auto px-4 grid gap-4 md:grid-cols-4">
-    <div class="p-4 rounded-2xl bg-white shadow border border-slate-200">
-      <div class="text-xs text-slate-500">Total filtrado</div>
-      <div id="kpiTotal" class="text-3xl font-semibold">0</div>
-    </div>
-    <div class="p-4 rounded-2xl bg-white shadow border border-slate-200">
-      <div class="text-xs text-slate-500">Vencidos</div>
-      <div id="kpiOverdue" class="text-3xl font-semibold">0</div>
-    </div>
-    <div class="p-4 rounded-2xl bg-white shadow border border-slate-200">
-      <div class="text-xs text-slate-500">Vencem em 30 dias</div>
-      <div id="kpi30" class="text-3xl font-semibold">0</div>
-    </div>
-    <div class="p-4 rounded-2xl bg-white shadow border border-slate-200">
-      <div class="text-xs text-slate-500">Este ano</div>
-      <div id="kpiYear" class="text-3xl font-semibold">0</div>
-    </div>
-  </section>
+      <div class="filtros-grid">
+        <div>
+          <div class="filtro-label">CS</div>
+          <input id="fCs" placeholder="ex: 445119" />
+        </div>
+        <div>
+          <div class="filtro-label">Nome Completo</div>
+          <input id="fNome" placeholder="digite parte do nome" />
+        </div>
+        <div>
+          <div class="filtro-label">Cargo</div>
+          <input id="fCargo" placeholder="ex: Coordenador" />
+        </div>
+        <div>
+          <div class="filtro-label">Cipia</div>
+          <input id="fCipia" placeholder="ex: Central Serras" />
+        </div>
+        <div>
+          <div class="filtro-label">Treinamento</div>
+          <input id="fTreino" placeholder="ex: Primeiros Socorros" />
+        </div>
+        <div>
+          <div class="filtro-label">Formação</div>
+          <input id="fFormacao" placeholder="dd/mm/aaaa ou /2025" />
+        </div>
+        <div>
+          <div class="filtro-label">Vencimento</div>
+          <input id="fVencimento" placeholder="dd/mm/aaaa ou /2026" />
+        </div>
+        <div>
+          <div class="filtro-label">Status (calculado)</div>
+          <select id="fStatus">
+            <option value="">(todos)</option>
+            <option value="valido">Válido</option>
+            <option value="a-vencer">À Vencer</option>
+            <option value="vencido">Vencido</option>
+            <option value="nao-concluido">Não Concluído</option>
+          </select>
+        </div>
+      </div>
+    </section>
 
-  <main class="max-w-7xl mx-auto px-4 py-6">
-    <div id="grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
-    <div id="vazio" class="hidden mt-10 text-center text-slate-500">Nada a exibir com os filtros atuais.</div>
+    <!-- LISTA -->
+    <section>
+      <div id="mural"></div>
+      <p id="vazio" class="empty" style="display:none">
+        Nenhum registro encontrado para os filtros selecionados.
+      </p>
+    </section>
+
   </main>
 
-  <script>
-    const SHAREPOINT_XLSX_URL = "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87%C3%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/TreinamentosR0.xlsx";
-    const FOTOS_BASE = "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87%C3%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/Fotos%20Treinamentos";
-    const PESSOAS_RAW = [{"nome": "Thalita Cristina Santos Jacojaco", "data": "07/ago", "dep": "Planejamento", "email": "thalita.jacojaco@rumolog.com"}, {"nome": "Matias Alejandro Aduco", "data": "21/fev", "dep": "Institucional e Faixa de Domínio", "email": "matias.aduco@rumolog.com"}, {"nome": "Priscyla Oliveira de Mello", "data": "23/fev", "dep": "Engenharia", "email": "priscyla.mello@rumolog.com"}, {"nome": "Priscila de Christan", "data": "04/fev", "dep": "OAE's", "email": "priscila.christan@rumolog.com"}, {"nome": "Rafael Robert Nahra", "data": "05/jan", "dep": "Execução CN", "email": "rafael.nahra@rumolog.com"}, {"nome": "Hevellyn Cristina de Oliveira Alves", "data": "15/jan", "dep": "Planejamento", "email": "hevellyn.alves@rumolog.com"}, {"nome": "Ricardo Assumpcao Junior", "data": "01/jul", "dep": "Institucional e Faixa de Domínio", "email": "ricardoaj@rumolog.com"}, {"nome": "Thainá de Fátima Rosa Lopes", "data": "06/jul", "dep": "Execução CS", "email": "Thaina.Lopes@rumolog.com"}, {"nome": "Israel Riegel", "data": "24/jul", "dep": "Execução RS", "email": "Israel.Riegel@ext.rumolog.com"}, {"nome": "Roberto Benedito Antunes", "data": "21/jun", "dep": "OBRAS", "email": "roberto.antunes@rumolog.com"}, {"nome": "Helder da Silva Barbosa", "data": "04/jun", "dep": "OAE's", "email": "Helder.Barbosa@rumolog.com"}, {"nome": "Vitor Cerqueira dos Santos", "data": "05/jun", "dep": "Planejamento", "email": "vitor.cerqueira@rumolog.com"}, {"nome": "Luis Felipe Martinelli Martins", "data": "03/mai", "dep": "Execução RS", "email": "luis.martins@rumolog.com"}, {"nome": "Luciano Frederico Stelle", "data": "02/nov", "dep": "OBRAS", "email": "luciano.stelle@rumolog.com"}, {"nome": "Victor Hugo Miranda Oliveira", "data": "07/nov", "dep": "Planejamento", "email": "victor.miranda@rumolog.com"}, {"nome": "Vitoria Araujo dos Santos", "data": "12/nov", "dep": "Planejamento", "email": "vitoria.santos@rumolog.com"}, {"nome": "Nicholas Matheus Bachaus Stein", "data": "15/nov", "dep": "Engenharia", "email": "nicholas.stein@rumolog.com"}, {"nome": "Vitor Hugo Tonini", "data": "29/nov", "dep": "Execução CN", "email": "Vitor.Tonini@rumolog.com"}, {"nome": "Derick Leonardo da Silva Lisboa", "data": "28/out", "dep": "OAE's", "email": "derick.lisboa@rumolog.com"}, {"nome": "Jennifer Desiree M Cavalheiro Cúnico", "data": "02/out", "dep": "OAE's", "email": "jennifer.cunico@rumolog.com"}, {"nome": "Livia Cristina Guimaraes Oliveira", "data": "29/out", "dep": "Institucional e Faixa de Domínio", "email": "Livia.Oliveira@ext.rumolog.com"}, {"nome": "Francisco Antonio Ramos de Faria Filho", "data": "07/set", "dep": "Execução CS", "email": "francisco.filho@rumolog.com"}, {"nome": "Thalita Iachitzki da Cruz", "data": "23/set", "dep": "Planejamento", "email": "thalita.cruz@rumolog.com"}, {"nome": "Kaue Ciesielski Stinglin", "data": "22/jan", "dep": "Institucional e Faixa de Domínio", "email": "Kaue.Stinglin@rumolog.com"}, {"nome": "Ricardo Gasparino Ribas", "data": "06/ago", "dep": "Gerente", "email": "ricardo.ribas@rumolog.com"}, {"nome": "Sergio Alves Neves Junior", "data": "13/mai", "dep": "Engenharia", "email": "Sergio.Junior@rumolog.com"}];
+<script>
+/* ===================== PASTA DE FOTOS ===================== */
+/* Mesmo caminho do portal de aniversariantes */
+const BASE_FOTOS =
+  "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87Ã%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/Fotos%20Aniversariantes";
 
-    const PESSOAS = (() => { const seen=new Set(); const out=[]; for(const p of PESSOAS_RAW){ const k=(p.nome||'').toLowerCase().trim(); if(!seen.has(k)){ seen.add(k); out.push(p); } } return out; })();
-    const MAPA_POR_NOME = Object.fromEntries(PESSOAS.map(p => [(p.nome||'').toLowerCase().trim(), p]));
+/* AJUSTE SÓ O NOME DO ARQUIVO DA LOGO (que está nessa mesma pasta) */
+const LOGO_RUMO = BASE_FOTOS + "/logo_rumo.png"; // <-- troque pelo nome correto, ex: "/Rumo_logo.png"
 
-    const CONFIG = { COLUMNS: { nome: "Nome Completo", setor: "Setor", formacao: "Treinamento", vencimentoCol: "Vencimento" } };
+/* coloca a logo no header */
+document.getElementById("logoRumo").src = LOGO_RUMO;
 
-    const norm = (s) => (s || "").toString().trim();
-    const normLower = (s) => norm(s).toLowerCase();
+/* ========================= DADOS ========================= */
+/* COLE AQUI o TREINOS_RAW COMPLETO que você já tem.
+   Deixo só um registro de exemplo para não poluir.      */
+const TREINOS_RAW = [
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "27/10/2025",
+    vencimento: "27/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "22/10/2025",
+    vencimento: "22/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Utilização Adequada dos EPI’s",
+    formacao: "22/10/2025",
+    vencimento: "22/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "22/10/2025",
+    vencimento: "22/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "RO Mód. III",
+    formacao: "22/10/2025",
+    vencimento: "22/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "20/10/2025",
+    vencimento: "20/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "13/10/2025",
+    vencimento: "13/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "09/10/2025",
+    vencimento: "09/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "03/10/2025",
+    vencimento: "03/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "03/10/2025",
+    vencimento: "03/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "03/10/2025",
+    vencimento: "03/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "22/09/2025",
+    vencimento: "22/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "22/09/2025",
+    vencimento: "22/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "18/09/2025",
+    vencimento: "18/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "18/09/2025",
+    vencimento: "18/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "7 Regras da Vida",
+    formacao: "16/09/2025",
+    vencimento: "16/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "16/09/2025",
+    vencimento: "16/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "16/09/2025",
+    vencimento: "16/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "16/09/2025",
+    vencimento: "16/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "RO Mód. III",
+    formacao: "16/09/2025",
+    vencimento: "16/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "16/09/2025",
+    vencimento: "16/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "12/09/2025",
+    vencimento: "12/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "12/09/2025",
+    vencimento: "12/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "12/09/2025",
+    vencimento: "12/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "11/09/2025",
+    vencimento: "11/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "11/09/2025",
+    vencimento: "11/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "16/09/2025",
+    vencimento: "16/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "Primeiros Socorros",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "7 Regras da Vida",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "03/10/2025",
+    vencimento: "03/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "03/10/2025",
+    vencimento: "03/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "11/09/2025",
+    vencimento: "11/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "12/09/2025",
+    vencimento: "12/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "11/09/2025",
+    vencimento: "11/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "20/10/2025",
+    vencimento: "20/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "20/10/2025",
+    vencimento: "20/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "20/10/2025",
+    vencimento: "20/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "20/10/2025",
+    vencimento: "20/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "13/10/2025",
+    vencimento: "13/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "09/10/2025",
+    vencimento: "09/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "13/10/2025",
+    vencimento: "13/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "09/10/2025",
+    vencimento: "09/10/2026",
+    status: "Válido"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "11/09/2025",
+    vencimento: "11/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "12/09/2025",
+    vencimento: "12/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "10/09/2025",
+    vencimento: "10/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "7 Regras da Vida",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "",
+    vencimento: "",
+    status: "Não Concluído"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "16/09/2025",
+    vencimento: "16/09/2026",
+    status: "Válido"
+  },
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "28/04/2025",
+    vencimento: "28/04/2026",
+    status: "Válido"
+  },
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "27/04/2025",
+    vencimento: "27/04/2026",
+    status: "Válido"
+  },
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "27/04/2025",
+    vencimento: "27/04/2026",
+    status: "Válido"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "",
+    vencimento: "",
+    status: "Não Concluído"
+  },
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "28/04/2025",
+    vencimento: "28/04/2026",
+    status: "Válido"
+  },
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "27/04/2025",
+    vencimento: "27/04/2026",
+    status: "Válido"
+  },
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "27/04/2025",
+    vencimento: "27/04/2026",
+    status: "Válido"
+  }
+];
 
-    function parseDataFlex(value) { if(!value) return null; const str=norm(value);
-      const formatos=["DD/MM/YYYY","D/M/YYYY","YYYY-MM-DD","DD/MM/YY","D/M/YY","YYYY/M/D","YYYY/MM/DD"];
-      for(const f of formatos){ const d=dayjs(str, f, true); if(d.isValid()) return d; }
-      const num=Number(str); if(!Number.isNaN(num)){ const base=dayjs("1899-12-30"); return base.add(num,"day"); }
-      const n=dayjs(str); return n.isValid()?n:null; }
 
-    function statusBadge(diffDias) { if (diffDias < 0) return {label:"Vencido",cls:"bg-red-100 text-red-700 border-red-200"};
-      if(diffDias===0) return {label:"Vence hoje",cls:"bg-amber-100 text-amber-800 border-amber-200"};
-      if(diffDias<=7)  return {label:"Até 7 dias",cls:"bg-amber-100 text-amber-800 border-amber-200"};
-      if(diffDias<=30) return {label:"Até 30 dias",cls:"bg-yellow-100 text-yellow-800 border-yellow-200"};
-      if(diffDias<=60) return {label:"Até 60 dias",cls:"bg-lime-100 text-lime-800 border-lime-200"};
-      if(diffDias<=90) return {label:"Até 90 dias",cls:"bg-emerald-100 text-emerald-800 border-emerald-200"};
-      return {label:">90 dias",cls:"bg-slate-100 text-slate-700 border-slate-200"}; }
+/* ==================== FUNÇÕES AUXILIARES ==================== */
+function semAcento(s){
+  return String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"");
+}
+function trim1(s){
+  return String(s||"").trim().replace(/\s+/g," ");
+}
 
-    function formatarData(d) { return d ? d.format("DD/MM/YYYY") : "-"; }
-    function initialsFromName(name){ const parts=(name||'').trim().split(/\s+/); const first=parts[0]?.[0]||''; const last=parts.length>1?parts[parts.length-1][0]:''; return (first+last).toUpperCase(); }
-    function fotoURLporNomeCompleto(nome){ const filename=encodeURIComponent(norm(nome)+".jpeg"); return FOTOS_BASE + "/" + filename; }
+/* FOTO – mesma lógica */
+const EXTS = [".jpeg",".jpg",".png",".webp"];
+const ICON_DEFAULT = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
-    function renderChips(formacoes) { const el=document.getElementById("chips"); el.innerHTML="";
-      const make=(label,value)=>{ const b=document.createElement("button"); b.className="px-3 py-1.5 rounded-full border border-slate-300 hover:bg-slate-100"; b.textContent=label; b.onclick=()=>{ document.getElementById("fFormacao").value=value; aplicarFiltros(); }; return b; };
-      el.appendChild(make("Todas as formações","")); formacoes.slice(0,14).forEach(f=>el.appendChild(make(f,f))); }
-    function preencherComboFormacao(formacoes) { const sel=document.getElementById("fFormacao"); sel.innerHTML=""; sel.add(new Option("Todas","")); formacoes.forEach(f=>sel.add(new Option(f,f))); }
+function variantesDeBase(nome){
+  const withAccents = trim1(nome);
+  const noAccents   = trim1(semAcento(nome));
+  const lowers = [withAccents.toLowerCase(), noAccents.toLowerCase()];
+  const set = new Set();
+  for (const b of lowers){
+    set.add(b);
+    set.add(b.replace(/\s+/g,'.'));
+    set.add(b.replace(/\s+/g,'-'));
+    set.add(b.replace(/\s+/g,''));
+  }
+  return Array.from(set);
+}
 
-    let REGISTROS=[]; let REGISTROS_FILTRADOS=[];
+function montarURLs(filename){
+  const pasta = BASE_FOTOS.replace(/\/$/,'');
+  const full = `${pasta}/${encodeURIComponent(filename)}`;
+  const down = `https://rumolog.sharepoint.com/_layouts/15/download.aspx?SourceUrl=${encodeURIComponent(full)}`;
+  return [full, down];
+}
 
-    function atualizarKPIs(lista){ const hoje=dayjs(); let overdue=0,ate30=0,esteAno=0;
-      lista.forEach(r=>{ const diff=r.diasParaVencer; if(diff<0)overdue++; if(diff>=0&&diff<=30)ate30++; if(r.vencimento&&r.vencimento.year()===hoje.year())esteAno++; });
-      document.getElementById("kpiTotal").textContent=lista.length; document.getElementById("kpiOverdue").textContent=overdue; document.getElementById("kpi30").textContent=ate30; document.getElementById("kpiYear").textContent=esteAno; }
+function construirListaCandidatosTreino(t){
+  const urls = [];
+  for(const v of variantesDeBase(t.nome||"")){
+    for(const e of EXTS) urls.push(...montarURLs(v+e));
+  }
+  return urls.map((u,i)=> u + (u.includes('?') ? '&' : '?') + 'v=' + (i%5));
+}
 
-    function card(reg){ const { nome, setor, formacao, ultima, vencimento, diasParaVencer } = reg;
-      const pessoa=MAPA_POR_NOME[(nome||'').toLowerCase().trim()]; const dep=pessoa?.dep || setor || ""; const badge=statusBadge(diasParaVencer);
-      const foto=fotoURLporNomeCompleto(nome); const avId=`av_${Math.random().toString(36).slice(2)}`;
-      return `
-        <article class="p-4 rounded-2xl bg-white shadow border border-slate-200 flex flex-col gap-3">
-          <div class="flex items-start justify-between gap-2">
-            <div class="flex items-center gap-3">
-              <img src="${foto}" alt="${initialsFromName(nome)}" class="w-14 h-14 rounded-xl object-cover border border-slate-200" onerror="this.style.display='none'; const av=document.getElementById('${avId}'); if(av) av.style.display='grid';" />
-              <div id="${avId}" class="hidden w-14 h-14 rounded-xl border border-slate-200 grid place-items-center text-sm font-semibold bg-slate-100 text-slate-700">${initialsFromName(nome)}</div>
-              <div><h3 class="font-semibold leading-tight">${nome || '-'}<span class="block text-sm text-slate-500">${dep || ''}</span></h3></div>
-            </div>
-            <span class="text-[11px] px-2 py-1 rounded-full border ${badge.cls}">${badge.label}</span>
-          </div>
-          <div class="text-sm">
-            <div><span class="text-slate-500">Formação:</span> <span class="font-medium">${formacao || '-'}</span></div>
-            <div><span class="text-slate-500">Vencimento:</span> <span class="font-medium">${formatarData(vencimento)}</span></div>
-            <div class="text-slate-500 text-xs">${diasParaVencer < 0 ? `${Math.abs(diasParaVencer)} dia(s) em atraso` : `faltam ${diasParaVencer} dia(s)`}</div>
-          </div>
-        </article>`; }
+function avatarIniciais(nome){
+  const ini=(nome||"").split(/\s+/).filter(Boolean)
+    .map(w=>w[0].toUpperCase()).slice(0,3).join('');
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="110" height="110">
+    <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#6b2fbf"/><stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient></defs>
+    <rect width="110" height="110" rx="55" fill="url(#g)"/>
+    <text x="50%" y="55%" text-anchor="middle" font-family="Segoe UI, Arial"
+          font-size="40" fill="#fff" font-weight="700">${ini}</text>
+  </svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
 
-    function aplicarFiltros(){ const q=normLower(document.getElementById("fNome").value);
-      const f=normLower(document.getElementById("fFormacao").value); const s=normLower(document.getElementById("fSetor").value);
-      const janela=document.getElementById("fJanela").value; const hoje=dayjs().startOf("day");
-      REGISTROS_FILTRADOS = REGISTROS.filter(r=>{ const nomeOK=!q||normLower(r.nome).includes(q); const formOK=!f||normLower(r.formacao)===f; const setOK=!s||normLower(r.setor).includes(s);
-        let janelaOK=true; const diff=r.diasParaVencer; if(janela==="overdue") janelaOK=diff<0; else if(["7","30","60","90"].includes(janela)) janelaOK=diff>=0 && diff<=Number(janela);
-        else if(janela==="year") janelaOK=r.vencimento && r.vencimento.year()===hoje.year(); return nomeOK && formOK && setOK && janelaOK; });
-      const grid=document.getElementById("grid"); const vazio=document.getElementById("vazio"); grid.innerHTML = REGISTROS_FILTRADOS.map(card).join("");
-      vazio.classList.toggle("hidden", REGISTROS_FILTRADOS.length>0); atualizarKPIs(REGISTROS_FILTRADOS); }
+function getFotoUrlTreino(t){
+  const cand = construirListaCandidatosTreino(t);
+  cand.push(avatarIniciais(t.nome));
+  cand.push(ICON_DEFAULT);
+  t.__fotos = cand.slice(1);
+  return cand[0];
+}
 
-    function exportCSV(){ if(!REGISTROS_FILTRADOS.length) return;
-      const rows=REGISTROS_FILTRADOS.map(r=>({Nome:r.nome,Setor:r.setor,Formacao:r.formacao,Vencimento:r.vencimento?r.vencimento.format("YYYY-MM-DD"):"",DiasParaVencer:r.diasParaVencer}));
-      const csv = rows.map(o=>Object.values(o).map(v=>`"${(v??'').toString().replaceAll('"','""')}"`).join(",")).join("\n");
-      const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`treinamentos_filtrados_${dayjs().format("YYYYMMDD_HHmm")}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+function aplicarOnError(img,t){
+  img.onerror=function(){
+    const fila=t.__fotos||[];
+    while(fila.length){
+      const prox=fila.shift();
+      if(prox && prox!==this.src){ this.src=prox; return; }
+    }
+    this.onerror=null;
+  };
+}
 
-    async function carregarXLSX(){ const res=await fetch(SHAREPOINT_XLSX_URL, {credentials:"include"}); const ab=await res.arrayBuffer();
-      const wb=XLSX.read(ab,{type:"array"}); const sheetName=wb.SheetNames[0]; const json=XLSX.utils.sheet_to_json(wb.Sheets[sheetName], {defval:""}); return json; }
+/* Datas dd/mm/aaaa → objeto */
+function parseDataBr(str){
+  if(!str) return {dia:NaN, mes:NaN, ano:NaN, date:null};
+  const partes = String(str).split("/");
+  if(partes.length!==3) return {dia:NaN, mes:NaN, ano:NaN, date:null};
+  const [d,m,a] = partes.map(x=>parseInt(x,10));
+  if(!d || !m || !a) return {dia:NaN, mes:NaN, ano:NaN, date:null};
+  const dt = new Date(a, m-1, d);
+  return {dia:d, mes:m, ano:a, date:isNaN(dt.getTime())?null:dt};
+}
 
-    function prepararRegistros(linhas){ const C=CONFIG.COLUMNS; const hoje=dayjs().startOf("day"); const permitido=new Set(Object.keys(MAPA_POR_NOME)); const regs=[];
-      for(const row of linhas){ const nome=norm(row[C.nome]); if(!nome||!permitido.has(nome.toLowerCase().trim())) continue;
-        const setor=norm(row[C.setor]); const formacao=norm(row[C.formacao]); const venc=parseDataFlex(row[C.vencimentoCol]); if(!formacao||!venc) continue;
-        const diff=venc.diff(hoje,"day"); regs.push({nome,setor,formacao,ultima:null,vencimento:venc,diasParaVencer:diff}); }
-      regs.sort((a,b)=>a.diasParaVencer-b.diasParaVencer); return regs; }
+/* STATUS – calcula pelo vencimento
+   Regra:
+   - sem data -> Não Concluído
+   - vencimento < hoje -> Vencido
+   - vencimento <= 30 dias -> À Vencer
+   - senão -> Válido
+*/
+function calcularStatusPorData(vObj, hojeBase){
+  const vDate = vObj.date;
+  if(!vDate){
+    return { key:"nao-concluido", label:"Não Concluído" };
+  }
 
-    function debounce(fn, wait=250){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(null,args),wait); }; }
+  const msDia = 24*60*60*1000;
+  const vBase = new Date(vDate.getFullYear(), vDate.getMonth(), vDate.getDate());
+  const diffDias = Math.round((vBase - hojeBase)/msDia);
 
-    (async ()=>{ try{ const linhas=await carregarXLSX(); REGISTROS=prepararRegistros(linhas);
-        const setForm = Array.from(new Set(REGISTROS.map(r => r.formacao))).sort((a,b)=>a.localeCompare(b));
-        preencherComboFormacao(setForm); renderChips(setForm); aplicarFiltros();
-      }catch(e){ console.error("Falha ao carregar XLSX:", e);
-        document.getElementById("grid").innerHTML=`<div class="col-span-full p-6 rounded-2xl bg-white border border-red-200 text-red-700">Erro ao carregar os dados do SharePoint. Verifique permissões e o arquivo <b>TreinamentosR0.xlsx</b>.</div>`; }
-      document.getElementById("fNome").addEventListener("input", debounce(aplicarFiltros));
-      document.getElementById("fFormacao").addEventListener("change", aplicarFiltros);
-      document.getElementById("fSetor").addEventListener("input", debounce(aplicarFiltros));
-      document.getElementById("fJanela").addEventListener("change", aplicarFiltros);
-      document.getElementById("btnExport").addEventListener("click", exportCSV);
-    })();
-  </script>
+  if(diffDias < 0){
+    return { key:"vencido", label:"Vencido" };
+  }
+  if(diffDias <= 30){
+    return { key:"a-vencer", label:"À Vencer" };
+  }
+  return { key:"valido", label:"Válido" };
+}
 
-  <footer class="max-w-7xl mx-auto px-4 py-8 text-center text-xs text-slate-500">
-    Atualiza sozinho todo ano, lê XLSX do SharePoint e usa fotos .jpeg por nome completo.
-  </footer>
+function statusClass(key){
+  switch(key){
+    case "valido": return "st-valido";
+    case "a-vencer": return "st-a-vencer";
+    case "vencido": return "st-vencido";
+    case "nao-concluido": return "st-nao-concluido";
+    default: return "";
+  }
+}
+
+/* =============== RENDERIZAÇÃO ================= */
+function renderTreinos(){
+  const mural=document.getElementById("mural");
+  const vazio=document.getElementById("vazio");
+  mural.innerHTML="";
+
+  const hoje=new Date();
+  const hojeBase = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  const diaHoje=hojeBase.getDate(), mesHoje=hojeBase.getMonth()+1, anoHoje=hojeBase.getFullYear();
+
+  const fCs = document.getElementById("fCs").value.trim();
+  const fNome = semAcento(document.getElementById("fNome").value.toLowerCase());
+  const fCargo = semAcento(document.getElementById("fCargo").value.toLowerCase());
+  const fCipia = semAcento(document.getElementById("fCipia").value.toLowerCase());
+  const fTreino = semAcento(document.getElementById("fTreino").value.toLowerCase());
+  const fFormacao = document.getElementById("fFormacao").value.trim();
+  const fVencimento = document.getElementById("fVencimento").value.trim();
+  const fStatus = document.getElementById("fStatus").value;
+
+  const lista = TREINOS_RAW
+    .map(t => {
+      const _v = parseDataBr(t.vencimento);
+      const _f = parseDataBr(t.formacao);
+      const st = calcularStatusPorData(_v, hojeBase);
+      return { ...t, _v, _f, _statusKey: st.key, _statusLabel: st.label };
+    })
+    .filter(t => {
+      if(fCs && !String(t.cs||"").includes(fCs)) return false;
+      if(fNome && !semAcento(t.nome||"").toLowerCase().includes(fNome)) return false;
+      if(fCargo && !semAcento(t.cargo||"").toLowerCase().includes(fCargo)) return false;
+      if(fCipia && !semAcento(t.cipia||"").toLowerCase().includes(fCipia)) return false;
+      if(fTreino && !semAcento(t.treinamento||"").toLowerCase().includes(fTreino)) return false;
+      if(fFormacao && !(t.formacao||"").includes(fFormacao)) return false;
+      if(fVencimento && !(t.vencimento||"").includes(fVencimento)) return false;
+      if(fStatus && t._statusKey !== fStatus) return false;
+      return true;
+    })
+    .sort((a,b)=>{
+      const da=a._v.date, db=b._v.date;
+      if(da && db) return da - db || semAcento(a.nome).localeCompare(semAcento(b.nome));
+      if(da && !db) return -1;
+      if(!da && db) return 1;
+      return semAcento(a.nome).localeCompare(semAcento(b.nome));
+    });
+
+  if(!lista.length){
+    vazio.style.display="block";
+    return;
+  }
+  vazio.style.display="none";
+
+  for(const t of lista){
+    const card=document.createElement("div");
+    const v = t._v;
+    const ehHoje = v.dia===diaHoje && v.mes===mesHoje && v.ano===anoHoje;
+    card.className="card" + (ehHoje?" card-hoje":"");
+
+    if(ehHoje){
+      const pill=document.createElement("div");
+      pill.className="pill-hoje";
+      pill.textContent="Vence hoje";
+      card.appendChild(pill);
+    }
+
+    const img=document.createElement("img");
+    img.alt=t.nome;
+    img.loading="lazy";
+    img.decoding="async";
+    img.src=getFotoUrlTreino(t);
+    aplicarOnError(img,t);
+
+    const info=document.createElement("div");
+    info.className="info";
+
+    const linhaTop=document.createElement("div");
+    linhaTop.className="linha-top";
+    const nomeEl=document.createElement("p");
+    nomeEl.className="nome";
+    nomeEl.textContent=t.nome;
+    linhaTop.appendChild(nomeEl);
+
+    if(t.cs){
+      const cs=document.createElement("span");
+      cs.className="cs-tag";
+      cs.textContent="CS " + t.cs;
+      linhaTop.appendChild(cs);
+    }
+
+    const linhaSub=document.createElement("p");
+    linhaSub.className="linha-sub";
+    linhaSub.textContent=(t.cargo || "") + (t.cargo && t.cipia? " • " : "") + (t.cipia || "");
+
+    const treino=document.createElement("p");
+    treino.className="treino";
+    treino.textContent=t.treinamento || "";
+
+    const datas=document.createElement("p");
+    datas.className="datas";
+    datas.textContent =
+      "Formação: " + (t.formacao || "--/--/----") +
+      " · Vencimento: " + (t.vencimento || "--/--/----");
+
+    info.appendChild(linhaTop);
+    info.appendChild(linhaSub);
+    info.appendChild(treino);
+    info.appendChild(datas);
+
+    if(t._statusLabel){
+      const st=document.createElement("span");
+      st.className="status-badge " + statusClass(t._statusKey);
+      st.textContent=t._statusLabel;
+      info.appendChild(st);
+    }
+
+    card.appendChild(img);
+    card.appendChild(info);
+    mural.appendChild(card);
+  }
+}
+
+/* Eventos de filtro – aplica na hora (com debounce leve) */
+let debounceId;
+function onFilterChange(){
+  clearTimeout(debounceId);
+  debounceId=setTimeout(renderTreinos, 120);
+}
+["fCs","fNome","fCargo","fCipia","fTreino","fFormacao","fVencimento","fStatus"]
+  .forEach(id=>{
+    document.getElementById(id).addEventListener(
+      id==="fStatus" ? "change" : "input",
+      onFilterChange
+    );
+  });
+
+/* Botão LIMPAR FILTROS */
+document.getElementById("btnLimpar").addEventListener("click", () => {
+  ["fCs","fNome","fCargo","fCipia","fTreino","fFormacao","fVencimento"].forEach(id=>{
+    document.getElementById(id).value="";
+  });
+  document.getElementById("fStatus").value="";
+  renderTreinos();
+});
+
+renderTreinos();
+</script>
+
 </body>
 </html>
