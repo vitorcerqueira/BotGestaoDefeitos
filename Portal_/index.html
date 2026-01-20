@@ -43,6 +43,12 @@
           <option value="7">Jul</option><option value="8">Ago</option><option value="9">Set</option>
           <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
         </select>
+
+        <!-- ✅ NOVO: filtro de departamento -->
+        <select id="depSel" title="Filtrar por departamento">
+          <option value="all">(todos os departamentos)</option>
+        </select>
+
         <input id="busca" type="search" placeholder="🔍 Buscar por nome, e-mail ou gerência…" />
       </div>
     </div>
@@ -67,23 +73,35 @@ const PESSOAS_RAW = [
   { nome:"Ricardo Assumpcao Junior",         data:"01/jul", dep:"Institucional e Faixa de Domínio", email:"ricardoaj@rumolog.com" },
   { nome:"Thaina de Fatima Rosa Lopes",      data:"06/jul", dep:"Execução CS", email:"Thaina.Lopes@rumolog.com" },
   { nome:"Israel Riegel",                    data:"24/jul", dep:"Execução RS", email:"Israel.Riegel@ext.rumolog.com" },
-  { nome:"Roberto Benedito Antunes",         data:"21/jun", dep:"OBRAS", email:"roberto.antunes@rumolog.com" },
+  { nome:"Roberto Benedito Antunes",         data:"21/jun", dep:"Execução CS", email:"roberto.antunes@rumolog.com" },
   { nome:"Helder da Silva Barbosa",          data:"04/jun", dep:"OAE's", email:"Helder.Barbosa@rumolog.com" },
   { nome:"Vitor Cerqueira dos Santos",       data:"05/jun", dep:"Planejamento", email:"vitor.cerqueira@rumolog.com" },
   { nome:"Vitor Cerqueira dos Santos",       data:"18/set", dep:"Planejamento", email:"vitor.cerqueira@rumolog.com" }, /* duplicado */
   { nome:"Luis Felipe Martinelli Martins",   data:"03/mai", dep:"Execução RS", email:"luis.martins@rumolog.com" },
-  { nome:"Luciano Frederico Stelle",         data:"02/nov", dep:"OBRAS", email:"luciano.stelle@rumolog.com" },
+  { nome:"Luciano Frederico Stelle",         data:"02/nov", dep:"Execução CS", email:"luciano.stelle@rumolog.com" },
   { nome:"Victor Hugo Santos Miranda de Souza", data:"07/nov", dep:"Planejamento", email:"victor.miranda@rumolog.com" },
   { nome:"Vitoria Araujo dos Santos",        data:"12/nov", dep:"Planejamento", email:"vitoria.santos@rumolog.com" },
   { nome:"Nicholas Matheus Bachaus Stein",   data:"15/nov", dep:"Engenharia", email:"nicholas.stein@rumolog.com" },
   { nome:"Vitor Hugo Tonini",                data:"29/nov", dep:"Execução CN", email:"Vitor.Tonini@rumolog.com" },
   { nome:"Derick Leonardo da Silva Lisboa",  data:"28/out", dep:"OAE's", email:"derick.lisboa@rumolog.com" },
-  { nome:"Jennifer Desiree M Cavalheiro Cúnico", data:"02/out", dep:"Planejamento", email:"jennifer.cunico@rumolog.com" },
+  { nome:"Jennifer Desiree M Cavalheiro Cúnico", data:"02/out", dep:"OAE's", email:"jennifer.cunico@rumolog.com" },
   { nome:"Livia Cristina Guimaraes Oliveira", data:"29/out", dep:"Institucional e Faixa de Domínio", email:"Livia.Oliveira@ext.rumolog.com" },
   { nome:"Francisco Antonio Ramos de Faria Filho", data:"07/set", dep:"Execução CS", email:"francisco.filho@rumolog.com" },
   { nome:"Thalita Iachitzki da Cruz",        data:"23/set", dep:"Planejamento", email:"thalita.cruz@rumolog.com" },
   { nome:"Kaue Ciesielski Stinglin",         data:"22/jan", dep:"Institucional e Faixa de Domínio", email:"Kaue.Stinglin@rumolog.com" },
-  { nome:"Sergio Alves Neves Junior",        data:"13/mai", dep:"Engenharia", email:"Sergio.Junior@rumolog.com" }
+  { nome:"Diorge Roni Garcia Viana",         data:"11/jan", dep:"Execução RS", email:"diorge.garcia@rumolog.com" },
+  { nome:"Eduandro Lutz",                    data:"01/set", dep:"Execução RS", email:"Eduandro.Lutz@rumolog.com" },
+  { nome:"Lucas Camargo Motta",              data:"31/mai", dep:"Execução RS", email:"lucas.motta@rumolog.com" },
+  { nome:"Walter Kegler Filho",              data:"30/ago", dep:"Execução CN", email:"walter.kegler@rumolog.com" },
+  { nome:"Vagner Henrique Dos Santos",       data:"08/jul", dep:"Execução CN", email:"Vagner.DosSantos@rumolog.com" },
+  { nome:"Jose Roberto Miranda",             data:"18/jan", dep:"Execução CS", email:"jose.rmiranda@rumolog.com" },
+  { nome:"Luis Henrique Freire Damasceno Nascimento",         data:"01/fev", dep:"Execução CS", email:"luisnasciment@rumolog.com" },
+  { nome:"João Paulo da Silva Garcia",         data:"08/jul", dep:"Execução CS", email:"" },
+  { nome:"Vitor Emanoel Gonçalves Pereira",    data:"27/jul", dep:"Engenharia", email:"vitor.pereira@rumolog.com" },
+  { nome:"Vitor Emanoel Gonçalves Pereira",    data:"27/jul", dep:"Engenharia", email:"vitor.pereira@rumolog.com" },
+  { nome:"Pablo Henrique Amarante",    data:"00/tes", dep:"Engenharia", email:"Pablo.Amarante@rumolog.com" },
+  { nome:"Ricardo Gasparino Ribas",    data:"06/ago", dep:"Gerente", email:"ricardo.ribas@rumolog.com" },
+  { nome:"Sergio Alves Neves Junior",          data:"13/mai", dep:"Engenharia", email:"Sergio.Junior@rumolog.com" }
 ];
 
 /* ====== DEDUP por (nome+email) ====== */
@@ -210,11 +228,39 @@ function aplicarOnError(img,p){
   };
 }
 
+/* ================== ✅ FILTRO DE DEPARTAMENTO ================== */
+function normTxt(s){
+  return String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"").toLowerCase().trim();
+}
+
+function preencherFiltroDepartamento(){
+  const depSel = document.getElementById("depSel");
+  const deps = Array.from(
+    new Set(PESSOAS.map(p => (p.dep || "").trim()).filter(Boolean))
+  ).sort((a,b)=> a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
+
+  // mantém o valor selecionado (se existir)
+  const atual = depSel.value || "all";
+
+  // limpa e recria opções
+  depSel.innerHTML = `<option value="all">(todos os departamentos)</option>`;
+  for (const d of deps){
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    depSel.appendChild(opt);
+  }
+
+  // tenta restaurar seleção
+  depSel.value = deps.includes(atual) ? atual : "all";
+}
+
 /* ======================= RENDER ======================= */
 function render(){
   const mural=document.getElementById("mural");
   const vazio=document.getElementById("vazio");
   const mesSel=document.getElementById("mesSel").value;
+  const depSel=document.getElementById("depSel").value; // ✅ NOVO
   const busca=document.getElementById("busca").value;
 
   mural.innerHTML="";
@@ -222,8 +268,8 @@ function render(){
   const mesAtual=hoje.getMonth()+1, diaHoje=hoje.getDate();
   const alvoMes = (mesSel==="all") ? "all" : (mesSel==="" ? mesAtual : parseInt(mesSel,10));
 
-  const norm = s => String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"").toLowerCase();
-  const termo = norm(busca);
+  const termo = normTxt(busca);
+  const depAlvo = depSel; // "all" ou texto do dep
 
   let lista = PESSOAS
     .filter(p => {
@@ -231,11 +277,15 @@ function render(){
       if(alvoMes==="all") return true;
       return mes === alvoMes;
     })
+    .filter(p => { // ✅ NOVO: filtro departamento
+      if(depAlvo === "all") return true;
+      return (p.dep || "").trim() === depAlvo;
+    })
     .filter(p => {
       if(!termo) return true;
-      return norm(p.nome).includes(termo) ||
+      return normTxt(p.nome).includes(termo) ||
              (p.email && p.email.toLowerCase().includes(termo)) ||
-             norm(p.dep||p.gerencia||"").includes(termo);
+             normTxt(p.dep||p.gerencia||"").includes(termo);
     })
     .sort((a,b)=>{
       const aa=parseDM(a.data), bb=parseDM(b.data);
@@ -279,10 +329,14 @@ function render(){
 
 /* ====================== CONTROLES ====================== */
 document.getElementById("mesSel").addEventListener("change", render);
+document.getElementById("depSel").addEventListener("change", render); // ✅ NOVO
 document.getElementById("busca").addEventListener("input", ()=>{
   clearTimeout(window.__deb);
   window.__deb=setTimeout(render,150);
 });
+
+/* ✅ inicializa filtro e renderiza */
+preencherFiltroDepartamento();
 render();
 </script>
 </body>
