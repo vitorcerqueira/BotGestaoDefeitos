@@ -99,9 +99,7 @@
     align-items:center;
     gap:4px;
   }
-  .btn-clear:hover{
-    background:#f9fafb;
-  }
+  .btn-clear:hover{ background:#f9fafb; }
 
   .filtros-grid{
     display:grid;
@@ -167,10 +165,7 @@
     flex-shrink:0;
     background:#f3f4f6;
   }
-  .info{
-    flex:1;
-    min-width:0;
-  }
+  .info{ flex:1; min-width:0; }
   .linha-top{
     display:flex;
     align-items:center;
@@ -218,26 +213,11 @@
     border:1px solid transparent;
     font-weight:600;
   }
-  .st-valido{
-    background:#ecfdf3;
-    color:#15803d;
-    border-color:#bbf7d0;
-  }
-  .st-a-vencer{
-    background:#fefce8;
-    color:#854d0e;
-    border-color:#fef08a;
-  }
-  .st-vencido{
-    background:#fef2f2;
-    color:#b91c1c;
-    border-color:#fecaca;
-  }
-  .st-nao-concluido{
-    background:#eff6ff;
-    color:#1d4ed8;
-    border-color:#bfdbfe;
-  }
+  .st-valido{ background:#ecfdf3; color:#15803d; border-color:#bbf7d0; }
+  .st-a-vencer{ background:#fefce8; color:#854d0e; border-color:#fef08a; }
+  .st-vencido{ background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+  .st-nao-concluido{ background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+  .st-teste{ background:#f3f4f6; color:#374151; border-color:#e5e7eb; }
 
   .empty{
     margin-top:12px;
@@ -254,30 +234,25 @@
 </head>
 <body>
 
-  <!-- HEADER ROXO COM LOGO -->
   <header class="top-bar">
     <div>
       <h1 class="top-title">Treinamentos – Tecnologia Rumo</h1>
       <p class="top-sub">
-        Visualize os treinamentos por colaborador, status e datas de formação e vencimento.
+        Visualize os treinamentos por colaborador, coordenação, status e datas de formação e vencimento.
       </p>
     </div>
-    <!-- AJUSTE A URL DA LOGO EM LOGO_RUMO (no script) -->
     <img id="logoRumo" class="logo-rumo" alt="Rumo">
   </header>
 
   <main class="wrap">
 
-    <!-- FILTROS POR COLUNA -->
     <section class="filtros-box">
       <div class="filtros-header">
         <p class="filtros-titulo">
           <span class="icon">🔍</span>
           Filtros por coluna
         </p>
-        <button type="button" id="btnLimpar" class="btn-clear">
-          ⟲ Limpar filtros
-        </button>
+        <button type="button" id="btnLimpar" class="btn-clear">⟲ Limpar filtros</button>
       </div>
 
       <div class="filtros-grid">
@@ -298,6 +273,10 @@
           <input id="fCipia" placeholder="ex: Central Serras" />
         </div>
         <div>
+          <div class="filtro-label">Coordenação</div>
+          <input id="fCoord" placeholder="ex: Planejamento" />
+        </div>
+        <div>
           <div class="filtro-label">Treinamento</div>
           <input id="fTreino" placeholder="ex: Primeiros Socorros" />
         </div>
@@ -310,19 +289,19 @@
           <input id="fVencimento" placeholder="dd/mm/aaaa ou /2026" />
         </div>
         <div>
-          <div class="filtro-label">Status (calculado)</div>
+          <div class="filtro-label">Status</div>
           <select id="fStatus">
             <option value="">(todos)</option>
             <option value="valido">Válido</option>
             <option value="a-vencer">À Vencer</option>
             <option value="vencido">Vencido</option>
             <option value="nao-concluido">Não Concluído</option>
+            <option value="teste">Teste</option>
           </select>
         </div>
       </div>
     </section>
 
-    <!-- LISTA -->
     <section>
       <div id="mural"></div>
       <p id="vazio" class="empty" style="display:none">
@@ -334,20 +313,76 @@
 
 <script>
 /* ===================== PASTA DE FOTOS ===================== */
-/* Mesmo caminho do portal de aniversariantes */
 const BASE_FOTOS =
-  "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87Ã%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/Fotos%20Aniversariantes";
+  "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87%C3%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/Fotos%20Aniversariantes";
 
-/* AJUSTE SÓ O NOME DO ARQUIVO DA LOGO (que está nessa mesma pasta) */
-const LOGO_RUMO = BASE_FOTOS + "/logo_rumo.png"; // <-- troque pelo nome correto, ex: "/Rumo_logo.png"
-
-/* coloca a logo no header */
+const LOGO_RUMO = BASE_FOTOS + "/logo_rumo.png"; // ajuste se precisar
 document.getElementById("logoRumo").src = LOGO_RUMO;
 
 /* ========================= DADOS ========================= */
-/* COLE AQUI o TREINOS_RAW COMPLETO que você já tem.
-   Deixo só um registro de exemplo para não poluir.      */
+/*
+  IMPORTANTE:
+  - Agora o layout inclui "coordenacao" (Coordenação).
+  - Você pode colar aqui seu TREINOS_RAW completo.
+*/
 const TREINOS_RAW = [
+
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "04/01/2023",
+    vencimento: "04/01/2024",
+    status: "Vencido",
+    coordenacao: "Engenharia OAE's"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "14/02/2024",
+    vencimento: "13/02/2025",
+    status: "Vencido",
+    coordenacao: "Engenharia OAE's"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "14/02/2024",
+    vencimento: "13/02/2025",
+    status: "Vencido",
+    coordenacao: "Engenharia OAE's"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "19/06/2024",
+    vencimento: "19/06/2025",
+    status: "Vencido",
+    coordenacao: "Engenharia OAE's"
+  },
+  {
+    cs: "383679",
+    nome: "Jennifer Desiree M Cavalheiro Cúnico",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "03/03/2025",
+    vencimento: "03/03/2026",
+    status: "Válido",
+    coordenacao: "Engenharia OAE's"
+  },
+
   {
     cs: "445119",
     nome: "Livia Cristina Guimaraes Oliveira",
@@ -356,18 +391,333 @@ const TREINOS_RAW = [
     treinamento: "Primeiros Socorros",
     formacao: "27/10/2025",
     vencimento: "27/10/2026",
-    status: "Válido"
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
   },
   {
-    cs: "268207",
-    nome: "Ricardo Assumpcao Junior",
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "24/09/2025",
+    vencimento: "24/09/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "445119",
+    nome: "Livia Cristina Guimaraes Oliveira",
+    cargo: "Técnico Administrativo Sr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "",
+    vencimento: "",
+    status: "Não Concluído",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "20/10/2025",
+    vencimento: "20/10/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "13/08/2025",
+    vencimento: "13/08/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "12/05/2025",
+    vencimento: "12/05/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2027",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "13/01/2025",
+    vencimento: "13/01/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "06/01/2025",
+    vencimento: "06/01/2026",
+    status: "Vencido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "407501",
+    nome: "Luciano Frederico Stelle",
+    cargo: "Analista de Operação Sr",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "06/01/2025",
+    vencimento: "06/01/2026",
+    status: "Vencido",
+    coordenacao: "Execução Central Serras"
+  },
+
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "16/06/2025",
+    vencimento: "16/06/2026",
+    status: "Válido",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "7 Regras da Vida",
+    formacao: "07/05/2025",
+    vencimento: "07/05/2026",
+    status: "Válido",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "RO Mód. III",
+    formacao: "07/05/2025",
+    vencimento: "07/05/2026",
+    status: "Válido",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "20/02/2025",
+    vencimento: "20/02/2027",
+    status: "Válido",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "24/01/2025",
+    vencimento: "24/01/2026",
+    status: "Válido",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "24/01/2025",
+    vencimento: "24/01/2026",
+    status: "Válido",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "261095",
+    nome: "Luis Felipe Martinelli Martins",
+    cargo: "Coordenador de Planejamento",
+    cipia: "RS",
+    treinamento: "Primeiros Socorros",
+    formacao: "07/10/2024",
+    vencimento: "07/10/2025",
+    status: "Vencido",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "08/07/2025",
+    vencimento: "08/07/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "16/06/2025",
+    vencimento: "16/06/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "12/05/2025",
+    vencimento: "12/05/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "12/05/2025",
+    vencimento: "12/05/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "23/01/2025",
+    vencimento: "23/01/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "263851",
+    nome: "Matias Alejandro Aduco",
+    cargo: "Analista de Planejamento Sr",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2027",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "18/07/2025",
+    vencimento: "18/07/2026",
+    status: "Válido",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
     cargo: "Coordenador de Planejamento",
     cipia: "Central Serras",
     treinamento: "Integração de Saúde e Segurança",
-    formacao: "22/10/2025",
-    vencimento: "22/10/2026",
-    status: "Válido"
+    formacao: "26/03/2025",
+    vencimento: "26/03/2026",
+    status: "Válido",
+    coordenacao: "Engenharia Infraestrutura"
   },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2027",
+    status: "Válido",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "02/09/2024",
+    vencimento: "02/09/2025",
+    status: "Vencido",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "02/09/2024",
+    vencimento: "02/09/2025",
+    status: "Vencido",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+  {
+    cs: "331946",
+    nome: "Nicholas Matheus Bachaus Stein",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "02/09/2024",
+    vencimento: "02/09/2025",
+    status: "Vencido",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+
   {
     cs: "279728",
     nome: "Rafael Robert Nahra",
@@ -376,38 +726,299 @@ const TREINOS_RAW = [
     treinamento: "Utilização Adequada dos EPI’s",
     formacao: "22/10/2025",
     vencimento: "22/10/2026",
-    status: "Válido"
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "444209",
-    nome: "Vitor Hugo Tonini",
-    cargo: "Analista Administrativo Jr",
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "09/07/2025",
+    vencimento: "09/07/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "09/07/2025",
+    vencimento: "09/07/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
     cipia: "Norte PR + Ramais",
     treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "22/10/2025",
-    vencimento: "22/10/2026",
-    status: "Válido"
+    formacao: "02/06/2025",
+    vencimento: "02/06/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Norte"
   },
   {
-    cs: "444209",
-    nome: "Vitor Hugo Tonini",
-    cargo: "Analista Administrativo Jr",
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "23/05/2025",
+    vencimento: "23/05/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "17/03/2025",
+    vencimento: "17/03/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
     cipia: "Norte PR + Ramais",
     treinamento: "RO Mód. III",
-    formacao: "22/10/2025",
-    vencimento: "22/10/2026",
-    status: "Válido"
+    formacao: "17/03/2025",
+    vencimento: "17/03/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Norte"
   },
   {
-    cs: "407501",
-    nome: "Luciano Frederico Stelle",
-    cargo: "Analista de Operação Sr",
+    cs: "279728",
+    nome: "Rafael Robert Nahra",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "09/03/2025",
+    vencimento: "09/03/2027",
+    status: "Válido",
+    coordenacao: "Execução Central Norte"
+  },
+
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "22/10/2025",
+    vencimento: "22/10/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "19/09/2025",
+    vencimento: "19/09/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
     cipia: "Central Serras",
     treinamento: "7 Regras da Vida",
-    formacao: "20/10/2025",
-    vencimento: "20/10/2026",
-    status: "Válido"
+    formacao: "16/07/2025",
+    vencimento: "16/07/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
   },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "10/06/2025",
+    vencimento: "10/06/2026",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2027",
+    status: "Válido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+  {
+    cs: "268207",
+    nome: "Ricardo Assumpcao Junior",
+    cargo: "Coordenador de Planejamento",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "07/11/2024",
+    vencimento: "07/11/2025",
+    status: "Vencido",
+    coordenacao: "Institucional e Faixa de Domínio"
+  },
+
+  {
+    cs: "385519",
+    nome: "Ricardo Gasparino Ribas",
+    cargo: "Gerente de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "RO Mód. III",
+    formacao: "21/01/2025",
+    vencimento: "21/01/2026",
+    status: "Válido",
+    coordenacao: "Gerente"
+  },
+  {
+    cs: "385519",
+    nome: "Ricardo Gasparino Ribas",
+    cargo: "Gerente de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Utilização Adequada dos EPI’s",
+    formacao: "16/01/2025",
+    vencimento: "16/01/2026",
+    status: "Válido",
+    coordenacao: "Gerente"
+  },
+  {
+    cs: "385519",
+    nome: "Ricardo Gasparino Ribas",
+    cargo: "Gerente de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2026",
+    status: "Válido",
+    coordenacao: "Gerente"
+  },
+  {
+    cs: "385519",
+    nome: "Ricardo Gasparino Ribas",
+    cargo: "Gerente de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2026",
+    status: "Válido",
+    coordenacao: "Gerente"
+  },
+  {
+    cs: "385519",
+    nome: "Ricardo Gasparino Ribas",
+    cargo: "Gerente de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2026",
+    status: "Válido",
+    coordenacao: "Gerente"
+  },
+  {
+    cs: "385519",
+    nome: "Ricardo Gasparino Ribas",
+    cargo: "Gerente de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2026",
+    status: "Válido",
+    coordenacao: "Gerente"
+  },
+  {
+    cs: "385519",
+    nome: "Ricardo Gasparino Ribas",
+    cargo: "Gerente de Planejamento",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "23/09/2024",
+    vencimento: "23/09/2025",
+    status: "Vencido",
+    coordenacao: "Gerente"
+  },
+
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "03/10/2025",
+    vencimento: "03/10/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "03/10/2025",
+    vencimento: "03/10/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "03/10/2025",
+    vencimento: "03/10/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "31/03/2025",
+    vencimento: "31/03/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "15/01/2025",
+    vencimento: "15/01/2027",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "258087",
+    nome: "Roberto Benedito Antunes",
+    cargo: "Especialista de Operação Jr",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "10/01/2025",
+    vencimento: "10/01/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+
   {
     cs: "437413",
     nome: "Sergio Alves Neves Junior",
@@ -416,67 +1027,265 @@ const TREINOS_RAW = [
     treinamento: "RO Mód. III",
     formacao: "13/10/2025",
     vencimento: "13/10/2026",
-    status: "Válido"
+    status: "Válido",
+    coordenacao: "Engenharia infraestrutura"
   },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "15/08/2025",
+    vencimento: "15/08/2027",
+    status: "Válido",
+    coordenacao: "Engenharia infraestrutura"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "15/05/2025",
+    vencimento: "15/05/2026",
+    status: "Válido",
+    coordenacao: "Engenharia infraestrutura"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "13/05/2025",
+    vencimento: "13/05/2026",
+    status: "Válido",
+    coordenacao: "Engenharia infraestrutura"
+  },
+  {
+    cs: "437413",
+    nome: "Sergio Alves Neves Junior",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "13/05/2025",
+    vencimento: "13/05/2026",
+    status: "Válido",
+    coordenacao: "Engenharia infraestrutura"
+  },
+
   {
     cs: "407664",
     nome: "Thalita Cristina Santos Jacojaco",
-    cargo: "Analista de Planejamento Pl",
+    cargo: "Analista de Planejamento Jr",
     cipia: "Norte PR + Ramais",
     treinamento: "Direção Segura -  Teórico",
     formacao: "09/10/2025",
     vencimento: "09/10/2026",
-    status: "Válido"
+    status: "Válido",
+    coordenacao: "Planejamento"
   },
   {
-    cs: "258087",
-    nome: "Roberto Benedito Antunes",
-    cargo: "Especialista de Operação Jr",
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "31/07/2025",
+    vencimento: "31/07/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "24/07/2025",
+    vencimento: "24/07/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "24/07/2025",
+    vencimento: "24/07/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "16/12/2024",
+    vencimento: "16/12/2025",
+    status: "Vencido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "407664",
+    nome: "Thalita Cristina Santos Jacojaco",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "RO Mód. III",
+    formacao: "16/12/2024",
+    vencimento: "16/12/2025",
+    status: "Vencido",
+    coordenacao: "Planejamento"
+  },
+
+  {
+    cs: "330762",
+    nome: "Victor Hugo Miranda Oliveira",
+    cargo: "Analista de Planejamento Jr",
     cipia: "Central Serras",
     treinamento: "7 Regras da Vida",
-    formacao: "03/10/2025",
-    vencimento: "03/10/2026",
-    status: "Válido"
+    formacao: "17/06/2025",
+    vencimento: "17/06/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
   },
   {
-    cs: "258087",
-    nome: "Roberto Benedito Antunes",
-    cargo: "Especialista de Operação Jr",
+    cs: "330762",
+    nome: "Victor Hugo Miranda Oliveira",
+    cargo: "Analista de Planejamento Jr",
     cipia: "Central Serras",
     treinamento: "Direção Segura -  Teórico",
-    formacao: "03/10/2025",
-    vencimento: "03/10/2026",
-    status: "Válido"
+    formacao: "30/04/2025",
+    vencimento: "30/04/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
   },
   {
-    cs: "258087",
-    nome: "Roberto Benedito Antunes",
-    cargo: "Especialista de Operação Jr",
+    cs: "330762",
+    nome: "Victor Hugo Miranda Oliveira",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "06/03/2025",
+    vencimento: "06/03/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "330762",
+    nome: "Victor Hugo Miranda Oliveira",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "23/01/2025",
+    vencimento: "23/01/2026",
+    status: "Vencido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "330762",
+    nome: "Victor Hugo Miranda Oliveira",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "23/01/2025",
+    vencimento: "23/01/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "330762",
+    nome: "Victor Hugo Miranda Oliveira",
+    cargo: "Analista de Planejamento Jr",
     cipia: "Central Serras",
     treinamento: "Integração de Saúde e Segurança",
-    formacao: "03/10/2025",
-    vencimento: "03/10/2026",
-    status: "Válido"
+    formacao: "17/12/2024",
+    vencimento: "17/12/2025",
+    status: "Vencido",
+    coordenacao: "Planejamento"
   },
   {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
+    cs: "330762",
+    nome: "Victor Hugo Miranda Oliveira",
+    cargo: "Analista de Planejamento Jr",
+    cipia: "Central Serras",
+    treinamento: "Utilização Adequada dos EPI’s",
+    formacao: "21/11/2024",
+    vencimento: "21/11/2025",
+    status: "Vencido",
+    coordenacao: "Planejamento"
+  },
+
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "28/04/2025",
+    vencimento: "28/04/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
     cipia: "Central Serras",
     treinamento: "7 Regras da Vida",
-    formacao: "24/09/2025",
-    vencimento: "24/09/2026",
-    status: "Válido"
+    formacao: "27/04/2025",
+    vencimento: "27/04/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
   },
   {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
     cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "24/09/2025",
-    vencimento: "24/09/2026",
-    status: "Válido"
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "27/04/2025",
+    vencimento: "27/04/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
+  },
+  {
+    cs: "434612",
+    nome: "Vitor Cerqueira Dos Santos",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "27/04/2025",
+    vencimento: "27/04/2026",
+    status: "Válido",
+    coordenacao: "Planejamento"
+  },
+
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "22/10/2025",
+    vencimento: "22/10/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "RO Mód. III",
+    formacao: "22/10/2025",
+    vencimento: "22/10/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
   },
   {
     cs: "444209",
@@ -486,27 +1295,30 @@ const TREINOS_RAW = [
     treinamento: "Direção Segura -  Teórico",
     formacao: "22/09/2025",
     vencimento: "22/09/2026",
-    status: "Válido"
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "268207",
-    nome: "Ricardo Assumpcao Junior",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "22/09/2025",
-    vencimento: "22/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "279728",
-    nome: "Rafael Robert Nahra",
-    cargo: "Coordenador de Planejamento",
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
     cipia: "Norte PR + Ramais",
-    treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "18/09/2025",
-    vencimento: "18/09/2026",
-    status: "Válido"
+    treinamento: "Primeiros Socorros",
+    formacao: "09/09/2025",
+    vencimento: "09/09/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "444209",
+    nome: "Vitor Hugo Tonini",
+    cargo: "Analista Administrativo Jr",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "04/09/2025",
+    vencimento: "04/09/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
   },
   {
     cs: "444209",
@@ -514,659 +1326,811 @@ const TREINOS_RAW = [
     cargo: "Analista Administrativo Jr",
     cipia: "Norte PR + Ramais",
     treinamento: "Integração de Saúde e Segurança",
-    formacao: "18/09/2025",
-    vencimento: "18/09/2026",
-    status: "Válido"
+    formacao: "04/09/2025",
+    vencimento: "04/09/2026",
+    status: "Válido",
+    coordenacao: "Execução Central Serras"
+  },
+
+  {
+    cs: "446899",
+    nome: "Vitor Emanoel Gonçalves Pereira",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "28/11/2025",
+    vencimento: "28/11/2027",
+    status: "Válido",
+    coordenacao: "Engenharia Infraestrutura"
   },
   {
-    cs: "261095",
-    nome: "Luis Felipe Martinelli Martins",
-    cargo: "Coordenador de Planejamento",
-    cipia: "RS",
+    cs: "446899",
+    nome: "Vitor Emanoel Gonçalves Pereira",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
     treinamento: "7 Regras da Vida",
-    formacao: "16/09/2025",
-    vencimento: "16/09/2026",
-    status: "Válido"
+    formacao: "19/11/2025",
+    vencimento: "19/11/2026",
+    status: "Válido",
+    coordenacao: "Engenharia Infraestrutura"
   },
   {
-    cs: "263851",
-    nome: "Matias Alejandro Aduco",
-    cargo: "Analista de Planejamento Sr",
+    cs: "446899",
+    nome: "Vitor Emanoel Gonçalves Pereira",
+    cargo: "Analista de Planejamento Pl",
     cipia: "Central Serras",
     treinamento: "Direção Segura -  Teórico",
-    formacao: "16/09/2025",
-    vencimento: "16/09/2026",
-    status: "Válido"
+    formacao: "19/11/2025",
+    vencimento: "19/11/2026",
+    status: "Válido",
+    coordenacao: "Engenharia Infraestrutura"
   },
   {
-    cs: "263851",
-    nome: "Matias Alejandro Aduco",
-    cargo: "Analista de Planejamento Sr",
+    cs: "446899",
+    nome: "Vitor Emanoel Gonçalves Pereira",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "19/11/2025",
+    vencimento: "19/11/2026",
+    status: "Válido",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+  {
+    cs: "446899",
+    nome: "Vitor Emanoel Gonçalves Pereira",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. II",
+    formacao: "19/11/2025",
+    vencimento: "19/11/2026",
+    status: "Válido",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+
+  {
+    cs: "448517",
+    nome: "Pablo Henrique Amarante",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+  {
+    cs: "448517",
+    nome: "Pablo Henrique Amarante",
+    cargo: "Analista de Planejamento Pl",
     cipia: "Central Serras",
     treinamento: "7 Regras da Vida",
-    formacao: "16/09/2025",
-    vencimento: "16/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Engenharia Infraestrutura"
   },
   {
-    cs: "263851",
-    nome: "Matias Alejandro Aduco",
-    cargo: "Analista de Planejamento Sr",
+    cs: "448517",
+    nome: "Pablo Henrique Amarante",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+  {
+    cs: "448517",
+    nome: "Pablo Henrique Amarante",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+  {
+    cs: "448517",
+    nome: "Pablo Henrique Amarante",
+    cargo: "Analista de Planejamento Pl",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. II",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Engenharia Infraestrutura"
+  },
+
+  // Vagner Henrique Dos Santos (sem CS)
+  {
+    cs: "",
+    nome: "Vagner Henrique Dos Santos",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Vagner Henrique Dos Santos",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Vagner Henrique Dos Santos",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Vagner Henrique Dos Santos",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Vagner Henrique Dos Santos",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Vagner Henrique Dos Santos",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Vagner Henrique Dos Santos",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "RO Mód. III",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+
+  // Walter Kegler Filho (sem CS)
+  {
+    cs: "",
+    nome: "Walter Kegler Filho",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "7 Regras da Vida",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Walter Kegler Filho",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Walter Kegler Filho",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Primeiros Socorros",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Walter Kegler Filho",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Walter Kegler Filho",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Walter Kegler Filho",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+  {
+    cs: "",
+    nome: "Walter Kegler Filho",
+    cargo: "Fiscal",
+    cipia: "Norte PR + Ramais",
+    treinamento: "RO Mód. III",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Norte"
+  },
+
+  // Jose Roberto Miranda (sem CS)
+  {
+    cs: "",
+    nome: "Jose Roberto Miranda",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "Jose Roberto Miranda",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "Jose Roberto Miranda",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "Jose Roberto Miranda",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "Jose Roberto Miranda",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "Jose Roberto Miranda",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "Jose Roberto Miranda",
+    cargo: "Fiscal",
     cipia: "Central Serras",
     treinamento: "RO Mód. III",
-    formacao: "16/09/2025",
-    vencimento: "16/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+
+  // Luis Henrique Freire Damasceno Nascimento
+  {
+    cs: "448859",
+    nome: "Luis Henrique Freire Damasceno Nascimento",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "7 Regras da Vida",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "444209",
-    nome: "Vitor Hugo Tonini",
-    cargo: "Analista Administrativo Jr",
-    cipia: "Norte PR + Ramais",
+    cs: "448859",
+    nome: "Luis Henrique Freire Damasceno Nascimento",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "448859",
+    nome: "Luis Henrique Freire Damasceno Nascimento",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Primeiros Socorros",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "448859",
+    nome: "Luis Henrique Freire Damasceno Nascimento",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "448859",
+    nome: "Luis Henrique Freire Damasceno Nascimento",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "448859",
+    nome: "Luis Henrique Freire Damasceno Nascimento",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "448859",
+    nome: "Luis Henrique Freire Damasceno Nascimento",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
     treinamento: "RO Mód. III",
-    formacao: "16/09/2025",
-    vencimento: "16/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
+
+  // João Paulo da Silva Garcia (sem CS)
   {
-    cs: "268207",
-    nome: "Ricardo Assumpcao Junior",
-    cargo: "Coordenador de Planejamento",
+    cs: "",
+    nome: "João Paulo da Silva Garcia",
+    cargo: "Fiscal",
     cipia: "Central Serras",
-    treinamento: "Direção Segura -  Teórico",
-    formacao: "16/09/2025",
-    vencimento: "16/09/2026",
-    status: "Válido"
+    treinamento: "7 Regras da Vida",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "263851",
-    nome: "Matias Alejandro Aduco",
-    cargo: "Analista de Planejamento Sr",
+    cs: "",
+    nome: "João Paulo da Silva Garcia",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "João Paulo da Silva Garcia",
+    cargo: "Fiscal",
     cipia: "Central Serras",
     treinamento: "Primeiros Socorros",
-    formacao: "12/09/2025",
-    vencimento: "12/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "444209",
-    nome: "Vitor Hugo Tonini",
+    cs: "",
+    nome: "João Paulo da Silva Garcia",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "João Paulo da Silva Garcia",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "João Paulo da Silva Garcia",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+  {
+    cs: "",
+    nome: "João Paulo da Silva Garcia",
+    cargo: "Fiscal",
+    cipia: "Central Serras",
+    treinamento: "RO Mód. III",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
+  },
+
+  // Thaina de Fatima Rosa Lopes
+  {
+    cs: "444075",
+    nome: "Thaina de Fatima Rosa Lopes",
     cargo: "Analista Administrativo Jr",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Primeiros Socorros",
-    formacao: "12/09/2025",
-    vencimento: "12/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "407664",
-    nome: "Thalita Cristina Santos Jacojaco",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "12/09/2025",
-    vencimento: "12/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "437413",
-    nome: "Sergio Alves Neves Junior",
-    cargo: "Analista de Planejamento Pl",
     cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "11/09/2025",
-    vencimento: "11/09/2026",
-    status: "Válido"
+    treinamento: "Política sobre Uso de Álcool e Drogas",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "263851",
-    nome: "Matias Alejandro Aduco",
-    cargo: "Analista de Planejamento Sr",
-    cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "11/09/2025",
-    vencimento: "11/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
-    cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "24/09/2025",
-    vencimento: "24/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
-    cipia: "Central Serras",
-    treinamento: "Direção Segura -  Teórico",
-    formacao: "24/09/2025",
-    vencimento: "24/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "444209",
-    nome: "Vitor Hugo Tonini",
+    cs: "444075",
+    nome: "Thaina de Fatima Rosa Lopes",
     cargo: "Analista Administrativo Jr",
-    cipia: "Norte PR + Ramais",
-    treinamento: "7 Regras da Vida",
-    formacao: "16/09/2025",
-    vencimento: "16/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "261095",
-    nome: "Luis Felipe Martinelli Martins",
-    cargo: "Coordenador de Planejamento",
-    cipia: "RS",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "383679",
-    nome: "Jennifer Desiree M Cavalheiro Cúnico",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "331946",
-    nome: "Nicholas Matheus Bachaus Stein",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "261095",
-    nome: "Luis Felipe Martinelli Martins",
-    cargo: "Coordenador de Planejamento",
-    cipia: "RS",
-    treinamento: "Primeiros Socorros",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "331946",
-    nome: "Nicholas Matheus Bachaus Stein",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Primeiros Socorros",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "383679",
-    nome: "Jennifer Desiree M Cavalheiro Cúnico",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Primeiros Socorros",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "261095",
-    nome: "Luis Felipe Martinelli Martins",
-    cargo: "Coordenador de Planejamento",
-    cipia: "RS",
-    treinamento: "Direção Segura -  Teórico",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "331946",
-    nome: "Nicholas Matheus Bachaus Stein",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Direção Segura -  Teórico",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "383679",
-    nome: "Jennifer Desiree M Cavalheiro Cúnico",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Direção Segura -  Teórico",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "261095",
-    nome: "Luis Felipe Martinelli Martins",
-    cargo: "Coordenador de Planejamento",
-    cipia: "RS",
-    treinamento: "7 Regras da Vida",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "331946",
-    nome: "Nicholas Matheus Bachaus Stein",
-    cargo: "Coordenador de Planejamento",
     cipia: "Central Serras",
     treinamento: "7 Regras da Vida",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "383679",
-    nome: "Jennifer Desiree M Cavalheiro Cúnico",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "7 Regras da Vida",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "268207",
-    nome: "Ricardo Assumpcao Junior",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "279728",
-    nome: "Rafael Robert Nahra",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "444209",
-    nome: "Vitor Hugo Tonini",
+    cs: "444075",
+    nome: "Thaina de Fatima Rosa Lopes",
     cargo: "Analista Administrativo Jr",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "258087",
-    nome: "Roberto Benedito Antunes",
-    cargo: "Especialista de Operação Jr",
-    cipia: "Central Serras",
-    treinamento: "Primeiros Socorros",
-    formacao: "03/10/2025",
-    vencimento: "03/10/2026",
-    status: "Válido"
-  },
-  {
-    cs: "258087",
-    nome: "Roberto Benedito Antunes",
-    cargo: "Especialista de Operação Jr",
-    cipia: "Central Serras",
-    treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "03/10/2025",
-    vencimento: "03/10/2026",
-    status: "Válido"
-  },
-  {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
-    cipia: "Central Serras",
-    treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "24/09/2025",
-    vencimento: "24/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "437413",
-    nome: "Sergio Alves Neves Junior",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
-    treinamento: "Primeiros Socorros",
-    formacao: "11/09/2025",
-    vencimento: "11/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "407664",
-    nome: "Thalita Cristina Santos Jacojaco",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Primeiros Socorros",
-    formacao: "12/09/2025",
-    vencimento: "12/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "279728",
-    nome: "Rafael Robert Nahra",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Primeiros Socorros",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "268207",
-    nome: "Ricardo Assumpcao Junior",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Primeiros Socorros",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "437413",
-    nome: "Sergio Alves Neves Junior",
-    cargo: "Analista de Planejamento Pl",
     cipia: "Central Serras",
     treinamento: "Direção Segura -  Teórico",
-    formacao: "11/09/2025",
-    vencimento: "11/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "279728",
-    nome: "Rafael Robert Nahra",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Direção Segura -  Teórico",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "268207",
-    nome: "Ricardo Assumpcao Junior",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Direção Segura -  Teórico",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "407501",
-    nome: "Luciano Frederico Stelle",
-    cargo: "Analista de Operação Sr",
-    cipia: "Central Serras",
-    treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "20/10/2025",
-    vencimento: "20/10/2026",
-    status: "Válido"
-  },
-  {
-    cs: "407501",
-    nome: "Luciano Frederico Stelle",
-    cargo: "Analista de Operação Sr",
-    cipia: "Central Serras",
-    treinamento: "Primeiros Socorros",
-    formacao: "20/10/2025",
-    vencimento: "20/10/2026",
-    status: "Válido"
-  },
-  {
-    cs: "407501",
-    nome: "Luciano Frederico Stelle",
-    cargo: "Analista de Operação Sr",
-    cipia: "Central Serras",
-    treinamento: "Direção Segura -  Teórico",
-    formacao: "20/10/2025",
-    vencimento: "20/10/2026",
-    status: "Válido"
-  },
-  {
-    cs: "407501",
-    nome: "Luciano Frederico Stelle",
-    cargo: "Analista de Operação Sr",
+    cs: "444075",
+    nome: "Thaina de Fatima Rosa Lopes",
+    cargo: "Analista Administrativo Jr",
     cipia: "Central Serras",
     treinamento: "Integração de Saúde e Segurança",
-    formacao: "20/10/2025",
-    vencimento: "20/10/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
   {
-    cs: "437413",
-    nome: "Sergio Alves Neves Junior",
-    cargo: "Analista de Planejamento Pl",
+    cs: "444075",
+    nome: "Thaina de Fatima Rosa Lopes",
+    cargo: "Analista Administrativo Jr",
     cipia: "Central Serras",
-    treinamento: "7 Regras da Vida",
-    formacao: "13/10/2025",
-    vencimento: "13/10/2026",
-    status: "Válido"
+    treinamento: "RO Mód. II",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Central Serras"
   },
+
+  // Diorge Roni Garcia Viana (sem CS)
   {
-    cs: "407664",
-    nome: "Thalita Cristina Santos Jacojaco",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Norte PR + Ramais",
-    treinamento: "7 Regras da Vida",
-    formacao: "09/10/2025",
-    vencimento: "09/10/2026",
-    status: "Válido"
-  },
-  {
-    cs: "437413",
-    nome: "Sergio Alves Neves Junior",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
-    treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "13/10/2025",
-    vencimento: "13/10/2026",
-    status: "Válido"
-  },
-  {
-    cs: "407664",
-    nome: "Thalita Cristina Santos Jacojaco",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "09/10/2025",
-    vencimento: "09/10/2026",
-    status: "Válido"
-  },
-  {
-    cs: "437413",
-    nome: "Sergio Alves Neves Junior",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
-    treinamento: "Primeiros Socorros",
-    formacao: "11/09/2025",
-    vencimento: "11/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "407664",
-    nome: "Thalita Cristina Santos Jacojaco",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Primeiros Socorros",
-    formacao: "12/09/2025",
-    vencimento: "12/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "279728",
-    nome: "Rafael Robert Nahra",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Norte PR + Ramais",
-    treinamento: "Primeiros Socorros",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "268207",
-    nome: "Ricardo Assumpcao Junior",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "Primeiros Socorros",
-    formacao: "10/09/2025",
-    vencimento: "10/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "261095",
-    nome: "Luis Felipe Martinelli Martins",
-    cargo: "Coordenador de Planejamento",
+    cs: "",
+    nome: "Diorge Roni Garcia Viana",
+    cargo: "Fiscal",
     cipia: "RS",
     treinamento: "7 Regras da Vida",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "331946",
-    nome: "Nicholas Matheus Bachaus Stein",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "7 Regras da Vida",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "383679",
-    nome: "Jennifer Desiree M Cavalheiro Cúnico",
-    cargo: "Coordenador de Planejamento",
-    cipia: "Central Serras",
-    treinamento: "7 Regras da Vida",
-    formacao: "09/09/2025",
-    vencimento: "09/09/2026",
-    status: "Válido"
-  },
-  {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
-    cipia: "Central Serras",
+    cs: "",
+    nome: "Diorge Roni Garcia Viana",
+    cargo: "Fiscal",
+    cipia: "RS",
     treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "",
-    vencimento: "",
-    status: "Não Concluído"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
-    cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "24/09/2025",
-    vencimento: "24/09/2026",
-    status: "Válido"
+    cs: "",
+    nome: "Diorge Roni Garcia Viana",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "Primeiros Socorros",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
-    cipia: "Central Serras",
+    cs: "",
+    nome: "Diorge Roni Garcia Viana",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "",
+    nome: "Diorge Roni Garcia Viana",
+    cargo: "Fiscal",
+    cipia: "RS",
     treinamento: "Direção Segura -  Teórico",
-    formacao: "24/09/2025",
-    vencimento: "24/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "444209",
-    nome: "Vitor Hugo Tonini",
-    cargo: "Analista Administrativo Jr",
-    cipia: "Norte PR + Ramais",
+    cs: "",
+    nome: "Diorge Roni Garcia Viana",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "",
+    nome: "Diorge Roni Garcia Viana",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "RO Mód. III",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+
+  // Lucas Camargo Motta (sem CS)
+  {
+    cs: "",
+    nome: "Lucas Camargo Motta",
+    cargo: "Fiscal",
+    cipia: "RS",
     treinamento: "7 Regras da Vida",
-    formacao: "16/09/2025",
-    vencimento: "16/09/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "434612",
-    nome: "Vitor Cerqueira Dos Santos",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
-    treinamento: "Integração de Saúde e Segurança",
-    formacao: "28/04/2025",
-    vencimento: "28/04/2026",
-    status: "Válido"
-  },
-  {
-    cs: "434612",
-    nome: "Vitor Cerqueira Dos Santos",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
+    cs: "",
+    nome: "Lucas Camargo Motta",
+    cargo: "Fiscal",
+    cipia: "RS",
     treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "27/04/2025",
-    vencimento: "27/04/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "434612",
-    nome: "Vitor Cerqueira Dos Santos",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
+    cs: "",
+    nome: "Lucas Camargo Motta",
+    cargo: "Fiscal",
+    cipia: "RS",
     treinamento: "Primeiros Socorros",
-    formacao: "27/04/2025",
-    vencimento: "27/04/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "445119",
-    nome: "Livia Cristina Guimaraes Oliveira",
-    cargo: "Técnico Administrativo Sr",
-    cipia: "Central Serras",
-    treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "",
-    vencimento: "",
-    status: "Não Concluído"
+    cs: "",
+    nome: "Lucas Camargo Motta",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "434612",
-    nome: "Vitor Cerqueira Dos Santos",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
+    cs: "",
+    nome: "Lucas Camargo Motta",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "",
+    nome: "Lucas Camargo Motta",
+    cargo: "Fiscal",
+    cipia: "RS",
     treinamento: "Integração de Saúde e Segurança",
-    formacao: "28/04/2025",
-    vencimento: "28/04/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "434612",
-    nome: "Vitor Cerqueira Dos Santos",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
+    cs: "",
+    nome: "Lucas Camargo Motta",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "RO Mód. III",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+
+  // Eduandro Lutz (sem CS)
+  {
+    cs: "",
+    nome: "Eduandro Lutz",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "7 Regras da Vida",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "",
+    nome: "Eduandro Lutz",
+    cargo: "Fiscal",
+    cipia: "RS",
     treinamento: "Política sobre Uso de Álcool e Drogas",
-    formacao: "27/04/2025",
-    vencimento: "27/04/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   },
   {
-    cs: "434612",
-    nome: "Vitor Cerqueira Dos Santos",
-    cargo: "Analista de Planejamento Pl",
-    cipia: "Central Serras",
+    cs: "",
+    nome: "Eduandro Lutz",
+    cargo: "Fiscal",
+    cipia: "RS",
     treinamento: "Primeiros Socorros",
-    formacao: "27/04/2025",
-    vencimento: "27/04/2026",
-    status: "Válido"
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "",
+    nome: "Eduandro Lutz",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "NR 35 - Trabalho em Altura",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "",
+    nome: "Eduandro Lutz",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "Direção Segura -  Teórico",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "",
+    nome: "Eduandro Lutz",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "Integração de Saúde e Segurança",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
+  },
+  {
+    cs: "",
+    nome: "Eduandro Lutz",
+    cargo: "Fiscal",
+    cipia: "RS",
+    treinamento: "RO Mód. III",
+    formacao: "xx/xx/xxxx",
+    vencimento: "xx/xx/xxxx",
+    status: "Teste",
+    coordenacao: "Execução Rio Grande do Sul"
   }
 ];
 
@@ -1177,6 +2141,27 @@ function semAcento(s){
 }
 function trim1(s){
   return String(s||"").trim().replace(/\s+/g," ");
+}
+function normKey(s){
+  // normaliza "Á Vencer", "A Vencer", "À Vencer" -> a-vencer etc.
+  const x = semAcento(String(s||"")).toLowerCase().trim();
+  if(!x) return "";
+  if(x.includes("nao") && x.includes("concl")) return "nao-concluido";
+  if(x.includes("vencido")) return "vencido";
+  if(x.includes("vencer")) return "a-vencer";
+  if(x.includes("valido")) return "valido";
+  if(x.includes("teste")) return "teste";
+  return x.replace(/\s+/g,"-");
+}
+function normLabelFromKey(key){
+  switch(key){
+    case "valido": return "Válido";
+    case "a-vencer": return "À Vencer";
+    case "vencido": return "Vencido";
+    case "nao-concluido": return "Não Concluído";
+    case "teste": return "Teste";
+    default: return key;
+  }
 }
 
 /* FOTO – mesma lógica */
@@ -1246,40 +2231,45 @@ function aplicarOnError(img,t){
   };
 }
 
-/* Datas dd/mm/aaaa → objeto */
+/* Datas dd/mm/aaaa → objeto (ignora "xx/xx/xxxx") */
 function parseDataBr(str){
-  if(!str) return {dia:NaN, mes:NaN, ano:NaN, date:null};
-  const partes = String(str).split("/");
-  if(partes.length!==3) return {dia:NaN, mes:NaN, ano:NaN, date:null};
-  const [d,m,a] = partes.map(x=>parseInt(x,10));
+  const s = String(str||"").trim();
+  if(!s) return {dia:NaN, mes:NaN, ano:NaN, date:null};
+  if(/x/i.test(s)) return {dia:NaN, mes:NaN, ano:NaN, date:null};
+  if(!/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return {dia:NaN, mes:NaN, ano:NaN, date:null};
+
+  const [d,m,a] = s.split("/").map(x=>parseInt(x,10));
   if(!d || !m || !a) return {dia:NaN, mes:NaN, ano:NaN, date:null};
   const dt = new Date(a, m-1, d);
-  return {dia:d, mes:m, ano:a, date:isNaN(dt.getTime())?null:dt};
+
+  // valida realmente a data (ex: 31/02/2025)
+  if(dt.getFullYear() !== a || (dt.getMonth()+1) !== m || dt.getDate() !== d){
+    return {dia:NaN, mes:NaN, ano:NaN, date:null};
+  }
+  return {dia:d, mes:m, ano:a, date:dt};
 }
 
-/* STATUS – calcula pelo vencimento
-   Regra:
-   - sem data -> Não Concluído
-   - vencimento < hoje -> Vencido
-   - vencimento <= 30 dias -> À Vencer
-   - senão -> Válido
+/* STATUS:
+   - Se vier status preenchido na planilha: usa ele (normalizado).
+   - Senão: calcula pelo vencimento:
+       - sem data -> Não Concluído
+       - vencimento < hoje -> Vencido
+       - vencimento <= 30 dias -> À Vencer
+       - senão -> Válido
 */
-function calcularStatusPorData(vObj, hojeBase){
+function calcularStatusFinal(t, vObj, hojeBase){
+  const keyFromSheet = normKey(t.status);
+  if(keyFromSheet) return { key: keyFromSheet, label: normLabelFromKey(keyFromSheet) };
+
   const vDate = vObj.date;
-  if(!vDate){
-    return { key:"nao-concluido", label:"Não Concluído" };
-  }
+  if(!vDate) return { key:"nao-concluido", label:"Não Concluído" };
 
   const msDia = 24*60*60*1000;
   const vBase = new Date(vDate.getFullYear(), vDate.getMonth(), vDate.getDate());
   const diffDias = Math.round((vBase - hojeBase)/msDia);
 
-  if(diffDias < 0){
-    return { key:"vencido", label:"Vencido" };
-  }
-  if(diffDias <= 30){
-    return { key:"a-vencer", label:"À Vencer" };
-  }
+  if(diffDias < 0) return { key:"vencido", label:"Vencido" };
+  if(diffDias <= 30) return { key:"a-vencer", label:"À Vencer" };
   return { key:"valido", label:"Válido" };
 }
 
@@ -1289,6 +2279,7 @@ function statusClass(key){
     case "a-vencer": return "st-a-vencer";
     case "vencido": return "st-vencido";
     case "nao-concluido": return "st-nao-concluido";
+    case "teste": return "st-teste";
     default: return "";
   }
 }
@@ -1307,6 +2298,7 @@ function renderTreinos(){
   const fNome = semAcento(document.getElementById("fNome").value.toLowerCase());
   const fCargo = semAcento(document.getElementById("fCargo").value.toLowerCase());
   const fCipia = semAcento(document.getElementById("fCipia").value.toLowerCase());
+  const fCoord = semAcento(document.getElementById("fCoord").value.toLowerCase());
   const fTreino = semAcento(document.getElementById("fTreino").value.toLowerCase());
   const fFormacao = document.getElementById("fFormacao").value.trim();
   const fVencimento = document.getElementById("fVencimento").value.trim();
@@ -1316,26 +2308,33 @@ function renderTreinos(){
     .map(t => {
       const _v = parseDataBr(t.vencimento);
       const _f = parseDataBr(t.formacao);
-      const st = calcularStatusPorData(_v, hojeBase);
-      return { ...t, _v, _f, _statusKey: st.key, _statusLabel: st.label };
+      const st = calcularStatusFinal(t, _v, hojeBase);
+      return {
+        ...t,
+        _v, _f,
+        _statusKey: st.key,
+        _statusLabel: st.label
+      };
     })
     .filter(t => {
       if(fCs && !String(t.cs||"").includes(fCs)) return false;
       if(fNome && !semAcento(t.nome||"").toLowerCase().includes(fNome)) return false;
       if(fCargo && !semAcento(t.cargo||"").toLowerCase().includes(fCargo)) return false;
       if(fCipia && !semAcento(t.cipia||"").toLowerCase().includes(fCipia)) return false;
+      if(fCoord && !semAcento(t.coordenacao||"").toLowerCase().includes(fCoord)) return false;
       if(fTreino && !semAcento(t.treinamento||"").toLowerCase().includes(fTreino)) return false;
-      if(fFormacao && !(t.formacao||"").includes(fFormacao)) return false;
-      if(fVencimento && !(t.vencimento||"").includes(fVencimento)) return false;
+      if(fFormacao && !(String(t.formacao||"").includes(fFormacao))) return false;
+      if(fVencimento && !(String(t.vencimento||"").includes(fVencimento))) return false;
       if(fStatus && t._statusKey !== fStatus) return false;
       return true;
     })
     .sort((a,b)=>{
+      // ordena por vencimento válido primeiro; depois nome; depois treinamento
       const da=a._v.date, db=b._v.date;
-      if(da && db) return da - db || semAcento(a.nome).localeCompare(semAcento(b.nome));
+      if(da && db) return (da - db) || semAcento(a.nome).localeCompare(semAcento(b.nome)) || semAcento(a.treinamento).localeCompare(semAcento(b.treinamento));
       if(da && !db) return -1;
       if(!da && db) return 1;
-      return semAcento(a.nome).localeCompare(semAcento(b.nome));
+      return semAcento(a.nome).localeCompare(semAcento(b.nome)) || semAcento(a.treinamento).localeCompare(semAcento(b.treinamento));
     });
 
   if(!lista.length){
@@ -1369,9 +2368,10 @@ function renderTreinos(){
 
     const linhaTop=document.createElement("div");
     linhaTop.className="linha-top";
+
     const nomeEl=document.createElement("p");
     nomeEl.className="nome";
-    nomeEl.textContent=t.nome;
+    nomeEl.textContent=t.nome || "(sem nome)";
     linhaTop.appendChild(nomeEl);
 
     if(t.cs){
@@ -1383,7 +2383,12 @@ function renderTreinos(){
 
     const linhaSub=document.createElement("p");
     linhaSub.className="linha-sub";
-    linhaSub.textContent=(t.cargo || "") + (t.cargo && t.cipia? " • " : "") + (t.cipia || "");
+
+    const partes = [];
+    if(t.cargo) partes.push(t.cargo);
+    if(t.cipia) partes.push(t.cipia);
+    if(t.coordenacao) partes.push(t.coordenacao);
+    linhaSub.textContent = partes.join(" • ");
 
     const treino=document.createElement("p");
     treino.className="treino";
@@ -1419,17 +2424,15 @@ function onFilterChange(){
   clearTimeout(debounceId);
   debounceId=setTimeout(renderTreinos, 120);
 }
-["fCs","fNome","fCargo","fCipia","fTreino","fFormacao","fVencimento","fStatus"]
+["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento","fStatus"]
   .forEach(id=>{
-    document.getElementById(id).addEventListener(
-      id==="fStatus" ? "change" : "input",
-      onFilterChange
-    );
+    const el = document.getElementById(id);
+    el.addEventListener(id==="fStatus" ? "change" : "input", onFilterChange);
   });
 
 /* Botão LIMPAR FILTROS */
 document.getElementById("btnLimpar").addEventListener("click", () => {
-  ["fCs","fNome","fCargo","fCipia","fTreino","fFormacao","fVencimento"].forEach(id=>{
+  ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento"].forEach(id=>{
     document.getElementById(id).value="";
   });
   document.getElementById("fStatus").value="";
