@@ -1,250 +1,473 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Portal de Treinamentos</title>
-<style>
-  :root{
-    --roxo-header: #6b2fbf;
-    --roxo-escuro: #51238f;
-    --roxo-claro: #ede7ff;
-    --roxo-chip: #f3e9ff;
-    --texto-principal: #1f2933;
-    --texto-sec: #6b7280;
-    --borda: #e5e7eb;
-    --bg: #f6f5fb;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-    background:var(--bg);
-    color:var(--texto-principal);
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portal de Treinamentos</title>
 
-  /* HEADER */
-  .top-bar{
-    background: linear-gradient(90deg, var(--roxo-header), var(--roxo-escuro));
-    color:#fff;
-    padding:14px 26px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:16px;
-  }
-  .top-title{
-    font-size:20px;
-    font-weight:600;
-    margin:0;
-  }
-  .top-sub{
-    margin:2px 0 0 0;
-    font-size:12px;
-    opacity:.9;
-  }
-  .logo-rumo{
-    height:40px;
-    max-width:140px;
-    object-fit:contain;
-  }
+  <style>
+    :root{
+      --roxo-header: #6b2fbf;
+      --roxo-escuro: #51238f;
+      --roxo-claro: #ede7ff;
+      --roxo-chip: #f3e9ff;
+      --texto-principal: #1f2933;
+      --texto-sec: #6b7280;
+      --borda: #e5e7eb;
+      --bg: #f6f5fb;
+    }
 
-  .wrap{
-    max-width:1300px;
-    margin:0 auto;
-    padding:18px 20px 28px 20px;
-  }
+    *{ box-sizing:border-box; }
 
-  /* FILTROS */
-  .filtros-box{
-    background:#fff;
-    border-radius:16px;
-    border:1px solid var(--borda);
-    padding:12px 14px 14px 14px;
-    box-shadow:0 2px 8px rgba(15,23,42,.05);
-    margin-bottom:16px;
-  }
-  .filtros-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:6px;
-  }
-  .filtros-titulo{
-    font-size:13px;
-    font-weight:600;
-    color:var(--texto-sec);
-    margin:0;
-    display:flex;
-    align-items:center;
-    gap:6px;
-  }
-  .filtros-titulo span.icon{
-    width:18px; height:18px; border-radius:999px;
-    background:var(--roxo-claro);
-    display:flex; align-items:center; justify-content:center;
-    font-size:11px;
-  }
-  .btn-clear{
-    border:1px solid #e5e7eb;
-    background:#fff;
-    color:#6b21a8;
-    font-size:11px;
-    font-weight:600;
-    padding:4px 10px;
-    border-radius:999px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:4px;
-  }
-  .btn-clear:hover{ background:#f9fafb; }
+    body{
+      margin:0;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--texto-principal);
+    }
 
-  .filtros-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-    gap:8px 10px;
-  }
-  .filtro-label{
-    font-size:11px;
-    color:var(--texto-sec);
-    margin-bottom:2px;
-  }
-  .filtros-grid input,
-  .filtros-grid select{
-    width:100%;
-    padding:6px 8px;
-    border-radius:8px;
-    border:1px solid var(--borda);
-    font-size:13px;
-    color:var(--texto-principal);
-    background:#fff;
-  }
-  .filtros-grid input::placeholder{
-    color:#9ca3af;
-    font-size:12px;
-  }
+    /* HEADER */
+    .top-bar{
+      background: linear-gradient(90deg, var(--roxo-header), var(--roxo-escuro));
+      color:#fff;
+      padding:14px 26px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-  /* LISTA DE CARDS */
-  #mural{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-    gap:14px;
-  }
-  .card{
-    background:#fff;
-    border-radius:16px;
-    border:1px solid #e5e7eb;
-    padding:12px 12px;
-    display:flex;
-    gap:10px;
-    position:relative;
-    box-shadow:0 2px 8px rgba(15,23,42,.04);
-  }
-  .card-hoje{
-    border-color:#f97316;
-    box-shadow:0 0 0 2px rgba(249,115,22,.25);
-  }
-  .pill-hoje{
-    position:absolute;
-    top:8px; right:8px;
-    background:#fff7ed;
-    color:#c2410c;
-    border-radius:999px;
-    border:1px solid #fed7aa;
-    padding:2px 8px;
-    font-size:10px;
-    font-weight:600;
-  }
-  .card img{
-    width:72px; height:72px;
-    border-radius:50%;
-    object-fit:cover;
-    border:2px solid var(--roxo-claro);
-    flex-shrink:0;
-    background:#f3f4f6;
-  }
-  .info{ flex:1; min-width:0; }
-  .linha-top{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:6px;
-  }
-  .nome{
-    margin:0;
-    font-size:14px;
-    font-weight:600;
-    color:var(--texto-principal);
-  }
-  .cs-tag{
-    font-size:11px;
-    color:#6b21a8;
-    background:var(--roxo-chip);
-    border-radius:999px;
-    padding:1px 8px;
-    border:1px solid #e9d5ff;
-    white-space:nowrap;
-  }
-  .linha-sub{
-    margin:2px 0 0 0;
-    font-size:11px;
-    color:var(--texto-sec);
-  }
-  .treino{
-    margin:6px 0 0 0;
-    font-size:12px;
-    color:var(--roxo-escuro);
-    font-weight:500;
-  }
-  .datas{
-    margin:4px 0 0 0;
-    font-size:11px;
-    color:#4b5563;
-  }
+    .top-left{
+      min-width:0;
+    }
 
-  .status-badge{
-    display:inline-block;
-    margin-top:6px;
-    font-size:10px;
-    padding:3px 9px;
-    border-radius:999px;
-    border:1px solid transparent;
-    font-weight:600;
-  }
-  .st-valido{ background:#ecfdf3; color:#15803d; border-color:#bbf7d0; }
-  .st-a-vencer{ background:#fefce8; color:#854d0e; border-color:#fef08a; }
-  .st-vencido{ background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
-  .st-nao-concluido{ background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
-  .st-teste{ background:#f3f4f6; color:#374151; border-color:#e5e7eb; }
+    .top-title{
+      font-size:20px;
+      font-weight:600;
+      margin:0;
+    }
 
-  .empty{
-    margin-top:12px;
-    font-size:13px;
-    color:var(--texto-sec);
-  }
+    .top-sub{
+      margin:2px 0 0 0;
+      font-size:12px;
+      opacity:.9;
+    }
 
-  @media (max-width:640px){
-    .top-bar{padding:12px 16px}
-    .wrap{padding-inline:14px}
-    .logo-rumo{height:30px;}
-  }
-</style>
+    .top-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-shrink:0;
+    }
+
+    .logo-rumo{
+      height:40px;
+      max-width:140px;
+      object-fit:contain;
+    }
+
+    .btn-bi{
+      border:1px solid rgba(255,255,255,.25);
+      background: rgba(255,255,255,.12);
+      color:#fff;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:700;
+      padding:8px 12px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+      cursor:pointer;
+      transition: transform .08s ease, background .12s ease;
+    }
+    .btn-bi:hover{ background: rgba(255,255,255,.18); transform: translateY(-1px); }
+    .btn-bi:active{ transform: translateY(0); }
+    .btn-bi .dot{
+      width:8px;height:8px;border-radius:50%;
+      background:#22c55e;
+      box-shadow:0 0 0 3px rgba(34,197,94,.2);
+    }
+
+    .wrap{
+      max-width:1300px;
+      margin:0 auto;
+      padding:18px 20px 28px 20px;
+    }
+
+    /* KPIs (CARDS DE TOTAL) */
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .kpi{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--borda);
+      padding:12px 14px;
+      box-shadow:0 2px 8px rgba(15,23,42,.05);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      min-height:78px;
+    }
+
+    .kpi .label{
+      font-size:12px;
+      color:var(--texto-sec);
+      margin:0 0 6px 0;
+      font-weight:600;
+    }
+    .kpi .value{
+      font-size:26px;
+      font-weight:800;
+      margin:0;
+      line-height:1.05;
+      letter-spacing:-.5px;
+      color:var(--texto-principal);
+    }
+    .kpi .hint{
+      margin:6px 0 0 0;
+      font-size:11px;
+      color:#94a3b8;
+    }
+
+    .kpi .pill{
+      font-size:11px;
+      font-weight:800;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid transparent;
+      white-space:nowrap;
+      margin-top:2px;
+    }
+
+    .pill-total{
+      background:#f3f4f6;
+      color:#111827;
+      border-color:#e5e7eb;
+    }
+    .pill-valido{
+      background:#ecfdf3;
+      color:#15803d;
+      border-color:#bbf7d0;
+    }
+    .pill-avencer{
+      background:#fefce8;
+      color:#854d0e;
+      border-color:#fef08a;
+    }
+    .pill-vencido{
+      background:#fef2f2;
+      color:#b91c1c;
+      border-color:#fecaca;
+    }
+
+    /* FILTROS */
+    .filtros-box{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--borda);
+      padding:12px 14px 14px 14px;
+      box-shadow:0 2px 8px rgba(15,23,42,.05);
+      margin-bottom:16px;
+    }
+
+    .filtros-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:6px;
+    }
+
+    .filtros-titulo{
+      font-size:13px;
+      font-weight:600;
+      color:var(--texto-sec);
+      margin:0;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .filtros-titulo span.icon{
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      background:var(--roxo-claro);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+    }
+
+    .btn-clear{
+      border:1px solid #e5e7eb;
+      background:#fff;
+      color:#6b21a8;
+      font-size:11px;
+      font-weight:600;
+      padding:4px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .btn-clear:hover{ background:#f9fafb; }
+
+    .filtros-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+      gap:8px 10px;
+    }
+
+    .filtro-label{
+      font-size:11px;
+      color:var(--texto-sec);
+      margin-bottom:2px;
+    }
+
+    .filtros-grid input,
+    .filtros-grid select{
+      width:100%;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid var(--borda);
+      font-size:13px;
+      color:var(--texto-principal);
+      background:#fff;
+    }
+
+    .filtros-grid input::placeholder{
+      color:#9ca3af;
+      font-size:12px;
+    }
+
+    /* LISTA DE CARDS */
+    #mural{
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+      gap:14px;
+    }
+
+    .card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid #e5e7eb;
+      padding:12px 12px;
+      display:flex;
+      gap:10px;
+      position:relative;
+      box-shadow:0 2px 8px rgba(15,23,42,.04);
+    }
+
+    .card-hoje{
+      border-color:#f97316;
+      box-shadow:0 0 0 2px rgba(249,115,22,.25);
+    }
+
+    .pill-hoje{
+      position:absolute;
+      top:8px;
+      right:8px;
+      background:#fff7ed;
+      color:#c2410c;
+      border-radius:999px;
+      border:1px solid #fed7aa;
+      padding:2px 8px;
+      font-size:10px;
+      font-weight:600;
+    }
+
+    .card img{
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      object-fit:cover;
+      border:2px solid var(--roxo-claro);
+      flex-shrink:0;
+      background:#f3f4f6;
+    }
+
+    .info{ flex:1; min-width:0; }
+
+    .linha-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+    }
+
+    .nome{
+      margin:0;
+      font-size:14px;
+      font-weight:600;
+      color:var(--texto-principal);
+    }
+
+    .cs-tag{
+      font-size:11px;
+      color:#6b21a8;
+      background:var(--roxo-chip);
+      border-radius:999px;
+      padding:1px 8px;
+      border:1px solid #e9d5ff;
+      white-space:nowrap;
+    }
+
+    .linha-sub{
+      margin:2px 0 0 0;
+      font-size:11px;
+      color:var(--texto-sec);
+    }
+
+    .treino{
+      margin:6px 0 0 0;
+      font-size:12px;
+      color:var(--roxo-escuro);
+      font-weight:500;
+    }
+
+    .datas{
+      margin:4px 0 0 0;
+      font-size:11px;
+      color:#4b5563;
+    }
+
+    .status-badge{
+      display:inline-block;
+      margin-top:6px;
+      font-size:10px;
+      padding:3px 9px;
+      border-radius:999px;
+      border:1px solid transparent;
+      font-weight:600;
+    }
+
+    .st-valido{
+      background:#ecfdf3;
+      color:#15803d;
+      border-color:#bbf7d0;
+    }
+
+    .st-a-vencer{
+      background:#fefce8;
+      color:#854d0e;
+      border-color:#fef08a;
+    }
+
+    .st-vencido{
+      background:#fef2f2;
+      color:#b91c1c;
+      border-color:#fecaca;
+    }
+
+    .st-nao-concluido{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border-color:#bfdbfe;
+    }
+
+    .st-teste{
+      background:#f3f4f6;
+      color:#374151;
+      border-color:#e5e7eb;
+    }
+
+    .empty{
+      margin-top:12px;
+      font-size:13px;
+      color:var(--texto-sec);
+    }
+
+    @media (max-width:980px){
+      .kpis{ grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+    }
+
+    @media (max-width:640px){
+      .top-bar{ padding:12px 16px; }
+      .wrap{ padding-inline:14px; }
+      .logo-rumo{ height:30px; }
+      .kpis{ grid-template-columns: 1fr; }
+      .btn-bi{ padding:7px 10px; font-size:12px; }
+    }
+  </style>
 </head>
-<body>
 
+<body>
   <header class="top-bar">
-    <div>
-      <h1 class="top-title">Treinamentos – Tecnologia Rumo</h1>
+    <div class="top-left">
+      <h1 class="top-title">Treinamentos Rumo</h1>
       <p class="top-sub">
         Visualize os treinamentos por colaborador, coordenação, status e datas de formação e vencimento.
       </p>
     </div>
-    <img id="logoRumo" class="logo-rumo" alt="Rumo">
+
+    <div class="top-right">
+      <!-- BOTÃO PARA O BI DE SEGURANÇA -->
+      <a
+        class="btn-bi"
+        href="https://app.powerbi.com/groups/6bf037f8-a952-41d5-8f33-867babe2eecc/reports/b648a096-1227-4087-813d-9f402b34c0a7/ReportSection?language=pt-BR&experience=power-bi"
+        target="_blank"
+        rel="noopener"
+        title="Abrir BI de Segurança"
+      >
+        <span class="dot"></span>
+        BI Segurança
+      </a>
+
+      <img id="logoRumo" class="logo-rumo" alt="Rumo">
+    </div>
   </header>
 
   <main class="wrap">
+
+    <!-- CARDS (TOTALIZADORES) -->
+    <section class="kpis" aria-label="Totais">
+      <div class="kpi">
+        <div>
+          <p class="label">Total de colaboradores</p>
+          <p class="value" id="kpiTotal">0</p>
+          <p class="hint" id="kpiHintTotal">considera os filtros atuais</p>
+        </div>
+        <span class="pill pill-total">TOTAL</span>
+      </div>
+
+      <div class="kpi">
+        <div>
+          <p class="label">Colaboradores com treinamento vencido</p>
+          <p class="value" id="kpiVencido">0</p>
+          <p class="hint">pelo menos 1 treinamento vencido</p>
+        </div>
+        <span class="pill pill-vencido">VENCIDO</span>
+      </div>
+
+      <div class="kpi">
+        <div>
+          <p class="label">Colaboradores com treinamento à vencer</p>
+          <p class="value" id="kpiAVencer">0</p>
+          <p class="hint">pelo menos 1 à vencer (≤ 30 dias)</p>
+        </div>
+        <span class="pill pill-avencer">À VENCER</span>
+      </div>
+
+      <div class="kpi">
+        <div>
+          <p class="label">Colaboradores com treinamento válido</p>
+          <p class="value" id="kpiValido">0</p>
+          <p class="hint">pelo menos 1 válido</p>
+        </div>
+        <span class="pill pill-valido">VÁLIDO</span>
+      </div>
+    </section>
 
     <section class="filtros-box">
       <div class="filtros-header">
@@ -260,34 +483,52 @@
           <div class="filtro-label">CS</div>
           <input id="fCs" placeholder="ex: 445119" />
         </div>
+
         <div>
           <div class="filtro-label">Nome Completo</div>
           <input id="fNome" placeholder="digite parte do nome" />
         </div>
+
         <div>
           <div class="filtro-label">Cargo</div>
           <input id="fCargo" placeholder="ex: Coordenador" />
         </div>
+
         <div>
           <div class="filtro-label">Cipia</div>
           <input id="fCipia" placeholder="ex: Central Serras" />
         </div>
+
         <div>
           <div class="filtro-label">Coordenação</div>
-          <input id="fCoord" placeholder="ex: Planejamento" />
+          <select id="fCoord">
+            <option value="">(todas)</option>
+            <option value="Engenharia Infraestrutura">Engenharia Infraestrutura</option>
+            <option value="Engenharia OAE's">Engenharia OAE's</option>
+            <option value="Execução Central Norte">Execução Central Norte</option>
+            <option value="Execução Central Serras">Execução Central Serras</option>
+            <option value="Execução Rio Grande do Sul">Execução Rio Grande do Sul</option>
+            <option value="Gerente">Gerente</option>
+            <option value="Institucional e Faixa de Domínio">Institucional e Faixa de Domínio</option>
+            <option value="Planejamento">Planejamento</option>
+          </select>
         </div>
+
         <div>
           <div class="filtro-label">Treinamento</div>
           <input id="fTreino" placeholder="ex: Primeiros Socorros" />
         </div>
+
         <div>
           <div class="filtro-label">Formação</div>
           <input id="fFormacao" placeholder="dd/mm/aaaa ou /2025" />
         </div>
+
         <div>
           <div class="filtro-label">Vencimento</div>
           <input id="fVencimento" placeholder="dd/mm/aaaa ou /2026" />
         </div>
+
         <div>
           <div class="filtro-label">Status</div>
           <select id="fStatus">
@@ -308,25 +549,20 @@
         Nenhum registro encontrado para os filtros selecionados.
       </p>
     </section>
-
   </main>
 
-<script>
-/* ===================== PASTA DE FOTOS ===================== */
-const BASE_FOTOS =
-  "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87%C3%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/Fotos%20Aniversariantes";
+  <script>
+    /* ===================== PASTA DE FOTOS ===================== */
+    const BASE_FOTOS =
+      "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87%C3%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/Fotos%20Aniversariantes";
 
-const LOGO_RUMO = BASE_FOTOS + "/logo_rumo.png"; // ajuste se precisar
-document.getElementById("logoRumo").src = LOGO_RUMO;
+    const LOGO_RUMO = BASE_FOTOS + "/logo_rumo.png"; // ajuste se precisar
+    document.getElementById("logoRumo").src = LOGO_RUMO;
 
-/* ========================= DADOS ========================= */
-/*
-  IMPORTANTE:
-  - Agora o layout inclui "coordenacao" (Coordenação).
-  - Você pode colar aqui seu TREINOS_RAW completo.
-*/
-const TREINOS_RAW = [
-
+    /* ========================= DADOS ========================= */
+    const TREINOS_RAW = [
+      /* COLE AQUI SEU ARRAY COMPLETO */
+     
   {
     cs: "383679",
     nome: "Jennifer Desiree M Cavalheiro Cúnico",
@@ -2134,313 +2370,368 @@ const TREINOS_RAW = [
   }
 ];
 
-
-/* ==================== FUNÇÕES AUXILIARES ==================== */
-function semAcento(s){
-  return String(s||"").normalize("NFD").replace(/\p{Diacritic}/gu,"");
-}
-function trim1(s){
-  return String(s||"").trim().replace(/\s+/g," ");
-}
-function normKey(s){
-  // normaliza "Á Vencer", "A Vencer", "À Vencer" -> a-vencer etc.
-  const x = semAcento(String(s||"")).toLowerCase().trim();
-  if(!x) return "";
-  if(x.includes("nao") && x.includes("concl")) return "nao-concluido";
-  if(x.includes("vencido")) return "vencido";
-  if(x.includes("vencer")) return "a-vencer";
-  if(x.includes("valido")) return "valido";
-  if(x.includes("teste")) return "teste";
-  return x.replace(/\s+/g,"-");
-}
-function normLabelFromKey(key){
-  switch(key){
-    case "valido": return "Válido";
-    case "a-vencer": return "À Vencer";
-    case "vencido": return "Vencido";
-    case "nao-concluido": return "Não Concluído";
-    case "teste": return "Teste";
-    default: return key;
-  }
-}
-
-/* FOTO – mesma lógica */
-const EXTS = [".jpeg",".jpg",".png",".webp"];
-const ICON_DEFAULT = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-
-function variantesDeBase(nome){
-  const withAccents = trim1(nome);
-  const noAccents   = trim1(semAcento(nome));
-  const lowers = [withAccents.toLowerCase(), noAccents.toLowerCase()];
-  const set = new Set();
-  for (const b of lowers){
-    set.add(b);
-    set.add(b.replace(/\s+/g,'.'));
-    set.add(b.replace(/\s+/g,'-'));
-    set.add(b.replace(/\s+/g,''));
-  }
-  return Array.from(set);
-}
-
-function montarURLs(filename){
-  const pasta = BASE_FOTOS.replace(/\/$/,'');
-  const full = `${pasta}/${encodeURIComponent(filename)}`;
-  const down = `https://rumolog.sharepoint.com/_layouts/15/download.aspx?SourceUrl=${encodeURIComponent(full)}`;
-  return [full, down];
-}
-
-function construirListaCandidatosTreino(t){
-  const urls = [];
-  for(const v of variantesDeBase(t.nome||"")){
-    for(const e of EXTS) urls.push(...montarURLs(v+e));
-  }
-  return urls.map((u,i)=> u + (u.includes('?') ? '&' : '?') + 'v=' + (i%5));
-}
-
-function avatarIniciais(nome){
-  const ini=(nome||"").split(/\s+/).filter(Boolean)
-    .map(w=>w[0].toUpperCase()).slice(0,3).join('');
-  const svg = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="110" height="110">
-    <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0%" stop-color="#6b2fbf"/><stop offset="100%" stop-color="#a855f7"/>
-    </linearGradient></defs>
-    <rect width="110" height="110" rx="55" fill="url(#g)"/>
-    <text x="50%" y="55%" text-anchor="middle" font-family="Segoe UI, Arial"
-          font-size="40" fill="#fff" font-weight="700">${ini}</text>
-  </svg>`;
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-}
-
-function getFotoUrlTreino(t){
-  const cand = construirListaCandidatosTreino(t);
-  cand.push(avatarIniciais(t.nome));
-  cand.push(ICON_DEFAULT);
-  t.__fotos = cand.slice(1);
-  return cand[0];
-}
-
-function aplicarOnError(img,t){
-  img.onerror=function(){
-    const fila=t.__fotos||[];
-    while(fila.length){
-      const prox=fila.shift();
-      if(prox && prox!==this.src){ this.src=prox; return; }
+    /* ==================== FUNÇÕES AUXILIARES ==================== */
+    function semAcento(s){
+      return String(s || "")
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "");
     }
-    this.onerror=null;
-  };
-}
 
-/* Datas dd/mm/aaaa → objeto (ignora "xx/xx/xxxx") */
-function parseDataBr(str){
-  const s = String(str||"").trim();
-  if(!s) return {dia:NaN, mes:NaN, ano:NaN, date:null};
-  if(/x/i.test(s)) return {dia:NaN, mes:NaN, ano:NaN, date:null};
-  if(!/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return {dia:NaN, mes:NaN, ano:NaN, date:null};
+    function trim1(s){
+      return String(s || "").trim().replace(/\s+/g, " ");
+    }
 
-  const [d,m,a] = s.split("/").map(x=>parseInt(x,10));
-  if(!d || !m || !a) return {dia:NaN, mes:NaN, ano:NaN, date:null};
-  const dt = new Date(a, m-1, d);
+    function normKey(s){
+      const x = semAcento(String(s || "")).toLowerCase().trim();
+      if(!x) return "";
+      if(x.includes("nao") && x.includes("concl")) return "nao-concluido";
+      if(x.includes("vencido")) return "vencido";
+      if(x.includes("vencer")) return "a-vencer";
+      if(x.includes("valido")) return "valido";
+      if(x.includes("teste")) return "teste";
+      return x.replace(/\s+/g, "-");
+    }
 
-  // valida realmente a data (ex: 31/02/2025)
-  if(dt.getFullYear() !== a || (dt.getMonth()+1) !== m || dt.getDate() !== d){
-    return {dia:NaN, mes:NaN, ano:NaN, date:null};
-  }
-  return {dia:d, mes:m, ano:a, date:dt};
-}
+    function normLabelFromKey(key){
+      switch(key){
+        case "valido": return "Válido";
+        case "a-vencer": return "À Vencer";
+        case "vencido": return "Vencido";
+        case "nao-concluido": return "Não Concluído";
+        case "teste": return "Teste";
+        default: return key;
+      }
+    }
 
-/* STATUS:
-   - Se vier status preenchido na planilha: usa ele (normalizado).
-   - Senão: calcula pelo vencimento:
-       - sem data -> Não Concluído
-       - vencimento < hoje -> Vencido
-       - vencimento <= 30 dias -> À Vencer
-       - senão -> Válido
-*/
-function calcularStatusFinal(t, vObj, hojeBase){
-  const keyFromSheet = normKey(t.status);
-  if(keyFromSheet) return { key: keyFromSheet, label: normLabelFromKey(keyFromSheet) };
+    /* FOTO – mesma lógica */
+    const EXTS = [".jpeg", ".jpg", ".png", ".webp"];
+    const ICON_DEFAULT = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
-  const vDate = vObj.date;
-  if(!vDate) return { key:"nao-concluido", label:"Não Concluído" };
+    function variantesDeBase(nome){
+      const withAccents = trim1(nome);
+      const noAccents = trim1(semAcento(nome));
+      const lowers = [withAccents.toLowerCase(), noAccents.toLowerCase()];
 
-  const msDia = 24*60*60*1000;
-  const vBase = new Date(vDate.getFullYear(), vDate.getMonth(), vDate.getDate());
-  const diffDias = Math.round((vBase - hojeBase)/msDia);
+      const set = new Set();
+      for(const b of lowers){
+        set.add(b);
+        set.add(b.replace(/\s+/g, "."));
+        set.add(b.replace(/\s+/g, "-"));
+        set.add(b.replace(/\s+/g, ""));
+      }
+      return Array.from(set);
+    }
 
-  if(diffDias < 0) return { key:"vencido", label:"Vencido" };
-  if(diffDias <= 30) return { key:"a-vencer", label:"À Vencer" };
-  return { key:"valido", label:"Válido" };
-}
+    function montarURLs(filename){
+      const pasta = BASE_FOTOS.replace(/\/$/, "");
+      const full = `${pasta}/${encodeURIComponent(filename)}`;
+      const down = `https://rumolog.sharepoint.com/_layouts/15/download.aspx?SourceUrl=${encodeURIComponent(full)}`;
+      return [full, down];
+    }
 
-function statusClass(key){
-  switch(key){
-    case "valido": return "st-valido";
-    case "a-vencer": return "st-a-vencer";
-    case "vencido": return "st-vencido";
-    case "nao-concluido": return "st-nao-concluido";
-    case "teste": return "st-teste";
-    default: return "";
-  }
-}
+    function construirListaCandidatosTreino(t){
+      const urls = [];
+      for(const v of variantesDeBase(t.nome || "")){
+        for(const e of EXTS){
+          urls.push(...montarURLs(v + e));
+        }
+      }
+      return urls.map((u, i) => u + (u.includes("?") ? "&" : "?") + "v=" + (i % 5));
+    }
 
-/* =============== RENDERIZAÇÃO ================= */
-function renderTreinos(){
-  const mural=document.getElementById("mural");
-  const vazio=document.getElementById("vazio");
-  mural.innerHTML="";
+    function avatarIniciais(nome){
+      const ini = (nome || "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(w => w[0].toUpperCase())
+        .slice(0, 3)
+        .join("");
 
-  const hoje=new Date();
-  const hojeBase = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-  const diaHoje=hojeBase.getDate(), mesHoje=hojeBase.getMonth()+1, anoHoje=hojeBase.getFullYear();
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="110" height="110">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#6b2fbf"/>
+              <stop offset="100%" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+          <rect width="110" height="110" rx="55" fill="url(#g)"/>
+          <text x="50%" y="55%" text-anchor="middle" font-family="Segoe UI, Arial" font-size="40" fill="#fff" font-weight="700">
+            ${ini}
+          </text>
+        </svg>
+      `;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
 
-  const fCs = document.getElementById("fCs").value.trim();
-  const fNome = semAcento(document.getElementById("fNome").value.toLowerCase());
-  const fCargo = semAcento(document.getElementById("fCargo").value.toLowerCase());
-  const fCipia = semAcento(document.getElementById("fCipia").value.toLowerCase());
-  const fCoord = semAcento(document.getElementById("fCoord").value.toLowerCase());
-  const fTreino = semAcento(document.getElementById("fTreino").value.toLowerCase());
-  const fFormacao = document.getElementById("fFormacao").value.trim();
-  const fVencimento = document.getElementById("fVencimento").value.trim();
-  const fStatus = document.getElementById("fStatus").value;
+    function getFotoUrlTreino(t){
+      const cand = construirListaCandidatosTreino(t);
+      cand.push(avatarIniciais(t.nome));
+      cand.push(ICON_DEFAULT);
 
-  const lista = TREINOS_RAW
-    .map(t => {
-      const _v = parseDataBr(t.vencimento);
-      const _f = parseDataBr(t.formacao);
-      const st = calcularStatusFinal(t, _v, hojeBase);
-      return {
-        ...t,
-        _v, _f,
-        _statusKey: st.key,
-        _statusLabel: st.label
+      t.__fotos = cand.slice(1);
+      return cand[0];
+    }
+
+    function aplicarOnError(img, t){
+      img.onerror = function(){
+        const fila = t.__fotos || [];
+        while(fila.length){
+          const prox = fila.shift();
+          if(prox && prox !== this.src){
+            this.src = prox;
+            return;
+          }
+        }
+        this.onerror = null;
       };
-    })
-    .filter(t => {
-      if(fCs && !String(t.cs||"").includes(fCs)) return false;
-      if(fNome && !semAcento(t.nome||"").toLowerCase().includes(fNome)) return false;
-      if(fCargo && !semAcento(t.cargo||"").toLowerCase().includes(fCargo)) return false;
-      if(fCipia && !semAcento(t.cipia||"").toLowerCase().includes(fCipia)) return false;
-      if(fCoord && !semAcento(t.coordenacao||"").toLowerCase().includes(fCoord)) return false;
-      if(fTreino && !semAcento(t.treinamento||"").toLowerCase().includes(fTreino)) return false;
-      if(fFormacao && !(String(t.formacao||"").includes(fFormacao))) return false;
-      if(fVencimento && !(String(t.vencimento||"").includes(fVencimento))) return false;
-      if(fStatus && t._statusKey !== fStatus) return false;
-      return true;
-    })
-    .sort((a,b)=>{
-      // ordena por vencimento válido primeiro; depois nome; depois treinamento
-      const da=a._v.date, db=b._v.date;
-      if(da && db) return (da - db) || semAcento(a.nome).localeCompare(semAcento(b.nome)) || semAcento(a.treinamento).localeCompare(semAcento(b.treinamento));
-      if(da && !db) return -1;
-      if(!da && db) return 1;
-      return semAcento(a.nome).localeCompare(semAcento(b.nome)) || semAcento(a.treinamento).localeCompare(semAcento(b.treinamento));
+    }
+
+    /* Datas dd/mm/aaaa → objeto (ignora "xx/xx/xxxx") */
+    function parseDataBr(str){
+      const s = String(str || "").trim();
+      if(!s) return { dia:NaN, mes:NaN, ano:NaN, date:null };
+      if(/x/i.test(s)) return { dia:NaN, mes:NaN, ano:NaN, date:null };
+      if(!/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return { dia:NaN, mes:NaN, ano:NaN, date:null };
+
+      const [d, m, a] = s.split("/").map(x => parseInt(x, 10));
+      if(!d || !m || !a) return { dia:NaN, mes:NaN, ano:NaN, date:null };
+
+      const dt = new Date(a, m - 1, d);
+
+      if(dt.getFullYear() !== a || (dt.getMonth() + 1) !== m || dt.getDate() !== d){
+        return { dia:NaN, mes:NaN, ano:NaN, date:null };
+      }
+
+      return { dia:d, mes:m, ano:a, date:dt };
+    }
+
+    /* STATUS FINAL */
+    function calcularStatusFinal(t, vObj, hojeBase){
+      const keyFromSheet = normKey(t.status);
+      if(keyFromSheet) return { key: keyFromSheet, label: normLabelFromKey(keyFromSheet) };
+
+      const vDate = vObj.date;
+      if(!vDate) return { key:"nao-concluido", label:"Não Concluído" };
+
+      const msDia = 24 * 60 * 60 * 1000;
+      const vBase = new Date(vDate.getFullYear(), vDate.getMonth(), vDate.getDate());
+      const diffDias = Math.round((vBase - hojeBase) / msDia);
+
+      if(diffDias < 0) return { key:"vencido", label:"Vencido" };
+      if(diffDias <= 30) return { key:"a-vencer", label:"À Vencer" };
+      return { key:"valido", label:"Válido" };
+    }
+
+    function statusClass(key){
+      switch(key){
+        case "valido": return "st-valido";
+        case "a-vencer": return "st-a-vencer";
+        case "vencido": return "st-vencido";
+        case "nao-concluido": return "st-nao-concluido";
+        case "teste": return "st-teste";
+        default: return "";
+      }
+    }
+
+    /* ====== CHAVE ÚNICA DO COLABORADOR (para contar "colaboradores") ======
+       - Se tiver CS, usa CS
+       - Se não tiver CS, usa o nome normalizado
+    */
+    function keyColaborador(t){
+      const cs = String(t.cs || "").trim();
+      if(cs) return "CS:" + cs;
+      return "NOME:" + semAcento(String(t.nome || "")).toLowerCase().trim().replace(/\s+/g, " ");
+    }
+
+    /* Atualiza os KPIs baseado na lista filtrada */
+    function atualizarKPIs(listaFiltrada){
+      const setTotal = new Set();
+      const setVencido = new Set();
+      const setAVencer = new Set();
+      const setValido = new Set();
+
+      for(const t of listaFiltrada){
+        const k = keyColaborador(t);
+        setTotal.add(k);
+
+        if(t._statusKey === "vencido") setVencido.add(k);
+        if(t._statusKey === "a-vencer") setAVencer.add(k);
+        if(t._statusKey === "valido") setValido.add(k);
+      }
+
+      document.getElementById("kpiTotal").textContent = String(setTotal.size);
+      document.getElementById("kpiVencido").textContent = String(setVencido.size);
+      document.getElementById("kpiAVencer").textContent = String(setAVencer.size);
+      document.getElementById("kpiValido").textContent = String(setValido.size);
+
+      const hint = document.getElementById("kpiHintTotal");
+      hint.textContent = setTotal.size === 1 ? "1 colaborador (com os filtros atuais)" : "considera os filtros atuais";
+    }
+
+    /* =============== RENDERIZAÇÃO ================= */
+    function renderTreinos(){
+      const mural = document.getElementById("mural");
+      const vazio = document.getElementById("vazio");
+      mural.innerHTML = "";
+
+      const hoje = new Date();
+      const hojeBase = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+      const diaHoje = hojeBase.getDate();
+      const mesHoje = hojeBase.getMonth() + 1;
+      const anoHoje = hojeBase.getFullYear();
+
+      const fCs = document.getElementById("fCs").value.trim();
+      const fNome = semAcento(document.getElementById("fNome").value.toLowerCase());
+      const fCargo = semAcento(document.getElementById("fCargo").value.toLowerCase());
+      const fCipia = semAcento(document.getElementById("fCipia").value.toLowerCase());
+      const fCoord = semAcento(document.getElementById("fCoord").value.toLowerCase());
+      const fTreino = semAcento(document.getElementById("fTreino").value.toLowerCase());
+      const fFormacao = document.getElementById("fFormacao").value.trim();
+      const fVencimento = document.getElementById("fVencimento").value.trim();
+      const fStatus = document.getElementById("fStatus").value;
+
+      const lista = TREINOS_RAW
+        .map(t => {
+          const _v = parseDataBr(t.vencimento);
+          const _f = parseDataBr(t.formacao);
+          const st = calcularStatusFinal(t, _v, hojeBase);
+          return { ...t, _v, _f, _statusKey: st.key, _statusLabel: st.label };
+        })
+        .filter(t => {
+          if(fCs && !String(t.cs || "").includes(fCs)) return false;
+          if(fNome && !semAcento(t.nome || "").toLowerCase().includes(fNome)) return false;
+          if(fCargo && !semAcento(t.cargo || "").toLowerCase().includes(fCargo)) return false;
+          if(fCipia && !semAcento(t.cipia || "").toLowerCase().includes(fCipia)) return false;
+          if(fCoord && !semAcento(t.coordenacao || "").toLowerCase().includes(fCoord)) return false;
+          if(fTreino && !semAcento(t.treinamento || "").toLowerCase().includes(fTreino)) return false;
+          if(fFormacao && !String(t.formacao || "").includes(fFormacao)) return false;
+          if(fVencimento && !String(t.vencimento || "").includes(fVencimento)) return false;
+          if(fStatus && t._statusKey !== fStatus) return false;
+          return true;
+        })
+        .sort((a, b) => {
+          const da = a._v.date, db = b._v.date;
+          if(da && db){
+            return (da - db)
+              || semAcento(a.nome).localeCompare(semAcento(b.nome))
+              || semAcento(a.treinamento).localeCompare(semAcento(b.treinamento));
+          }
+          if(da && !db) return -1;
+          if(!da && db) return 1;
+          return semAcento(a.nome).localeCompare(semAcento(b.nome))
+            || semAcento(a.treinamento).localeCompare(semAcento(b.treinamento));
+        });
+
+      /* Atualiza os cards de totais (sempre) */
+      atualizarKPIs(lista);
+
+      if(!lista.length){
+        vazio.style.display = "block";
+        return;
+      }
+      vazio.style.display = "none";
+
+      for(const t of lista){
+        const card = document.createElement("div");
+
+        const v = t._v;
+        const ehHoje = v.dia === diaHoje && v.mes === mesHoje && v.ano === anoHoje;
+
+        card.className = "card" + (ehHoje ? " card-hoje" : "");
+
+        if(ehHoje){
+          const pill = document.createElement("div");
+          pill.className = "pill-hoje";
+          pill.textContent = "Vence hoje";
+          card.appendChild(pill);
+        }
+
+        const img = document.createElement("img");
+        img.alt = t.nome;
+        img.loading = "lazy";
+        img.decoding = "async";
+        img.src = getFotoUrlTreino(t);
+        aplicarOnError(img, t);
+
+        const info = document.createElement("div");
+        info.className = "info";
+
+        const linhaTop = document.createElement("div");
+        linhaTop.className = "linha-top";
+
+        const nomeEl = document.createElement("p");
+        nomeEl.className = "nome";
+        nomeEl.textContent = t.nome || "(sem nome)";
+        linhaTop.appendChild(nomeEl);
+
+        if(t.cs){
+          const cs = document.createElement("span");
+          cs.className = "cs-tag";
+          cs.textContent = "CS " + t.cs;
+          linhaTop.appendChild(cs);
+        }
+
+        const linhaSub = document.createElement("p");
+        linhaSub.className = "linha-sub";
+
+        const partes = [];
+        if(t.cargo) partes.push(t.cargo);
+        if(t.cipia) partes.push(t.cipia);
+        if(t.coordenacao) partes.push(t.coordenacao);
+        linhaSub.textContent = partes.join(" • ");
+
+        const treino = document.createElement("p");
+        treino.className = "treino";
+        treino.textContent = t.treinamento || "";
+
+        const datas = document.createElement("p");
+        datas.className = "datas";
+        datas.textContent =
+          "Formação: " + (t.formacao || "--/--/----") +
+          " · Vencimento: " + (t.vencimento || "--/--/----");
+
+        info.appendChild(linhaTop);
+        info.appendChild(linhaSub);
+        info.appendChild(treino);
+        info.appendChild(datas);
+
+        if(t._statusLabel){
+          const st = document.createElement("span");
+          st.className = "status-badge " + statusClass(t._statusKey);
+          st.textContent = t._statusLabel;
+          info.appendChild(st);
+        }
+
+        card.appendChild(img);
+        card.appendChild(info);
+        mural.appendChild(card);
+      }
+    }
+
+    /* Eventos de filtro – aplica na hora (com debounce leve) */
+    let debounceId;
+    function onFilterChange(){
+      clearTimeout(debounceId);
+      debounceId = setTimeout(renderTreinos, 120);
+    }
+
+    ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento","fStatus"]
+      .forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener(id === "fStatus" ? "change" : "input", onFilterChange);
+      });
+
+    /* Botão LIMPAR FILTROS */
+    document.getElementById("btnLimpar").addEventListener("click", () => {
+      ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento"].forEach(id => {
+        document.getElementById(id).value = "";
+      });
+      document.getElementById("fStatus").value = "";
+      renderTreinos();
     });
 
-  if(!lista.length){
-    vazio.style.display="block";
-    return;
-  }
-  vazio.style.display="none";
-
-  for(const t of lista){
-    const card=document.createElement("div");
-    const v = t._v;
-    const ehHoje = v.dia===diaHoje && v.mes===mesHoje && v.ano===anoHoje;
-    card.className="card" + (ehHoje?" card-hoje":"");
-
-    if(ehHoje){
-      const pill=document.createElement("div");
-      pill.className="pill-hoje";
-      pill.textContent="Vence hoje";
-      card.appendChild(pill);
-    }
-
-    const img=document.createElement("img");
-    img.alt=t.nome;
-    img.loading="lazy";
-    img.decoding="async";
-    img.src=getFotoUrlTreino(t);
-    aplicarOnError(img,t);
-
-    const info=document.createElement("div");
-    info.className="info";
-
-    const linhaTop=document.createElement("div");
-    linhaTop.className="linha-top";
-
-    const nomeEl=document.createElement("p");
-    nomeEl.className="nome";
-    nomeEl.textContent=t.nome || "(sem nome)";
-    linhaTop.appendChild(nomeEl);
-
-    if(t.cs){
-      const cs=document.createElement("span");
-      cs.className="cs-tag";
-      cs.textContent="CS " + t.cs;
-      linhaTop.appendChild(cs);
-    }
-
-    const linhaSub=document.createElement("p");
-    linhaSub.className="linha-sub";
-
-    const partes = [];
-    if(t.cargo) partes.push(t.cargo);
-    if(t.cipia) partes.push(t.cipia);
-    if(t.coordenacao) partes.push(t.coordenacao);
-    linhaSub.textContent = partes.join(" • ");
-
-    const treino=document.createElement("p");
-    treino.className="treino";
-    treino.textContent=t.treinamento || "";
-
-    const datas=document.createElement("p");
-    datas.className="datas";
-    datas.textContent =
-      "Formação: " + (t.formacao || "--/--/----") +
-      " · Vencimento: " + (t.vencimento || "--/--/----");
-
-    info.appendChild(linhaTop);
-    info.appendChild(linhaSub);
-    info.appendChild(treino);
-    info.appendChild(datas);
-
-    if(t._statusLabel){
-      const st=document.createElement("span");
-      st.className="status-badge " + statusClass(t._statusKey);
-      st.textContent=t._statusLabel;
-      info.appendChild(st);
-    }
-
-    card.appendChild(img);
-    card.appendChild(info);
-    mural.appendChild(card);
-  }
-}
-
-/* Eventos de filtro – aplica na hora (com debounce leve) */
-let debounceId;
-function onFilterChange(){
-  clearTimeout(debounceId);
-  debounceId=setTimeout(renderTreinos, 120);
-}
-["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento","fStatus"]
-  .forEach(id=>{
-    const el = document.getElementById(id);
-    el.addEventListener(id==="fStatus" ? "change" : "input", onFilterChange);
-  });
-
-/* Botão LIMPAR FILTROS */
-document.getElementById("btnLimpar").addEventListener("click", () => {
-  ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento"].forEach(id=>{
-    document.getElementById(id).value="";
-  });
-  document.getElementById("fStatus").value="";
-  renderTreinos();
-});
-
-renderTreinos();
-</script>
-
+    renderTreinos();
+  </script>
 </body>
 </html>
