@@ -21,6 +21,10 @@
       --c-vencido:#E66C37;
       --c-avencer:#118DFF;
       --c-rotulo:#65B357;
+
+      --c-nao: #9CA3AF;
+      --c-integracao: #7C3AED;
+      --c-teste: #111827;
     }
 
     *{ box-sizing:border-box; }
@@ -47,15 +51,16 @@
     .top-title{ font-size:20px; font-weight:600; margin:0; }
     .top-sub{ margin:2px 0 0 0; font-size:12px; opacity:.9; }
     .top-right{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+
     .logo-rumo{ height:40px; max-width:140px; object-fit:contain; }
 
-    .btn-bi{
+    .btn-pill{
       border:1px solid rgba(255,255,255,.25);
       background: rgba(255,255,255,.12);
       color:#fff;
       text-decoration:none;
       font-size:12px;
-      font-weight:700;
+      font-weight:800;
       padding:8px 12px;
       border-radius:999px;
       display:inline-flex;
@@ -65,9 +70,9 @@
       cursor:pointer;
       transition: transform .08s ease, background .12s ease;
     }
-    .btn-bi:hover{ background: rgba(255,255,255,.18); transform: translateY(-1px); }
-    .btn-bi:active{ transform: translateY(0); }
-    .btn-bi .dot{
+    .btn-pill:hover{ background: rgba(255,255,255,.18); transform: translateY(-1px); }
+    .btn-pill:active{ transform: translateY(0); }
+    .btn-pill .dot{
       width:8px;height:8px;border-radius:50%;
       background:#22c55e;
       box-shadow:0 0 0 3px rgba(34,197,94,.2);
@@ -79,76 +84,34 @@
       padding:18px 20px 28px 20px;
     }
 
-    /* KPIs */
-    .kpis{
+    /* DASHBOARD (CARD + 4 GRÁFICOS) */
+    .dash-grid{
       display:grid;
-      grid-template-columns: repeat(4, minmax(180px, 1fr));
-      gap:10px;
+      grid-template-columns: 1.2fr 1fr;
+      gap:14px;
       margin-bottom:16px;
     }
 
-    .kpi{
-      background:#fff;
-      border-radius:16px;
-      border:1px solid var(--borda);
-      padding:12px 14px;
-      box-shadow:0 2px 8px rgba(15,23,42,.05);
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:10px;
-      min-height:78px;
-    }
-
-    .kpi .label{
-      font-size:12px;
-      color:var(--texto-sec);
-      margin:0 0 6px 0;
-      font-weight:600;
-    }
-    .kpi .value{
-      font-size:26px;
-      font-weight:800;
-      margin:0;
-      line-height:1.05;
-      letter-spacing:-.5px;
-      color:var(--texto-principal);
-    }
-    .kpi .hint{
-      margin:6px 0 0 0;
-      font-size:11px;
-      color:#94a3b8;
-    }
-
-    .kpi .pill{
-      font-size:11px;
-      font-weight:800;
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid transparent;
-      white-space:nowrap;
-      margin-top:2px;
-    }
-
-    .pill-total{ background:#f3f4f6; color:#111827; border-color:#e5e7eb; }
-    .pill-valido{ background:#ecfdf3; color:#15803d; border-color:#bbf7d0; }
-    .pill-avencer{ background:#fefce8; color:#854d0e; border-color:#fef08a; }
-    .pill-vencido{ background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
-
-    /* CHARTS */
-    .charts{
+    .dash-row{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-bottom:16px;
+      gap:14px;
+      margin-top:14px;
     }
-    .chart-card{
+
+    .card-box{
       background:#fff;
       border-radius:16px;
       border:1px solid var(--borda);
       padding:12px 14px 14px 14px;
       box-shadow:0 2px 8px rgba(15,23,42,.05);
     }
+
+    /* ✅ REMOVE ESPAÇO VAZIO: último card ocupa 2 colunas */
+    .dash-grid > .card-box:last-child{
+      grid-column: 1 / -1;
+    }
+
     .chart-title{
       display:flex;
       align-items:center;
@@ -156,8 +119,101 @@
       gap:10px;
       margin:0 0 10px 0;
       font-size:13px;
-      font-weight:700;
+      font-weight:800;
       color:var(--texto-sec);
+    }
+    .small-note{
+      margin:8px 0 0 0;
+      font-size:11px;
+      color:#94a3b8;
+    }
+
+    /* METRIC */
+    .metric{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .metric-left{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .metric-kpi{
+      font-size:24px;
+      font-weight:900;
+      color:var(--texto-principal);
+      line-height:1;
+    }
+    .metric-label{
+      font-size:12px;
+      color:var(--texto-sec);
+      font-weight:800;
+    }
+    .metric-pill{
+      font-size:12px;
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--roxo-claro);
+      color:var(--roxo-escuro);
+      border:1px solid #e9d5ff;
+      white-space:nowrap;
+    }
+
+    /* BARRAS SIMPLES (Quantidade por status) */
+    .bars{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:8px;
+    }
+    .bar-row{
+      display:grid;
+      grid-template-columns: 140px 1fr 60px;
+      gap:10px;
+      align-items:center;
+    }
+    .bar-label{
+      font-size:12px;
+      color:var(--texto-principal);
+      font-weight:700;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .bar-track{
+      height:14px;
+      background:#f3f4f6;
+      border:1px solid #e5e7eb;
+      border-radius:999px;
+      position:relative;
+      overflow:hidden;
+    }
+    .bar-fill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      position:relative;
+    }
+    .bar-value{
+      font-size:12px;
+      font-weight:900;
+      color: var(--c-rotulo);
+      text-align:right;
+    }
+    .bar-fill .bar-bubble{
+      position:absolute;
+      right:6px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:11px;
+      font-weight:900;
+      color:#fff;
+      padding:2px 6px;
+      border-radius:999px;
+      background: rgba(0,0,0,.25);
+      backdrop-filter: blur(2px);
+      white-space:nowrap;
     }
 
     .legend{
@@ -182,204 +238,114 @@
       background:#ddd;
     }
 
-    .bars{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-top:8px;
-    }
-    .bar-row{
-      display:grid;
-      grid-template-columns: 120px 1fr 60px;
-      gap:10px;
-      align-items:center;
-    }
-    .bar-label{
-      font-size:12px;
-      color:var(--texto-principal);
-      font-weight:600;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .bar-track{
-      height:14px;
-      background:#f3f4f6;
-      border:1px solid #e5e7eb;
-      border-radius:999px;
-      position:relative;
-      overflow:hidden;
-    }
-    .bar-fill{
-      height:100%;
-      width:0%;
-      border-radius:999px;
-      background: var(--c-valido);
-      position:relative;
-    }
-    .bar-value{
-      font-size:12px;
-      font-weight:800;
-      color: var(--c-rotulo);
-      text-align:right;
-    }
-    .bar-fill .bar-bubble{
-      position:absolute;
-      right:6px;
-      top:50%;
-      transform:translateY(-50%);
-      font-size:11px;
-      font-weight:800;
-      color:#fff;
-      padding:2px 6px;
-      border-radius:999px;
-      background: rgba(0,0,0,.25);
-      backdrop-filter: blur(2px);
-      white-space:nowrap;
-    }
-
+    /* DONUT (Percentual por status) */
     .donut-wrap{
-      display:flex;
+      display:grid;
+      grid-template-columns: 170px 1fr;
+      gap:12px;
       align-items:center;
-      gap:14px;
     }
     .donut{
       width:170px;
       height:170px;
-      border-radius:50%;
-      background: conic-gradient(#e5e7eb 0 100%);
       position:relative;
-      flex-shrink:0;
-      border:1px solid #e5e7eb;
-    }
-    .donut::after{
-      content:"";
-      position:absolute;
-      inset:18px;
-      border-radius:50%;
-      background:#fff;
-      border:1px solid #eef2f7;
-    }
-    .donut-center{
-      position:absolute;
-      inset:0;
       display:flex;
-      flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:2px;
-      z-index:1;
-      text-align:center;
-      padding:0 10px;
+    }
+    .donut svg{ width:170px; height:170px; transform: rotate(-90deg); }
+    .donut-center{
+      position:absolute;
+      width:118px;
+      height:118px;
+      border-radius:50%;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      border:1px solid #eef2f7;
+      box-shadow: inset 0 0 0 1px rgba(15,23,42,.02);
     }
     .donut-center .big{
-      font-size:20px;
+      font-size:18px;
       font-weight:900;
       color:var(--texto-principal);
-      line-height:1.1;
+      line-height:1;
     }
     .donut-center .sub{
+      margin-top:2px;
       font-size:11px;
+      font-weight:800;
       color:var(--texto-sec);
-      font-weight:700;
     }
-    .donut-list{
-      flex:1;
-      min-width:0;
+    .donut-legend{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
     }
     .donut-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:6px 0;
-      border-bottom:1px dashed #eef2f7;
-    }
-    .donut-row:last-child{ border-bottom:none; }
-    .donut-row .left{
-      display:flex;
-      align-items:center;
+      display:grid;
+      grid-template-columns: 14px 1fr auto;
       gap:8px;
-      min-width:0;
-    }
-    .donut-row .name{
+      align-items:center;
       font-size:12px;
-      font-weight:700;
       color:var(--texto-principal);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:240px;
     }
-    .donut-row .pct{
-      font-size:12px;
+    .donut-row .name{ font-weight:700; color:var(--texto-principal); }
+    .donut-row .vals{
       font-weight:900;
       color:var(--c-rotulo);
       white-space:nowrap;
     }
-    .donut-row .qtd{
-      font-size:12px;
-      color:var(--texto-sec);
-      white-space:nowrap;
+    .dot{
+      width:10px;height:10px;border-radius:3px;
+      border:1px solid rgba(15,23,42,.1);
     }
 
-    /* === GRÁFICOS TREINAMENTO x STATUS (NOVOS) === */
-    .stack-wrap{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
+    /* BARRAS EMPILHADAS (Treinamentos por status) */
+    .stack-bars{ display:flex; flex-direction:column; gap:10px; }
     .stack-row{
       display:grid;
       grid-template-columns: 220px 1fr 60px;
       gap:10px;
       align-items:center;
     }
-    .stack-name{
+    .stack-label{
       font-size:12px;
       font-weight:700;
-      color:var(--texto-principal);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    .stack-bar{
-      height:14px;
+    .stack-track{
+      height:16px;
       background:#f3f4f6;
       border:1px solid #e5e7eb;
       border-radius:999px;
       overflow:hidden;
       display:flex;
-    }
-    .stack-seg{
-      height:100%;
-      width:0%;
-      min-width:0;
       position:relative;
     }
-    .stack-seg .seg-label{
-      position:absolute;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      font-size:10px;
+    .seg{
+      height:100%;
+      width:0%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
       font-weight:900;
       color:#fff;
+      position:relative;
       white-space:nowrap;
-      pointer-events:none;
-      text-shadow:0 1px 1px rgba(0,0,0,.35);
-      opacity:.95;
+      min-width:0;
     }
+    .seg span{ padding:0 6px; }
     .stack-total{
+      text-align:right;
       font-size:12px;
       font-weight:900;
       color:var(--c-rotulo);
-      text-align:right;
-    }
-    .muted-note{
-      margin:6px 0 0 0;
-      font-size:11px;
-      color:#94a3b8;
     }
 
     /* FILTROS */
@@ -400,7 +366,7 @@
     }
     .filtros-titulo{
       font-size:13px;
-      font-weight:600;
+      font-weight:700;
       color:var(--texto-sec);
       margin:0;
       display:flex;
@@ -422,7 +388,7 @@
       background:#fff;
       color:#6b21a8;
       font-size:11px;
-      font-weight:600;
+      font-weight:700;
       padding:4px 10px;
       border-radius:999px;
       cursor:pointer;
@@ -442,7 +408,8 @@
       color:var(--texto-sec);
       margin-bottom:2px;
     }
-    .filtros-grid input{
+    .filtros-grid input,
+    .filtros-grid select{
       width:100%;
       padding:6px 8px;
       border-radius:8px;
@@ -472,22 +439,6 @@
       position:relative;
       box-shadow:0 2px 8px rgba(15,23,42,.04);
     }
-    .card-hoje{
-      border-color:#f97316;
-      box-shadow:0 0 0 2px rgba(249,115,22,.25);
-    }
-    .pill-hoje{
-      position:absolute;
-      top:8px;
-      right:8px;
-      background:#fff7ed;
-      color:#c2410c;
-      border-radius:999px;
-      border:1px solid #fed7aa;
-      padding:2px 8px;
-      font-size:10px;
-      font-weight:600;
-    }
     .card img{
       width:72px;
       height:72px;
@@ -507,7 +458,7 @@
     .nome{
       margin:0;
       font-size:14px;
-      font-weight:600;
+      font-weight:700;
       color:var(--texto-principal);
     }
     .cs-tag{
@@ -528,7 +479,7 @@
       margin:6px 0 0 0;
       font-size:12px;
       color:var(--roxo-escuro);
-      font-weight:500;
+      font-weight:600;
     }
     .datas{
       margin:4px 0 0 0;
@@ -542,51 +493,18 @@
       padding:3px 9px;
       border-radius:999px;
       border:1px solid transparent;
-      font-weight:600;
+      font-weight:800;
     }
     .st-valido{ background:#ecfdf3; color:#15803d; border-color:#bbf7d0; }
     .st-a-vencer{ background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
     .st-vencido{ background:#fff7ed; color:#c2410c; border-color:#fed7aa; }
     .st-nao-concluido{ background:#f3f4f6; color:#374151; border-color:#e5e7eb; }
-    .st-teste{ background:#f3f4f6; color:#374151; border-color:#e5e7eb; }
 
     .empty{
       margin-top:12px;
       font-size:13px;
       color:var(--texto-sec);
     }
-
-    /* BOTÃO VOLTAR AO TOPO */
-    .back-to-top{
-      position:fixed;
-      right:18px;
-      bottom:18px;
-      width:46px;
-      height:46px;
-      border-radius:999px;
-      border:1px solid rgba(15,23,42,.12);
-      background: rgba(255,255,255,.92);
-      box-shadow:0 10px 30px rgba(15,23,42,.18);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      opacity:0;
-      pointer-events:none;
-      transform: translateY(8px);
-      transition: opacity .15s ease, transform .15s ease;
-      z-index:999;
-    }
-    .back-to-top.show{
-      opacity:1;
-      pointer-events:auto;
-      transform: translateY(0);
-    }
-    .back-to-top:hover{
-      box-shadow:0 12px 34px rgba(15,23,42,.22);
-      transform: translateY(-1px);
-    }
-    .back-to-top svg{ width:22px; height:22px; }
 
     footer.footer-rumo{
       background: linear-gradient(90deg, var(--roxo-header), var(--roxo-escuro));
@@ -603,47 +521,83 @@
       opacity:.98;
     }
 
-    @media (max-width:980px){
-      .kpis{ grid-template-columns: repeat(2, minmax(180px, 1fr)); }
-      .charts{ grid-template-columns: 1fr; }
-      .bar-row{ grid-template-columns: 110px 1fr 56px; }
-      .stack-row{ grid-template-columns: 180px 1fr 56px; }
+    /* BOTÃO TOPO */
+    .to-top{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      width:44px;
+      height:44px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      box-shadow:0 10px 22px rgba(15,23,42,.12);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      font-size:18px;
+      font-weight:900;
+      color:var(--roxo-escuro);
+      z-index:9999;
+      transition: transform .08s ease, opacity .12s ease;
+      opacity:.95;
     }
+    .to-top:hover{ transform: translateY(-1px); opacity:1; }
+    .to-top:active{ transform: translateY(0); }
 
+    @media (max-width:980px){
+      .dash-grid{ grid-template-columns: 1fr; }
+      .dash-row{ grid-template-columns: 1fr; }
+      .stack-row{ grid-template-columns: 1fr; }
+      .stack-total{ text-align:left; }
+      .bar-row{ grid-template-columns: 120px 1fr 56px; }
+      .donut-wrap{ grid-template-columns: 1fr; justify-items:center; }
+      .donut-legend{ width:100%; }
+
+      /* no mobile não precisa "span-2" */
+      .dash-grid > .card-box:last-child{ grid-column:auto; }
+    }
     @media (max-width:640px){
       .top-bar{ padding:12px 16px; }
       .wrap{ padding-inline:14px; }
       .logo-rumo{ height:30px; }
-      .kpis{ grid-template-columns: 1fr; }
-      .btn-bi{ padding:7px 10px; font-size:12px; }
-      .donut-wrap{ flex-direction:column; align-items:flex-start; }
-      .donut{ width:160px; height:160px; }
-      .back-to-top{ right:14px; bottom:14px; }
-      .stack-row{ grid-template-columns: 1fr; }
-      .stack-total{ text-align:left; }
+      .btn-pill{ padding:7px 10px; font-size:12px; }
+      .bar-row{ grid-template-columns: 1fr; }
+      .bar-value{ text-align:left; }
     }
   </style>
 </head>
 
 <body>
-  <header class="top-bar">
+  <header class="top-bar" id="topo">
     <div class="top-left">
       <h1 class="top-title">Treinamentos Rumo</h1>
-      <p class="top-sub">
-        Visualize os treinamentos por colaborador, coordenação, status e datas de formação e vencimento.
-      </p>
+      <p class="top-sub">Filtre e visualize indicadores e lista de colaboradores.</p>
     </div>
 
     <div class="top-right">
+      <!-- LINK PARA FAZER OS TREINAMENTOS (MANTIDO) -->
       <a
-        class="btn-bi"
+        class="btn-pill"
+        href="https://rumolog.csod.com/ui/lms-learner-playlist/PlaylistDetails?playlistId=88c8c161-b8a6-496a-9a40-c20ae42505e3"
+        target="_blank"
+        rel="noopener"
+        title="Abrir trilha de treinamentos"
+      >
+        <span class="dot"></span>
+        Realizar Treinamentos Obrigatórios
+      </a>
+
+      <!-- NOVO BOTÃO: BI DE TREINAMENTOS (RUMO) -->
+      <a
+        class="btn-pill"
         href="https://app.powerbi.com/groups/6bf037f8-a952-41d5-8f33-867babe2eecc/reports/b648a096-1227-4087-813d-9f402b34c0a7/ReportSection?language=pt-BR&experience=power-bi"
         target="_blank"
         rel="noopener"
-        title="Abrir BI de Segurança"
+        title="Abrir BI de Treinamentos (Rumo)"
       >
-        <span class="dot"></span>
-        BI Segurança
+        🟠 BI Treinamentos Rumo Malha Sul 
       </a>
 
       <img id="logoRumo" class="logo-rumo" alt="Rumo">
@@ -651,103 +605,89 @@
   </header>
 
   <main class="wrap">
-
-    <!-- KPIs -->
-    <section class="kpis" aria-label="Totais">
-      <div class="kpi">
-        <div>
-          <p class="label">Total de colaboradores</p>
-          <p class="value" id="kpiTotal">0</p>
-          <p class="hint" id="kpiHintTotal">considera os filtros atuais</p>
-        </div>
-        <span class="pill pill-total">TOTAL</span>
-      </div>
-
-      <div class="kpi">
-        <div>
-          <p class="label">Colaboradores com treinamento vencido</p>
-          <p class="value" id="kpiVencido">0</p>
-          <p class="hint">pelo menos 1 treinamento vencido</p>
-        </div>
-        <span class="pill pill-vencido">VENCIDO</span>
-      </div>
-
-      <div class="kpi">
-        <div>
-          <p class="label">Colaboradores com treinamento à vencer</p>
-          <p class="value" id="kpiAVencer">0</p>
-          <p class="hint">pelo menos 1 à vencer (≤ 30 dias)</p>
-        </div>
-        <span class="pill pill-avencer">À VENCER</span>
-      </div>
-
-      <div class="kpi">
-        <div>
-          <p class="label">Colaboradores com treinamento válido</p>
-          <p class="value" id="kpiValido">0</p>
-          <p class="hint">pelo menos 1 válido</p>
-        </div>
-        <span class="pill pill-valido">VÁLIDO</span>
-      </div>
-    </section>
-
-    <!-- GRÁFICOS STATUS -->
-    <section class="charts" aria-label="Gráficos de status">
-      <div class="chart-card">
+    <!-- QUADRO + 4 GRÁFICOS (SOMENTE ESTES) -->
+    <section class="dash-grid" aria-label="Indicadores e gráficos">
+      <!-- QUADRO: TOTAL FUNCIONÁRIOS -->
+      <div class="card-box">
         <p class="chart-title">
-          Quantidade por status
-          <span id="chartCountTotal" style="font-size:12px;font-weight:800;color:var(--texto-principal)"></span>
+          Total de funcionários (únicos)
+          <span id="dashRegistros" style="font-size:12px;font-weight:900;color:var(--texto-principal)"></span>
         </p>
 
-        <div id="bars" class="bars" aria-label="Barras de quantidade por status"></div>
-        <div class="legend" id="legendBars"></div>
+        <div class="metric">
+          <div class="metric-left">
+            <div id="kpiFuncionarios" class="metric-kpi">0</div>
+            <div class="metric-label">Colaboradores no filtro atual</div>
+          </div>
+          <div id="kpiStatusResumo" class="metric-pill">—</div>
+        </div>
+
+    
       </div>
 
-      <div class="chart-card">
+      <!-- GRÁFICO 1: Quantidade por status -->
+      <div class="card-box" aria-label="Quantidade por status">
+        <p class="chart-title">
+          Quantidade por status
+          <span id="chartCountTotal" style="font-size:12px;font-weight:900;color:var(--texto-principal)"></span>
+        </p>
+
+        <div id="barsStatusQtd" class="bars"></div>
+        <div class="legend" id="legendStatusQtd"></div>
+      </div>
+
+      <!-- GRÁFICO 2: Percentual por status -->
+      <div class="card-box" aria-label="Percentual por status">
         <p class="chart-title">
           Percentual por status
-          <span id="chartPctTotal" style="font-size:12px;font-weight:800;color:var(--texto-principal)"></span>
+          <span id="chartPctTotal" style="font-size:12px;font-weight:900;color:var(--texto-principal)"></span>
         </p>
 
         <div class="donut-wrap">
-          <div class="donut" id="donut" aria-label="Gráfico de rosca"></div>
-          <div class="donut-center" aria-hidden="true">
-            <div class="big" id="donutCenterBig">0</div>
-            <div class="sub" id="donutCenterSub">registros</div>
+          <div class="donut" aria-label="Donut percentual por status">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#EEF2F7" stroke-width="14"></circle>
+              <g id="donutSlices"></g>
+            </svg>
+            <div class="donut-center">
+              <div id="donutTotal" class="big">0</div>
+              <div class="sub">Treinamentos</div>
+            </div>
           </div>
 
-          <div class="donut-list" id="donutList"></div>
+          <div class="donut-legend" id="donutLegend"></div>
         </div>
       </div>
-    </section>
 
-    <!-- NOVOS GRÁFICOS: TREINAMENTO x STATUS -->
-    <section class="charts" aria-label="Gráficos por treinamento e status">
-      <div class="chart-card">
+      <!-- GRÁFICO 3: Treinamentos por status (Quantidade) -->
+      <div class="card-box" aria-label="Treinamentos por status (Quantidade)">
         <p class="chart-title">
           Treinamentos por status (Quantidade)
-          <span id="chartTreinoCountTotal" style="font-size:12px;font-weight:800;color:var(--texto-principal)"></span>
+          <span id="chartTreinoQtdTotal" style="font-size:12px;font-weight:900;color:var(--texto-principal)"></span>
         </p>
-        <div id="treinoStackCount" class="stack-wrap"></div>
-        <p class="muted-note" id="treinoNoteCount"></p>
+
+        <div id="stackTreinoQtd" class="stack-bars"></div>
+        <p class="small-note">Mostrando TOP 8 treinamentos por quantidade (com os filtros atuais).</p>
       </div>
 
-      <div class="chart-card">
+      <!-- GRÁFICO 4: Treinamentos por status (%) -->
+      <div class="card-box" aria-label="Treinamentos por status (%)">
         <p class="chart-title">
           Treinamentos por status (%)
-          <span id="chartTreinoPctTotal" style="font-size:12px;font-weight:800;color:var(--texto-principal)"></span>
+          <span id="chartTreinoPctTotal" style="font-size:12px;font-weight:900;color:var(--texto-principal)"></span>
         </p>
-        <div id="treinoStackPct" class="stack-wrap"></div>
-        <p class="muted-note" id="treinoNotePct"></p>
+
+        <div id="stackTreinoPct" class="stack-bars"></div>
+        <p class="small-note">Mostrando TOP 8 treinamentos por quantidade (com os filtros atuais).</p>
       </div>
     </section>
 
-    <!-- FILTROS (TODOS COM DIGITAÇÃO + SELEÇÃO) -->
+    <!-- FILTROS -->
     <section class="filtros-box">
       <div class="filtros-header">
         <p class="filtros-titulo">
-          <span class="icon">🔍</span>
-          Filtros por coluna
+          <span class="icon">🔎</span>
+          Filtros
         </p>
         <button type="button" id="btnLimpar" class="btn-clear">⟲ Limpar filtros</button>
       </div>
@@ -755,38 +695,32 @@
       <div class="filtros-grid">
         <div>
           <div class="filtro-label">CS</div>
-          <input id="fCs" list="dlCs" placeholder="ex: 445119" />
-          <datalist id="dlCs"></datalist>
+          <select id="fCs"></select>
         </div>
 
         <div>
           <div class="filtro-label">Nome Completo</div>
-          <input id="fNome" list="dlNome" placeholder="digite ou selecione" />
-          <datalist id="dlNome"></datalist>
+          <select id="fNome"></select>
         </div>
 
         <div>
           <div class="filtro-label">Cargo</div>
-          <input id="fCargo" list="dlCargo" placeholder="digite ou selecione" />
-          <datalist id="dlCargo"></datalist>
+          <select id="fCargo"></select>
         </div>
 
         <div>
           <div class="filtro-label">Cipia</div>
-          <input id="fCipia" list="dlCipia" placeholder="digite ou selecione" />
-          <datalist id="dlCipia"></datalist>
+          <select id="fCipia"></select>
         </div>
 
         <div>
           <div class="filtro-label">Coordenação</div>
-          <input id="fCoord" list="dlCoord" placeholder="digite ou selecione" />
-          <datalist id="dlCoord"></datalist>
+          <select id="fCoord"></select>
         </div>
 
         <div>
           <div class="filtro-label">Treinamento</div>
-          <input id="fTreino" list="dlTreino" placeholder="digite ou selecione" />
-          <datalist id="dlTreino"></datalist>
+          <select id="fTreino"></select>
         </div>
 
         <div>
@@ -801,15 +735,7 @@
 
         <div>
           <div class="filtro-label">Status</div>
-          <input id="fStatus" list="dlStatus" placeholder="digite ou selecione" />
-          <datalist id="dlStatus">
-            <option value="Válido"></option>
-            <option value="À Vencer"></option>
-            <option value="Vencido"></option>
-            <option value="Não Concluído"></option>
-            <option value="Teste"></option>
-            <option value="Integração"></option>
-          </datalist>
+          <select id="fStatus"></select>
         </div>
       </div>
     </section>
@@ -826,11 +752,8 @@
     <img id="logoRumoFooter" alt="Rumo">
   </footer>
 
-  <button class="back-to-top" id="btnTop" type="button" aria-label="Voltar ao topo" title="Voltar ao topo">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 5l7 7-1.4 1.4L13 8.8V20h-2V8.8L6.4 13.4 5 12l7-7z" fill="currentColor"/>
-    </svg>
-  </button>
+  <!-- BOTÃO IR AO TOPO -->
+  <button id="btnTopo" class="to-top" title="Ir para o topo" aria-label="Ir para o topo">↑</button>
 
   <script>
     /* ===================== PASTA DE FOTOS ===================== */
@@ -843,9 +766,9 @@
 
     /* ========================= DADOS ========================= */
     const TREINOS_RAW = [
-      /* COLE AQUI SEU ARRAY COMPLETO (mantive o seu, não alterei nada) */
-
-      
+      /* COLE AQUI SEU ARRAY COMPLETO (MANTIVE O SEU) */
+    
+  
   { cs: "407501", nome: "Luciano Frederico Stelle", cargo: "Analista de Operação Sr", cipia: "Central Serras", treinamento: "Direção Segura -  Teórico", formacao: "09/02/2026", vencimento: "09/02/2027", status: "Válido", coordenacao: "Execução Central Serras" },
   { cs: "407501", nome: "Luciano Frederico Stelle", cargo: "Analista de Operação Sr", cipia: "Central Serras", treinamento: "Integração de Saúde e Segurança", formacao: "09/02/2026", vencimento: "09/02/2027", status: "Válido", coordenacao: "Execução Central Serras" },
   { cs: "407501", nome: "Luciano Frederico Stelle", cargo: "Analista de Operação Sr", cipia: "Central Serras", treinamento: "RO Mód. III", formacao: "18/01/2026", vencimento: "18/01/2027", status: "Válido", coordenacao: "Execução Central Serras" },
@@ -972,7 +895,6 @@
   { cs: "261095", nome: "Luis Felipe Martinelli Martins", cargo: "Coordenador de Planejamento", cipia: "RS", treinamento: "Direção Segura -  Teórico", formacao: "16/06/2025", vencimento: "16/06/2026", status: "Válido", coordenacao: "Execução Rio Grande do Sul" },
   { cs: "263851", nome: "Matias Alejandro Aduco", cargo: "Analista de Planejamento Sr", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "16/06/2025", vencimento: "16/06/2026", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
 
-  { cs: "433186", nome: "Kauê Ciesielski Stinglin", cargo: "Aprendiz", cipia: "Central Serras", treinamento: "RO Mód. II", formacao: "16/06/2025", vencimento: "16/06/2026", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
 
   { cs: "268207", nome: "Ricardo Assumpcao Junior", cargo: "Coordenador de Planejamento", cipia: "Central Serras", treinamento: "RO Mód. III", formacao: "10/06/2025", vencimento: "10/06/2026", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
 
@@ -990,10 +912,7 @@
 
   { cs: "263684", nome: "Vitoria Araujo Dos Santos", cargo: "Analista de Planejamento Sr", cipia: "Central Serras", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "21/05/2025", vencimento: "21/05/2027", status: "Válido", coordenacao: "Planejamento" },
 
-  { cs: "433186", nome: "Kauê Ciesielski Stinglin", cargo: "Aprendiz", cipia: "Central Serras", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "20/05/2025", vencimento: "20/05/2027", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
-  { cs: "433186", nome: "Kauê Ciesielski Stinglin", cargo: "Aprendiz", cipia: "Central Serras", treinamento: "Primeiros Socorros", formacao: "20/05/2025", vencimento: "20/05/2026", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
-  { cs: "433186", nome: "Kauê Ciesielski Stinglin", cargo: "Aprendiz", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "16/05/2025", vencimento: "16/05/2026", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
-  { cs: "433186", nome: "Kauê Ciesielski Stinglin", cargo: "Aprendiz", cipia: "Central Serras", treinamento: "Integração de Saúde e Segurança", formacao: "16/05/2025", vencimento: "16/05/2026", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
+  
 
   { cs: "437045", nome: "Helder Da Silva Barbosa", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Direção Segura -  Teórico", formacao: "15/05/2025", vencimento: "15/05/2026", status: "Válido", coordenacao: "Engenharia OAE's" },
   { cs: "437045", nome: "Helder Da Silva Barbosa", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "RO Mód. III", formacao: "15/05/2025", vencimento: "15/05/2026", status: "Válido", coordenacao: "Engenharia OAE's" },
@@ -1168,6 +1087,7 @@
 
 ];
 
+
     /* ==================== FUNÇÕES AUXILIARES ==================== */
     function semAcento(s){
       return String(s || "")
@@ -1181,7 +1101,6 @@
     function normKey(s){
       const x = semAcento(String(s || "")).toLowerCase().trim();
       if(!x) return "";
-
       if(x.includes("nao") && x.includes("concl")) return "nao-concluido";
       if(x.includes("vencido")) return "vencido";
       if(x.includes("vencer")) return "a-vencer";
@@ -1329,20 +1248,13 @@
         case "a-vencer": return "st-a-vencer";
         case "vencido": return "st-vencido";
         case "nao-concluido": return "st-nao-concluido";
-        case "teste": return "st-teste";
         case "integracao": return "st-nao-concluido";
+        case "teste": return "st-nao-concluido";
         default: return "";
       }
     }
 
-    /* ====== CHAVE ÚNICA DO COLABORADOR ====== */
-    function keyColaborador(t){
-      const cs = String(t.cs || "").trim();
-      if(cs) return "CS:" + cs;
-      return "NOME:" + semAcento(String(t.nome || "")).toLowerCase().trim().replace(/\s+/g, " ");
-    }
-
-    /* ==================== DATALISTS (FILTROS PESQUISÁVEIS) ==================== */
+    /* ==================== SELECTS ==================== */
     function uniqSorted(arr){
       const s = new Set();
       for(const v of arr){
@@ -1352,93 +1264,97 @@
       return Array.from(s).sort((a,b) => semAcento(a).localeCompare(semAcento(b)));
     }
 
-    function fillDatalist(id, values){
-      const dl = document.getElementById(id);
-      if(!dl) return;
-      dl.innerHTML = "";
+    function fillSelect(id, values, placeholder){
+      const el = document.getElementById(id);
+      if(!el) return;
+
+      el.innerHTML = "";
+
+      const opt0 = document.createElement("option");
+      opt0.value = "";
+      opt0.textContent = placeholder || "Todos";
+      el.appendChild(opt0);
+
       for(const v of values){
         const op = document.createElement("option");
         op.value = v;
-        dl.appendChild(op);
+        op.textContent = v;
+        el.appendChild(op);
       }
     }
 
-    function initDatalists(){
-      fillDatalist("dlCs", uniqSorted(TREINOS_RAW.map(x => String(x.cs || "").trim()).filter(Boolean)));
-      fillDatalist("dlNome", uniqSorted(TREINOS_RAW.map(x => x.nome)));
-      fillDatalist("dlCargo", uniqSorted(TREINOS_RAW.map(x => x.cargo)));
-      fillDatalist("dlCipia", uniqSorted(TREINOS_RAW.map(x => x.cipia)));
-      fillDatalist("dlCoord", uniqSorted(TREINOS_RAW.map(x => x.coordenacao)));
-      fillDatalist("dlTreino", uniqSorted(TREINOS_RAW.map(x => x.treinamento)));
+    function initSelects(){
+      fillSelect("fCs", uniqSorted(TREINOS_RAW.map(x => String(x.cs || "").trim()).filter(Boolean)), "Todos");
+      fillSelect("fNome", uniqSorted(TREINOS_RAW.map(x => x.nome)), "Todos");
+      fillSelect("fCargo", uniqSorted(TREINOS_RAW.map(x => x.cargo)), "Todos");
+      fillSelect("fCipia", uniqSorted(TREINOS_RAW.map(x => x.cipia)), "Todos");
+      fillSelect("fCoord", uniqSorted(TREINOS_RAW.map(x => x.coordenacao)), "Todos");
+      fillSelect("fTreino", uniqSorted(TREINOS_RAW.map(x => x.treinamento)), "Todos");
+
+      const statusOptions = ["Válido","À Vencer","Vencido","Não Concluído","Integração","Teste"];
+      fillSelect("fStatus", statusOptions, "Todos");
     }
 
-    /* ==================== KPIs ==================== */
-    function atualizarKPIs(listaFiltrada){
-      const setTotal = new Set();
-      const setVencido = new Set();
-      const setAVencer = new Set();
-      const setValido = new Set();
+    /* ==================== PRÉ-PROCESSAMENTO (1x) ==================== */
+    function preprocessarBase(){
+      const hoje = new Date();
+      const hojeBase = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
 
-      for(const t of listaFiltrada){
-        const k = keyColaborador(t);
-        setTotal.add(k);
-        if(t._statusKey === "vencido") setVencido.add(k);
-        if(t._statusKey === "a-vencer") setAVencer.add(k);
-        if(t._statusKey === "valido") setValido.add(k);
-      }
+      return TREINOS_RAW.map(t => {
+        const _v = parseDataBr(t.vencimento);
+        const _f = parseDataBr(t.formacao);
+        const st = calcularStatusFinal(t, _v, hojeBase);
 
-      document.getElementById("kpiTotal").textContent = String(setTotal.size);
-      document.getElementById("kpiVencido").textContent = String(setVencido.size);
-      document.getElementById("kpiAVencer").textContent = String(setAVencer.size);
-      document.getElementById("kpiValido").textContent = String(setValido.size);
+        return {
+          ...t,
+          _v,
+          _f,
+          _statusKey: st.key,
+          _statusLabel: st.label,
 
-      const hint = document.getElementById("kpiHintTotal");
-      hint.textContent = setTotal.size === 1 ? "1 colaborador (com os filtros atuais)" : "considera os filtros atuais";
+          _cs: String(t.cs || "").trim(),
+          _nomeN: semAcento(String(t.nome || "")).toLowerCase(),
+          _cargoN: semAcento(String(t.cargo || "")).toLowerCase(),
+          _cipiaN: semAcento(String(t.cipia || "")).toLowerCase(),
+          _coordN: semAcento(String(t.coordenacao || "")).toLowerCase(),
+          _treinoN: semAcento(String(t.treinamento || "")).toLowerCase(),
+        };
+      });
     }
 
-    /* ==================== GRÁFICOS STATUS (CONTAGEM + %) ==================== */
-    const STATUS_ORDER = ["valido","a-vencer","vencido","nao-concluido","integracao","teste"];
+    let TREINOS_BASE = [];
+
+    /* ==================== CORES / ORDEM STATUS ==================== */
+    const STATUS_ORDER = ["valido","a-vencer","vencido","integracao","nao-concluido","teste"];
     const STATUS_COLORS = {
       "valido": getComputedStyle(document.documentElement).getPropertyValue("--c-valido").trim() || "#00223D",
       "a-vencer": getComputedStyle(document.documentElement).getPropertyValue("--c-avencer").trim() || "#118DFF",
       "vencido": getComputedStyle(document.documentElement).getPropertyValue("--c-vencido").trim() || "#E66C37",
-      "nao-concluido": "#9CA3AF",
-      "integracao": "#7C3AED",
-      "teste": "#111827"
+      "integracao": getComputedStyle(document.documentElement).getPropertyValue("--c-integracao").trim() || "#7C3AED",
+      "nao-concluido": getComputedStyle(document.documentElement).getPropertyValue("--c-nao").trim() || "#9CA3AF",
+      "teste": getComputedStyle(document.documentElement).getPropertyValue("--c-teste").trim() || "#111827"
     };
 
-    function formatPct(p){
-      return (Math.round(p * 10) / 10).toFixed(1).replace(".", ",") + "%";
-    }
-
-    function atualizarGraficos(listaFiltrada){
+    /* ==================== GRÁFICO 1: Quantidade por status ==================== */
+    function atualizarQtdPorStatus(lista){
       const counts = {};
-      for(const t of listaFiltrada){
+      for(const t of lista){
         const k = t._statusKey || "nao-concluido";
         counts[k] = (counts[k] || 0) + 1;
       }
 
-      const totalRegs = listaFiltrada.length;
-      document.getElementById("chartCountTotal").textContent = totalRegs ? `${totalRegs} registros` : "";
-      document.getElementById("chartPctTotal").textContent = totalRegs ? `${totalRegs} registros` : "";
-      document.getElementById("donutCenterBig").textContent = String(totalRegs);
-      document.getElementById("donutCenterSub").textContent = totalRegs === 1 ? "registro" : "registros";
+      const total = lista.length;
+      /*document.getElementById("chartCountTotal").textContent = total ? `${total} Treinamentos` : "";
+      document.getElementById("dashRegistros").textContent = total ? `${total} Treinamentos` : "";*/
 
       const keysPresentes = STATUS_ORDER.filter(k => (counts[k] || 0) > 0);
 
-      const barsEl = document.getElementById("bars");
-      const legendEl = document.getElementById("legendBars");
-      const donutEl = document.getElementById("donut");
-      const donutListEl = document.getElementById("donutList");
-
+      const barsEl = document.getElementById("barsStatusQtd");
+      const legendEl = document.getElementById("legendStatusQtd");
       barsEl.innerHTML = "";
       legendEl.innerHTML = "";
-      donutListEl.innerHTML = "";
 
-      if(!totalRegs){
-        donutEl.style.background = "conic-gradient(#e5e7eb 0 100%)";
-        return;
-      }
+      if(!total) return;
 
       const max = Math.max(...keysPresentes.map(k => counts[k] || 0), 1);
 
@@ -1494,187 +1410,195 @@
         legendEl.appendChild(item);
       }
 
-      let acc = 0;
-      const parts = [];
-      for(const k of keysPresentes){
-        const qtd = counts[k] || 0;
-        const pct = (qtd / totalRegs) * 100;
-        const start = acc;
-        const end = acc + pct;
-        acc = end;
-        const color = STATUS_COLORS[k] || "#111827";
-        parts.push(`${color} ${start}% ${end}%`);
-      }
-      donutEl.style.background = `conic-gradient(${parts.join(",")})`;
+      return { counts, total, keysPresentes };
+    }
+
+    /* ==================== GRÁFICO 2: Donut percentual por status ==================== */
+    function atualizarPctPorStatus(counts, total, keysPresentes){
+      /*  document.getElementById("chartPctTotal").textContent = total ? `${total} Treinamentos` : "";*/
+      document.getElementById("donutTotal").textContent = String(total || 0);
+
+      const g = document.getElementById("donutSlices");
+      const legend = document.getElementById("donutLegend");
+      g.innerHTML = "";
+      legend.innerHTML = "";
+
+      if(!total) return;
+
+      const r = 46;
+      const c = 2 * Math.PI * r;
+
+      let offset = 0;
 
       for(const k of keysPresentes){
         const qtd = counts[k] || 0;
-        const pct = (qtd / totalRegs) * 100;
+        const frac = qtd / total;
+        const len = c * frac;
+
+        const slice = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        slice.setAttribute("cx", "60");
+        slice.setAttribute("cy", "60");
+        slice.setAttribute("r", String(r));
+        slice.setAttribute("fill", "none");
+        slice.setAttribute("stroke", STATUS_COLORS[k] || "#111827");
+        slice.setAttribute("stroke-width", "14");
+        slice.setAttribute("stroke-linecap", "butt");
+        slice.setAttribute("stroke-dasharray", `${len} ${c - len}`);
+        slice.setAttribute("stroke-dashoffset", String(-offset));
+        g.appendChild(slice);
+
+        offset += len;
+      }
+
+      for(const k of keysPresentes){
+        const qtd = counts[k] || 0;
+        const pct = total ? (qtd / total) * 100 : 0;
 
         const row = document.createElement("div");
         row.className = "donut-row";
 
-        const left = document.createElement("div");
-        left.className = "left";
+        const d = document.createElement("div");
+        d.className = "dot";
+        d.style.background = STATUS_COLORS[k] || "#111827";
 
-        const sw = document.createElement("span");
-        sw.className = "swatch";
-        sw.style.background = STATUS_COLORS[k] || "#111827";
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = normLabelFromKey(k);
 
-        const nm = document.createElement("div");
-        nm.className = "name";
-        nm.textContent = normLabelFromKey(k);
+        const vals = document.createElement("div");
+        vals.className = "vals";
+        vals.textContent = `${pct.toFixed(1)}%`;
 
-        left.appendChild(sw);
-        left.appendChild(nm);
 
-        const right = document.createElement("div");
-        right.style.display = "flex";
-        right.style.alignItems = "center";
-        right.style.gap = "10px";
-
-        const pctEl = document.createElement("div");
-        pctEl.className = "pct";
-        pctEl.textContent = formatPct(pct);
-
-        const qtdEl = document.createElement("div");
-        qtdEl.className = "qtd";
-        qtdEl.textContent = `${qtd}`;
-
-        right.appendChild(pctEl);
-        right.appendChild(qtdEl);
-
-        row.appendChild(left);
-        row.appendChild(right);
-        donutListEl.appendChild(row);
+        row.appendChild(d);
+        row.appendChild(name);
+        row.appendChild(vals);
+        legend.appendChild(row);
       }
     }
 
-    /* ==================== NOVOS GRÁFICOS: TREINAMENTO x STATUS ==================== */
-    function buildTreinoAgg(lista){
-      const map = new Map(); // treino -> { total, byStatus: {k: qtd}}
+    /* ==================== GRÁFICOS 3 e 4: Treinamentos por status ==================== */
+    function topTreinamentos(lista, topN){
+      const map = new Map(); // treino -> {total, byStatus}
       for(const t of lista){
-        const treino = trim1(t.treinamento || "(Sem treinamento)");
-        const st = t._statusKey || "nao-concluido";
-
-        if(!map.has(treino)){
-          map.set(treino, { treino, total: 0, byStatus: {} });
+        const tr = String(t.treinamento || "").trim() || "(Sem treinamento)";
+        const k = t._statusKey || "nao-concluido";
+        if(!map.has(tr)){
+          map.set(tr, { total:0, by:{} });
         }
-        const obj = map.get(treino);
+        const obj = map.get(tr);
         obj.total += 1;
-        obj.byStatus[st] = (obj.byStatus[st] || 0) + 1;
+        obj.by[k] = (obj.by[k] || 0) + 1;
       }
-      const arr = Array.from(map.values());
+      const arr = Array.from(map.entries()).map(([treino, v]) => ({ treino, total:v.total, by:v.by }));
       arr.sort((a,b) => b.total - a.total || semAcento(a.treino).localeCompare(semAcento(b.treino)));
-      return arr;
+      return arr.slice(0, topN);
     }
 
-    function renderStackRow(container, item, modePct){
-      // modePct = false => largura proporcional ao TOTAL GERAL do topN
-      // modePct = true  => 100% por treinamento (percentual dentro do treinamento)
-      const row = document.createElement("div");
-      row.className = "stack-row";
-
-      const name = document.createElement("div");
-      name.className = "stack-name";
-      name.textContent = item.treino;
-
-      const bar = document.createElement("div");
-      bar.className = "stack-bar";
-
-      const total = item.total || 1;
-
-      for(const st of STATUS_ORDER){
-        const qtd = item.byStatus[st] || 0;
-        if(!qtd) continue;
-
-        const seg = document.createElement("div");
-        seg.className = "stack-seg";
-        seg.style.background = STATUS_COLORS[st] || "#111827";
-        seg.style.width = (modePct ? (qtd / total) * 100 : item._globalWidthPct[st]) + "%";
-
-        // label (só se tiver espaço)
-        const label = document.createElement("span");
-        label.className = "seg-label";
-
-        if(modePct){
-          const p = (qtd / total) * 100;
-          label.textContent = p >= 12 ? formatPct(p) : "";
-        } else {
-          label.textContent = qtd >= 3 ? String(qtd) : "";
-        }
-
-        seg.appendChild(label);
-        bar.appendChild(seg);
+    function setSeg(segEl, wPct, color, text){
+      segEl.style.width = wPct + "%";
+      segEl.style.background = color;
+      segEl.innerHTML = "";
+      if(wPct >= 10){ // só mostra rótulo se tiver espaço
+        const sp = document.createElement("span");
+        sp.textContent = text;
+        segEl.appendChild(sp);
       }
-
-      const totalEl = document.createElement("div");
-      totalEl.className = "stack-total";
-      totalEl.textContent = String(item.total);
-
-      row.appendChild(name);
-      row.appendChild(bar);
-      row.appendChild(totalEl);
-
-      container.appendChild(row);
     }
 
-    function atualizarGraficosTreinamento(listaFiltrada){
-      const totalRegs = listaFiltrada.length;
+    function renderStackQtd(containerId, rows, totalRegs){
+      const cont = document.getElementById(containerId);
+      cont.innerHTML = "";
+      if(!totalRegs) return;
 
-      const elCount = document.getElementById("treinoStackCount");
-      const elPct = document.getElementById("treinoStackPct");
-      const noteCount = document.getElementById("treinoNoteCount");
-      const notePct = document.getElementById("treinoNotePct");
+      for(const r of rows){
+        const line = document.createElement("div");
+        line.className = "stack-row";
 
-      elCount.innerHTML = "";
-      elPct.innerHTML = "";
-      noteCount.textContent = "";
-      notePct.textContent = "";
+        const lab = document.createElement("div");
+        lab.className = "stack-label";
+        lab.textContent = r.treino;
 
-      document.getElementById("chartTreinoCountTotal").textContent = totalRegs ? `${totalRegs} registros` : "";
-      document.getElementById("chartTreinoPctTotal").textContent = totalRegs ? `${totalRegs} registros` : "";
+        const track = document.createElement("div");
+        track.className = "stack-track";
 
-      if(!totalRegs){
-        noteCount.textContent = "Sem dados para os filtros atuais.";
-        notePct.textContent = "Sem dados para os filtros atuais.";
-        return;
-      }
+        const tot = r.total || 1;
 
-      const agg = buildTreinoAgg(listaFiltrada);
-      const TOP_N = 8;
-      const top = agg.slice(0, TOP_N);
-
-      // Para o gráfico de QUANTIDADE: empilhar com escala baseada no MAIOR TOTAL do topN
-      const maxTotal = Math.max(...top.map(x => x.total), 1);
-
-      // pré-calcula largura "global" por status com base no total do treinamento vs maxTotal
-      // e dividindo proporcionalmente por status
-      for(const item of top){
-        item._globalWidthPct = {};
-        for(const st of STATUS_ORDER){
-          const qtd = item.byStatus[st] || 0;
-          const pctDoTreinoNoMax = (item.total / maxTotal) * 100;
-          const pctDoStatusDentroDoTreino = item.total ? (qtd / item.total) : 0;
-          item._globalWidthPct[st] = pctDoTreinoNoMax * pctDoStatusDentroDoTreino;
+        const order = STATUS_ORDER.filter(k => (r.by[k] || 0) > 0);
+        for(const k of order){
+          const qtd = r.by[k] || 0;
+          const wPct = (qtd / tot) * 100;
+          const seg = document.createElement("div");
+          seg.className = "seg";
+          setSeg(seg, wPct, STATUS_COLORS[k] || "#111827", String(qtd));
+          track.appendChild(seg);
         }
-      }
 
-      // Render
-      for(const item of top){
-        renderStackRow(elCount, item, false);
-      }
-      for(const item of top){
-        renderStackRow(elPct, item, true);
-      }
+        const totalEl = document.createElement("div");
+        totalEl.className = "stack-total";
+        totalEl.textContent = String(r.total);
 
-      if(agg.length > TOP_N){
-        noteCount.textContent = `Mostrando TOP ${TOP_N} treinamentos por quantidade (com os filtros atuais).`;
-        notePct.textContent = `Mostrando TOP ${TOP_N} treinamentos por quantidade (com os filtros atuais).`;
-      } else {
-        noteCount.textContent = `Mostrando ${agg.length} treinamentos (com os filtros atuais).`;
-        notePct.textContent = `Mostrando ${agg.length} treinamentos (com os filtros atuais).`;
+        line.appendChild(lab);
+        line.appendChild(track);
+        line.appendChild(totalEl);
+        cont.appendChild(line);
       }
+    }
+
+    function renderStackPct(containerId, rows, totalRegs){
+      const cont = document.getElementById(containerId);
+      cont.innerHTML = "";
+      if(!totalRegs) return;
+
+      for(const r of rows){
+        const line = document.createElement("div");
+        line.className = "stack-row";
+
+        const lab = document.createElement("div");
+        lab.className = "stack-label";
+        lab.textContent = r.treino;
+
+        const track = document.createElement("div");
+        track.className = "stack-track";
+
+        const tot = r.total || 1;
+        const order = STATUS_ORDER.filter(k => (r.by[k] || 0) > 0);
+
+        for(const k of order){
+          const qtd = r.by[k] || 0;
+          const pct = (qtd / tot) * 100;
+          const seg = document.createElement("div");
+          seg.className = "seg";
+          setSeg(seg, pct, STATUS_COLORS[k] || "#111827", `${pct.toFixed(1)}%`);
+          track.appendChild(seg);
+        }
+
+        const totalEl = document.createElement("div");
+        totalEl.className = "stack-total";
+        totalEl.textContent = String(r.total);
+
+        line.appendChild(lab);
+        line.appendChild(track);
+        line.appendChild(totalEl);
+        cont.appendChild(line);
+      }
+    }
+
+    /* ==================== KPI: Funcionários únicos ==================== */
+    function atualizarKPI(lista, counts){
+      const set = new Set();
+      for(const t of lista){
+        const cs = String(t.cs || "").trim();
+        if(cs) set.add("CS:" + cs);
+        else set.add("N:" + semAcento(String(t.nome || "")).toLowerCase().trim());
+      }
+      document.getElementById("kpiFuncionarios").textContent = String(set.size);
+
+      const v = counts.valido || 0;
+      const a = counts["a-vencer"] || 0;
+      const ve = counts.vencido || 0;
+      const i = counts.integracao || 0;
+      document.getElementById("kpiStatusResumo").textContent = `Válido ${v} • À Vencer ${a} • Vencido ${ve} • Integração ${i}`;
     }
 
     /* ==================== RENDERIZAÇÃO ==================== */
@@ -1683,39 +1607,24 @@
       const vazio = document.getElementById("vazio");
       mural.innerHTML = "";
 
-      const hoje = new Date();
-      const hojeBase = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-      const diaHoje = hojeBase.getDate();
-      const mesHoje = hojeBase.getMonth() + 1;
-      const anoHoje = hojeBase.getFullYear();
-
-      // filtros (agora todos são input, com datalist)
-      const fCs = document.getElementById("fCs").value.trim();
-      const fNome = semAcento(document.getElementById("fNome").value.toLowerCase());
-      const fCargo = semAcento(document.getElementById("fCargo").value.toLowerCase());
-      const fCipia = semAcento(document.getElementById("fCipia").value.toLowerCase());
-      const fCoord = semAcento(document.getElementById("fCoord").value.toLowerCase());
-      const fTreino = semAcento(document.getElementById("fTreino").value.toLowerCase());
+      const fCs = String(document.getElementById("fCs").value || "").trim();
+      const fNome = semAcento(String(document.getElementById("fNome").value || "")).toLowerCase();
+      const fCargo = semAcento(String(document.getElementById("fCargo").value || "")).toLowerCase();
+      const fCipia = semAcento(String(document.getElementById("fCipia").value || "")).toLowerCase();
+      const fCoord = semAcento(String(document.getElementById("fCoord").value || "")).toLowerCase();
+      const fTreino = semAcento(String(document.getElementById("fTreino").value || "")).toLowerCase();
       const fFormacao = document.getElementById("fFormacao").value.trim();
       const fVencimento = document.getElementById("fVencimento").value.trim();
-
-      // status digitável (aceita "Válido", "valido", "à vencer"...)
       const fStatusKey = normKey(document.getElementById("fStatus").value);
 
-      const lista = TREINOS_RAW
-        .map(t => {
-          const _v = parseDataBr(t.vencimento);
-          const _f = parseDataBr(t.formacao);
-          const st = calcularStatusFinal(t, _v, hojeBase);
-          return { ...t, _v, _f, _statusKey: st.key, _statusLabel: st.label };
-        })
+      const lista = TREINOS_BASE
         .filter(t => {
-          if(fCs && !String(t.cs || "").includes(fCs)) return false;
-          if(fNome && !semAcento(t.nome || "").toLowerCase().includes(fNome)) return false;
-          if(fCargo && !semAcento(t.cargo || "").toLowerCase().includes(fCargo)) return false;
-          if(fCipia && !semAcento(t.cipia || "").toLowerCase().includes(fCipia)) return false;
-          if(fCoord && !semAcento(t.coordenacao || "").toLowerCase().includes(fCoord)) return false;
-          if(fTreino && !semAcento(t.treinamento || "").toLowerCase().includes(fTreino)) return false;
+          if(fCs && t._cs !== fCs) return false;
+          if(fNome && t._nomeN !== fNome) return false;
+          if(fCargo && t._cargoN !== fCargo) return false;
+          if(fCipia && t._cipiaN !== fCipia) return false;
+          if(fCoord && t._coordN !== fCoord) return false;
+          if(fTreino && t._treinoN !== fTreino) return false;
           if(fFormacao && !String(t.formacao || "").includes(fFormacao)) return false;
           if(fVencimento && !String(t.vencimento || "").includes(fVencimento)) return false;
           if(fStatusKey && t._statusKey !== fStatusKey) return false;
@@ -1734,9 +1643,17 @@
             || semAcento(a.treinamento).localeCompare(semAcento(b.treinamento));
         });
 
-      atualizarKPIs(lista);
-      atualizarGraficos(lista);
-      atualizarGraficosTreinamento(lista);
+      const res = atualizarQtdPorStatus(lista) || { counts:{}, total:0, keysPresentes:[] };
+      atualizarPctPorStatus(res.counts, res.total, res.keysPresentes);
+
+      const top8 = topTreinamentos(lista, 8);
+     /* document.getElementById("chartTreinoQtdTotal").textContent = res.total ? `${res.total} Treinamentos` : "";
+      document.getElementById("chartTreinoPctTotal").textContent = res.total ? `${res.total} Treinamentos` : "";*/
+
+      renderStackQtd("stackTreinoQtd", top8, res.total);
+      renderStackPct("stackTreinoPct", top8, res.total);
+
+      atualizarKPI(lista, res.counts);
 
       if(!lista.length){
         vazio.style.display = "block";
@@ -1746,18 +1663,7 @@
 
       for(const t of lista){
         const card = document.createElement("div");
-
-        const v = t._v;
-        const ehHoje = v.dia === diaHoje && v.mes === mesHoje && v.ano === anoHoje;
-
-        card.className = "card" + (ehHoje ? " card-hoje" : "");
-
-        if(ehHoje){
-          const pill = document.createElement("div");
-          pill.className = "pill-hoje";
-          pill.textContent = "Vence hoje";
-          card.appendChild(pill);
-        }
+        card.className = "card";
 
         const img = document.createElement("img");
         img.alt = t.nome;
@@ -1825,10 +1731,13 @@
     let debounceId;
     function onFilterChange(){
       clearTimeout(debounceId);
-      debounceId = setTimeout(renderTreinos, 120);
+      debounceId = setTimeout(renderTreinos, 80);
     }
 
-    ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento","fStatus"]
+    ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fStatus"]
+      .forEach(id => document.getElementById(id).addEventListener("change", onFilterChange));
+
+    ["fFormacao","fVencimento"]
       .forEach(id => {
         const el = document.getElementById(id);
         el.addEventListener("input", onFilterChange);
@@ -1836,24 +1745,35 @@
       });
 
     document.getElementById("btnLimpar").addEventListener("click", () => {
-      ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento","fStatus"]
-        .forEach(id => document.getElementById(id).value = "");
+      ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fStatus"].forEach(id => document.getElementById(id).value = "");
+      ["fFormacao","fVencimento"].forEach(id => document.getElementById(id).value = "");
       renderTreinos();
     });
 
-    /* BOTÃO VOLTAR AO TOPO */
-    const btnTop = document.getElementById("btnTop");
-    function toggleTopButton(){
+    /* BOTÃO TOPO */
+    const btnTopo = document.getElementById("btnTopo");
+    btnTopo.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    function controlarBotaoTopo(){
       const y = window.scrollY || document.documentElement.scrollTop;
-      btnTop.classList.toggle("show", y > 500);
+      const h = document.documentElement.scrollHeight;
+      const vh = window.innerHeight;
+
+      const pertoDoFim = (y + vh) >= (h - 280);
+      const rolouBastante = y > 700;
+
+      btnTopo.style.display = (pertoDoFim || rolouBastante) ? "flex" : "none";
     }
-    window.addEventListener("scroll", toggleTopButton, { passive:true });
-    btnTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    window.addEventListener("scroll", controlarBotaoTopo, { passive:true });
+    window.addEventListener("resize", controlarBotaoTopo);
 
     // init
-    initDatalists();
+    initSelects();
+    TREINOS_BASE = preprocessarBase();
     renderTreinos();
-    toggleTopButton();
+    controlarBotaoTopo();
   </script>
 </body>
 </html>
