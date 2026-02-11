@@ -15,9 +15,16 @@
       --texto-sec: #6b7280;
       --borda: #e5e7eb;
       --bg: #f6f5fb;
+
+      /* CORES STATUS */
+      --c-valido: #00223D;
+      --c-vencido:#E66C37;
+      --c-avencer:#118DFF;
+      --c-rotulo:#65B357;
     }
 
     *{ box-sizing:border-box; }
+    html{ scroll-behavior: smooth; }
 
     body{
       margin:0;
@@ -36,35 +43,11 @@
       justify-content:space-between;
       gap:16px;
     }
-
-    .top-left{
-      min-width:0;
-    }
-
-    .top-title{
-      font-size:20px;
-      font-weight:600;
-      margin:0;
-    }
-
-    .top-sub{
-      margin:2px 0 0 0;
-      font-size:12px;
-      opacity:.9;
-    }
-
-    .top-right{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-shrink:0;
-    }
-
-    .logo-rumo{
-      height:40px;
-      max-width:140px;
-      object-fit:contain;
-    }
+    .top-left{ min-width:0; }
+    .top-title{ font-size:20px; font-weight:600; margin:0; }
+    .top-sub{ margin:2px 0 0 0; font-size:12px; opacity:.9; }
+    .top-right{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .logo-rumo{ height:40px; max-width:140px; object-fit:contain; }
 
     .btn-bi{
       border:1px solid rgba(255,255,255,.25);
@@ -96,7 +79,7 @@
       padding:18px 20px 28px 20px;
     }
 
-    /* KPIs (CARDS DE TOTAL) */
+    /* KPIs */
     .kpis{
       display:grid;
       grid-template-columns: repeat(4, minmax(180px, 1fr));
@@ -147,25 +130,256 @@
       margin-top:2px;
     }
 
-    .pill-total{
+    .pill-total{ background:#f3f4f6; color:#111827; border-color:#e5e7eb; }
+    .pill-valido{ background:#ecfdf3; color:#15803d; border-color:#bbf7d0; }
+    .pill-avencer{ background:#fefce8; color:#854d0e; border-color:#fef08a; }
+    .pill-vencido{ background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+
+    /* CHARTS */
+    .charts{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .chart-card{
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--borda);
+      padding:12px 14px 14px 14px;
+      box-shadow:0 2px 8px rgba(15,23,42,.05);
+    }
+    .chart-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:0 0 10px 0;
+      font-size:13px;
+      font-weight:700;
+      color:var(--texto-sec);
+    }
+
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px 10px;
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px dashed #e5e7eb;
+    }
+    .leg-item{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      color:var(--texto-sec);
+      white-space:nowrap;
+    }
+    .swatch{
+      width:10px;height:10px;border-radius:3px;
+      border:1px solid rgba(15,23,42,.1);
+      background:#ddd;
+    }
+
+    .bars{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:8px;
+    }
+    .bar-row{
+      display:grid;
+      grid-template-columns: 120px 1fr 60px;
+      gap:10px;
+      align-items:center;
+    }
+    .bar-label{
+      font-size:12px;
+      color:var(--texto-principal);
+      font-weight:600;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .bar-track{
+      height:14px;
       background:#f3f4f6;
-      color:#111827;
-      border-color:#e5e7eb;
+      border:1px solid #e5e7eb;
+      border-radius:999px;
+      position:relative;
+      overflow:hidden;
     }
-    .pill-valido{
-      background:#ecfdf3;
-      color:#15803d;
-      border-color:#bbf7d0;
+    .bar-fill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: var(--c-valido);
+      position:relative;
     }
-    .pill-avencer{
-      background:#fefce8;
-      color:#854d0e;
-      border-color:#fef08a;
+    .bar-value{
+      font-size:12px;
+      font-weight:800;
+      color: var(--c-rotulo);
+      text-align:right;
     }
-    .pill-vencido{
-      background:#fef2f2;
-      color:#b91c1c;
-      border-color:#fecaca;
+    .bar-fill .bar-bubble{
+      position:absolute;
+      right:6px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:11px;
+      font-weight:800;
+      color:#fff;
+      padding:2px 6px;
+      border-radius:999px;
+      background: rgba(0,0,0,.25);
+      backdrop-filter: blur(2px);
+      white-space:nowrap;
+    }
+
+    .donut-wrap{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .donut{
+      width:170px;
+      height:170px;
+      border-radius:50%;
+      background: conic-gradient(#e5e7eb 0 100%);
+      position:relative;
+      flex-shrink:0;
+      border:1px solid #e5e7eb;
+    }
+    .donut::after{
+      content:"";
+      position:absolute;
+      inset:18px;
+      border-radius:50%;
+      background:#fff;
+      border:1px solid #eef2f7;
+    }
+    .donut-center{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      z-index:1;
+      text-align:center;
+      padding:0 10px;
+    }
+    .donut-center .big{
+      font-size:20px;
+      font-weight:900;
+      color:var(--texto-principal);
+      line-height:1.1;
+    }
+    .donut-center .sub{
+      font-size:11px;
+      color:var(--texto-sec);
+      font-weight:700;
+    }
+    .donut-list{
+      flex:1;
+      min-width:0;
+    }
+    .donut-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:6px 0;
+      border-bottom:1px dashed #eef2f7;
+    }
+    .donut-row:last-child{ border-bottom:none; }
+    .donut-row .left{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+    }
+    .donut-row .name{
+      font-size:12px;
+      font-weight:700;
+      color:var(--texto-principal);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:240px;
+    }
+    .donut-row .pct{
+      font-size:12px;
+      font-weight:900;
+      color:var(--c-rotulo);
+      white-space:nowrap;
+    }
+    .donut-row .qtd{
+      font-size:12px;
+      color:var(--texto-sec);
+      white-space:nowrap;
+    }
+
+    /* === GRÁFICOS TREINAMENTO x STATUS (NOVOS) === */
+    .stack-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .stack-row{
+      display:grid;
+      grid-template-columns: 220px 1fr 60px;
+      gap:10px;
+      align-items:center;
+    }
+    .stack-name{
+      font-size:12px;
+      font-weight:700;
+      color:var(--texto-principal);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .stack-bar{
+      height:14px;
+      background:#f3f4f6;
+      border:1px solid #e5e7eb;
+      border-radius:999px;
+      overflow:hidden;
+      display:flex;
+    }
+    .stack-seg{
+      height:100%;
+      width:0%;
+      min-width:0;
+      position:relative;
+    }
+    .stack-seg .seg-label{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      font-size:10px;
+      font-weight:900;
+      color:#fff;
+      white-space:nowrap;
+      pointer-events:none;
+      text-shadow:0 1px 1px rgba(0,0,0,.35);
+      opacity:.95;
+    }
+    .stack-total{
+      font-size:12px;
+      font-weight:900;
+      color:var(--c-rotulo);
+      text-align:right;
+    }
+    .muted-note{
+      margin:6px 0 0 0;
+      font-size:11px;
+      color:#94a3b8;
     }
 
     /* FILTROS */
@@ -177,7 +391,6 @@
       box-shadow:0 2px 8px rgba(15,23,42,.05);
       margin-bottom:16px;
     }
-
     .filtros-header{
       display:flex;
       align-items:center;
@@ -185,7 +398,6 @@
       gap:10px;
       margin-bottom:6px;
     }
-
     .filtros-titulo{
       font-size:13px;
       font-weight:600;
@@ -195,7 +407,6 @@
       align-items:center;
       gap:6px;
     }
-
     .filtros-titulo span.icon{
       width:18px;
       height:18px;
@@ -206,7 +417,6 @@
       justify-content:center;
       font-size:11px;
     }
-
     .btn-clear{
       border:1px solid #e5e7eb;
       background:#fff;
@@ -220,23 +430,19 @@
       align-items:center;
       gap:4px;
     }
-
     .btn-clear:hover{ background:#f9fafb; }
 
     .filtros-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
       gap:8px 10px;
     }
-
     .filtro-label{
       font-size:11px;
       color:var(--texto-sec);
       margin-bottom:2px;
     }
-
-    .filtros-grid input,
-    .filtros-grid select{
+    .filtros-grid input{
       width:100%;
       padding:6px 8px;
       border-radius:8px;
@@ -245,7 +451,6 @@
       color:var(--texto-principal);
       background:#fff;
     }
-
     .filtros-grid input::placeholder{
       color:#9ca3af;
       font-size:12px;
@@ -257,7 +462,6 @@
       grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
       gap:14px;
     }
-
     .card{
       background:#fff;
       border-radius:16px;
@@ -268,12 +472,10 @@
       position:relative;
       box-shadow:0 2px 8px rgba(15,23,42,.04);
     }
-
     .card-hoje{
       border-color:#f97316;
       box-shadow:0 0 0 2px rgba(249,115,22,.25);
     }
-
     .pill-hoje{
       position:absolute;
       top:8px;
@@ -286,7 +488,6 @@
       font-size:10px;
       font-weight:600;
     }
-
     .card img{
       width:72px;
       height:72px;
@@ -296,23 +497,19 @@
       flex-shrink:0;
       background:#f3f4f6;
     }
-
     .info{ flex:1; min-width:0; }
-
     .linha-top{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:6px;
     }
-
     .nome{
       margin:0;
       font-size:14px;
       font-weight:600;
       color:var(--texto-principal);
     }
-
     .cs-tag{
       font-size:11px;
       color:#6b21a8;
@@ -322,26 +519,22 @@
       border:1px solid #e9d5ff;
       white-space:nowrap;
     }
-
     .linha-sub{
       margin:2px 0 0 0;
       font-size:11px;
       color:var(--texto-sec);
     }
-
     .treino{
       margin:6px 0 0 0;
       font-size:12px;
       color:var(--roxo-escuro);
       font-weight:500;
     }
-
     .datas{
       margin:4px 0 0 0;
       font-size:11px;
       color:#4b5563;
     }
-
     .status-badge{
       display:inline-block;
       margin-top:6px;
@@ -351,36 +544,11 @@
       border:1px solid transparent;
       font-weight:600;
     }
-
-    .st-valido{
-      background:#ecfdf3;
-      color:#15803d;
-      border-color:#bbf7d0;
-    }
-
-    .st-a-vencer{
-      background:#fefce8;
-      color:#854d0e;
-      border-color:#fef08a;
-    }
-
-    .st-vencido{
-      background:#fef2f2;
-      color:#b91c1c;
-      border-color:#fecaca;
-    }
-
-    .st-nao-concluido{
-      background:#eff6ff;
-      color:#1d4ed8;
-      border-color:#bfdbfe;
-    }
-
-    .st-teste{
-      background:#f3f4f6;
-      color:#374151;
-      border-color:#e5e7eb;
-    }
+    .st-valido{ background:#ecfdf3; color:#15803d; border-color:#bbf7d0; }
+    .st-a-vencer{ background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+    .st-vencido{ background:#fff7ed; color:#c2410c; border-color:#fed7aa; }
+    .st-nao-concluido{ background:#f3f4f6; color:#374151; border-color:#e5e7eb; }
+    .st-teste{ background:#f3f4f6; color:#374151; border-color:#e5e7eb; }
 
     .empty{
       margin-top:12px;
@@ -388,8 +556,58 @@
       color:var(--texto-sec);
     }
 
+    /* BOTÃO VOLTAR AO TOPO */
+    .back-to-top{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      width:46px;
+      height:46px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.92);
+      box-shadow:0 10px 30px rgba(15,23,42,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      opacity:0;
+      pointer-events:none;
+      transform: translateY(8px);
+      transition: opacity .15s ease, transform .15s ease;
+      z-index:999;
+    }
+    .back-to-top.show{
+      opacity:1;
+      pointer-events:auto;
+      transform: translateY(0);
+    }
+    .back-to-top:hover{
+      box-shadow:0 12px 34px rgba(15,23,42,.22);
+      transform: translateY(-1px);
+    }
+    .back-to-top svg{ width:22px; height:22px; }
+
+    footer.footer-rumo{
+      background: linear-gradient(90deg, var(--roxo-header), var(--roxo-escuro));
+      padding:18px 20px;
+      margin-top:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .footer-rumo img{
+      height:38px;
+      max-width:180px;
+      object-fit:contain;
+      opacity:.98;
+    }
+
     @media (max-width:980px){
       .kpis{ grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+      .charts{ grid-template-columns: 1fr; }
+      .bar-row{ grid-template-columns: 110px 1fr 56px; }
+      .stack-row{ grid-template-columns: 180px 1fr 56px; }
     }
 
     @media (max-width:640px){
@@ -398,6 +616,11 @@
       .logo-rumo{ height:30px; }
       .kpis{ grid-template-columns: 1fr; }
       .btn-bi{ padding:7px 10px; font-size:12px; }
+      .donut-wrap{ flex-direction:column; align-items:flex-start; }
+      .donut{ width:160px; height:160px; }
+      .back-to-top{ right:14px; bottom:14px; }
+      .stack-row{ grid-template-columns: 1fr; }
+      .stack-total{ text-align:left; }
     }
   </style>
 </head>
@@ -412,7 +635,6 @@
     </div>
 
     <div class="top-right">
-      <!-- BOTÃO PARA O BI DE SEGURANÇA -->
       <a
         class="btn-bi"
         href="https://app.powerbi.com/groups/6bf037f8-a952-41d5-8f33-867babe2eecc/reports/b648a096-1227-4087-813d-9f402b34c0a7/ReportSection?language=pt-BR&experience=power-bi"
@@ -430,7 +652,7 @@
 
   <main class="wrap">
 
-    <!-- CARDS (TOTALIZADORES) -->
+    <!-- KPIs -->
     <section class="kpis" aria-label="Totais">
       <div class="kpi">
         <div>
@@ -469,6 +691,58 @@
       </div>
     </section>
 
+    <!-- GRÁFICOS STATUS -->
+    <section class="charts" aria-label="Gráficos de status">
+      <div class="chart-card">
+        <p class="chart-title">
+          Quantidade por status
+          <span id="chartCountTotal" style="font-size:12px;font-weight:800;color:var(--texto-principal)"></span>
+        </p>
+
+        <div id="bars" class="bars" aria-label="Barras de quantidade por status"></div>
+        <div class="legend" id="legendBars"></div>
+      </div>
+
+      <div class="chart-card">
+        <p class="chart-title">
+          Percentual por status
+          <span id="chartPctTotal" style="font-size:12px;font-weight:800;color:var(--texto-principal)"></span>
+        </p>
+
+        <div class="donut-wrap">
+          <div class="donut" id="donut" aria-label="Gráfico de rosca"></div>
+          <div class="donut-center" aria-hidden="true">
+            <div class="big" id="donutCenterBig">0</div>
+            <div class="sub" id="donutCenterSub">registros</div>
+          </div>
+
+          <div class="donut-list" id="donutList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOVOS GRÁFICOS: TREINAMENTO x STATUS -->
+    <section class="charts" aria-label="Gráficos por treinamento e status">
+      <div class="chart-card">
+        <p class="chart-title">
+          Treinamentos por status (Quantidade)
+          <span id="chartTreinoCountTotal" style="font-size:12px;font-weight:800;color:var(--texto-principal)"></span>
+        </p>
+        <div id="treinoStackCount" class="stack-wrap"></div>
+        <p class="muted-note" id="treinoNoteCount"></p>
+      </div>
+
+      <div class="chart-card">
+        <p class="chart-title">
+          Treinamentos por status (%)
+          <span id="chartTreinoPctTotal" style="font-size:12px;font-weight:800;color:var(--texto-principal)"></span>
+        </p>
+        <div id="treinoStackPct" class="stack-wrap"></div>
+        <p class="muted-note" id="treinoNotePct"></p>
+      </div>
+    </section>
+
+    <!-- FILTROS (TODOS COM DIGITAÇÃO + SELEÇÃO) -->
     <section class="filtros-box">
       <div class="filtros-header">
         <p class="filtros-titulo">
@@ -481,42 +755,38 @@
       <div class="filtros-grid">
         <div>
           <div class="filtro-label">CS</div>
-          <input id="fCs" placeholder="ex: 445119" />
+          <input id="fCs" list="dlCs" placeholder="ex: 445119" />
+          <datalist id="dlCs"></datalist>
         </div>
 
         <div>
           <div class="filtro-label">Nome Completo</div>
-          <input id="fNome" placeholder="digite parte do nome" />
+          <input id="fNome" list="dlNome" placeholder="digite ou selecione" />
+          <datalist id="dlNome"></datalist>
         </div>
 
         <div>
           <div class="filtro-label">Cargo</div>
-          <input id="fCargo" placeholder="ex: Coordenador" />
+          <input id="fCargo" list="dlCargo" placeholder="digite ou selecione" />
+          <datalist id="dlCargo"></datalist>
         </div>
 
         <div>
           <div class="filtro-label">Cipia</div>
-          <input id="fCipia" placeholder="ex: Central Serras" />
+          <input id="fCipia" list="dlCipia" placeholder="digite ou selecione" />
+          <datalist id="dlCipia"></datalist>
         </div>
 
         <div>
           <div class="filtro-label">Coordenação</div>
-          <select id="fCoord">
-            <option value="">(todas)</option>
-            <option value="Engenharia Infraestrutura">Engenharia Infraestrutura</option>
-            <option value="Engenharia OAE's">Engenharia OAE's</option>
-            <option value="Execução Central Norte">Execução Central Norte</option>
-            <option value="Execução Central Serras">Execução Central Serras</option>
-            <option value="Execução Rio Grande do Sul">Execução Rio Grande do Sul</option>
-            <option value="Gerente">Gerente</option>
-            <option value="Institucional e Faixa de Domínio">Institucional e Faixa de Domínio</option>
-            <option value="Planejamento">Planejamento</option>
-          </select>
+          <input id="fCoord" list="dlCoord" placeholder="digite ou selecione" />
+          <datalist id="dlCoord"></datalist>
         </div>
 
         <div>
           <div class="filtro-label">Treinamento</div>
-          <input id="fTreino" placeholder="ex: Primeiros Socorros" />
+          <input id="fTreino" list="dlTreino" placeholder="digite ou selecione" />
+          <datalist id="dlTreino"></datalist>
         </div>
 
         <div>
@@ -531,14 +801,15 @@
 
         <div>
           <div class="filtro-label">Status</div>
-          <select id="fStatus">
-            <option value="">(todos)</option>
-            <option value="valido">Válido</option>
-            <option value="a-vencer">À Vencer</option>
-            <option value="vencido">Vencido</option>
-            <option value="nao-concluido">Não Concluído</option>
-            <option value="teste">Teste</option>
-          </select>
+          <input id="fStatus" list="dlStatus" placeholder="digite ou selecione" />
+          <datalist id="dlStatus">
+            <option value="Válido"></option>
+            <option value="À Vencer"></option>
+            <option value="Vencido"></option>
+            <option value="Não Concluído"></option>
+            <option value="Teste"></option>
+            <option value="Integração"></option>
+          </datalist>
         </div>
       </div>
     </section>
@@ -551,19 +822,30 @@
     </section>
   </main>
 
+  <footer class="footer-rumo" aria-label="Rodapé Rumo">
+    <img id="logoRumoFooter" alt="Rumo">
+  </footer>
+
+  <button class="back-to-top" id="btnTop" type="button" aria-label="Voltar ao topo" title="Voltar ao topo">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 5l7 7-1.4 1.4L13 8.8V20h-2V8.8L6.4 13.4 5 12l7-7z" fill="currentColor"/>
+    </svg>
+  </button>
+
   <script>
     /* ===================== PASTA DE FOTOS ===================== */
     const BASE_FOTOS =
       "https://rumolog.sharepoint.com/sites/AdernciaaoPDMInfraePonte/Documentos%20Compartilhados/0.%20MALHA%20SUL/02.%20PLANEJAMENTO/04.%20PLANO%20DE%20MANUTEN%C3%87%C3%83O/06.%20BI%27s/3.%20T.I/DOC%20-%20PORTAL%20INFRA/Fotos%20Aniversariantes";
 
-    const LOGO_RUMO = BASE_FOTOS + "/logoRumo.png"; // ajuste se precisar
+    const LOGO_RUMO = BASE_FOTOS + "/logoRumo.png";
     document.getElementById("logoRumo").src = LOGO_RUMO;
+    document.getElementById("logoRumoFooter").src = LOGO_RUMO;
 
     /* ========================= DADOS ========================= */
     const TREINOS_RAW = [
-      /* COLE AQUI SEU ARRAY COMPLETO */
-     
-  
+      /* COLE AQUI SEU ARRAY COMPLETO (mantive o seu, não alterei nada) */
+
+      
   { cs: "407501", nome: "Luciano Frederico Stelle", cargo: "Analista de Operação Sr", cipia: "Central Serras", treinamento: "Direção Segura -  Teórico", formacao: "09/02/2026", vencimento: "09/02/2027", status: "Válido", coordenacao: "Execução Central Serras" },
   { cs: "407501", nome: "Luciano Frederico Stelle", cargo: "Analista de Operação Sr", cipia: "Central Serras", treinamento: "Integração de Saúde e Segurança", formacao: "09/02/2026", vencimento: "09/02/2027", status: "Válido", coordenacao: "Execução Central Serras" },
   { cs: "407501", nome: "Luciano Frederico Stelle", cargo: "Analista de Operação Sr", cipia: "Central Serras", treinamento: "RO Mód. III", formacao: "18/01/2026", vencimento: "18/01/2027", status: "Válido", coordenacao: "Execução Central Serras" },
@@ -585,18 +867,18 @@
   { cs: "263851", nome: "Matias Alejandro Aduco", cargo: "Analista de Planejamento Sr", cipia: "Central Serras", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "29/01/2026", vencimento: "29/01/2028", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
   { cs: "419004", nome: "Francisco Antonio Ramos De Faria Filho", cargo: "Coordenador de Planejamento", cipia: "Central Serras", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "12/01/2026", vencimento: "12/01/2028", status: "Válido", coordenacao: "Execução Central Serras" },
 
-  { cs: "330762", nome: "Victor Hugo Santos Miranda de Souza", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "RO Mód. III", formacao: "07/01/2026", vencimento: "07/01/2027", status: "Válido", coordenacao: "Planejamento" },
-  { cs: "330762", nome: "Victor Hugo Santos Miranda de Souza", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Integração de Saúde e Segurança", formacao: "23/12/2025", vencimento: "23/12/2026", status: "Válido", coordenacao: "Planejamento" },
-  { cs: "330762", nome: "Victor Hugo Santos Miranda de Souza", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "23/12/2025", vencimento: "23/12/2027", status: "Válido", coordenacao: "Planejamento" },
-  { cs: "330762", nome: "Victor Hugo Santos Miranda de Souza", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Utilização Adequada dos EPI’s", formacao: "23/12/2025", vencimento: "23/12/2027", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "330762", nome: "Victor Hugo Miranda Oliveira", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "RO Mód. III", formacao: "07/01/2026", vencimento: "07/01/2027", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "330762", nome: "Victor Hugo Miranda Oliveira", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Integração de Saúde e Segurança", formacao: "23/12/2025", vencimento: "23/12/2026", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "330762", nome: "Victor Hugo Miranda Oliveira", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "23/12/2025", vencimento: "23/12/2027", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "330762", nome: "Victor Hugo Miranda Oliveira", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Utilização Adequada dos EPI’s", formacao: "23/12/2025", vencimento: "23/12/2027", status: "Válido", coordenacao: "Planejamento" },
 
   { cs: "261095", nome: "Luis Felipe Martinelli Martins", cargo: "Coordenador de Planejamento", cipia: "RS", treinamento: "Integração de Saúde e Segurança", formacao: "05/01/2026", vencimento: "05/01/2027", status: "Válido", coordenacao: "Execução Rio Grande do Sul" },
   { cs: "261095", nome: "Luis Felipe Martinelli Martins", cargo: "Coordenador de Planejamento", cipia: "RS", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "05/01/2026", vencimento: "05/01/2028", status: "Válido", coordenacao: "Execução Rio Grande do Sul" },
 
   { cs: "279728", nome: "Rafael Robert Nahra", cargo: "Coordenador de Planejamento", cipia: "Norte PR + Ramais", treinamento: "Utilização Adequada dos EPI’s", formacao: "22/10/2025", vencimento: "22/10/2027", status: "Válido", coordenacao: "Execução Central Norte" },
 
-  { cs: "407664", nome: "Thalita Cristina Santos Jocojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "RO Mód. III", formacao: "28/12/2025", vencimento: "28/12/2026", status: "Válido", coordenacao: "Planejamento" },
-  { cs: "407664", nome: "Thalita Cristina Santos Jocojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "Integração de Saúde e Segurança", formacao: "15/12/2025", vencimento: "15/12/2026", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "407664", nome: "Thalita Cristina Santos Jacojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "RO Mód. III", formacao: "28/12/2025", vencimento: "28/12/2026", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "407664", nome: "Thalita Cristina Santos Jacojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "Integração de Saúde e Segurança", formacao: "15/12/2025", vencimento: "15/12/2026", status: "Válido", coordenacao: "Planejamento" },
 
   { cs: "444209", nome: "Vitor Hugo Tonini", cargo: "Analista Administrativo Jr", cipia: "Norte PR + Ramais", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "22/10/2025", vencimento: "22/10/2027", status: "Válido", coordenacao: "Execução Central Norte" },
   { cs: "444209", nome: "Vitor Hugo Tonini", cargo: "Analista Administrativo Jr", cipia: "Norte PR + Ramais", treinamento: "RO Mód. III", formacao: "22/10/2025", vencimento: "22/10/2026", status: "Válido", coordenacao: "Execução Central Norte" },
@@ -622,7 +904,7 @@
   { cs: "407501", nome: "Luciano Frederico Stelle", cargo: "Analista de Operação Sr", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "20/10/2025", vencimento: "20/10/2026", status: "Válido", coordenacao: "Execução Central Serras" },
 
   { cs: "437413", nome: "Sergio Alves Neves Junior", cargo: "Analista de Planejamento Pl", cipia: "Central Serras", treinamento: "RO Mód. III", formacao: "13/10/2025", vencimento: "13/10/2026", status: "Válido", coordenacao: "Engenharia Infraestrutura" },
-  { cs: "407664", nome: "Thalita Cristina Santos Jocojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "Direção Segura -  Teórico", formacao: "09/10/2025", vencimento: "09/10/2026", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "407664", nome: "Thalita Cristina Santos Jacojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "Direção Segura -  Teórico", formacao: "09/10/2025", vencimento: "09/10/2026", status: "Válido", coordenacao: "Planejamento" },
 
   { cs: "258087", nome: "Roberto Benedito Antunes", cargo: "Especialista de Operação Jr", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "03/10/2025", vencimento: "03/10/2026", status: "Válido", coordenacao: "Especialista Execução" },
   { cs: "258087", nome: "Roberto Benedito Antunes", cargo: "Especialista de Operação Jr", cipia: "Central Serras", treinamento: "Direção Segura -  Teórico", formacao: "03/10/2025", vencimento: "03/10/2026", status: "Válido", coordenacao: "Especialista Execução" },
@@ -659,13 +941,13 @@
 
   { cs: "405370", nome: "Priscila De Christan", cargo: "Especialista de Planejamento Sr", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "08/08/2025", vencimento: "08/08/2026", status: "Válido", coordenacao: "Engenharia OAE's" },
 
-  { cs: "407664", nome: "Thalita Cristina Santos Jocojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "7 Regras da Vida", formacao: "31/07/2025", vencimento: "31/07/2026", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "407664", nome: "Thalita Cristina Santos Jacojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "7 Regras da Vida", formacao: "31/07/2025", vencimento: "31/07/2026", status: "Válido", coordenacao: "Planejamento" },
 
   { cs: "366693", nome: "Thalita Iachitzki Da Cruz", cargo: "Coordenador de Planejamento", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "24/07/2025", vencimento: "24/07/2026", status: "Válido", coordenacao: "Planejamento" },
   { cs: "366693", nome: "Thalita Iachitzki Da Cruz", cargo: "Coordenador de Planejamento", cipia: "Central Serras", treinamento: "RO Mód. III", formacao: "24/07/2025", vencimento: "24/07/2026", status: "Válido", coordenacao: "Planejamento" },
 
-  { cs: "407664", nome: "Thalita Cristina Santos Jocojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "24/07/2025", vencimento: "24/07/2027", status: "Válido", coordenacao: "Planejamento" },
-  { cs: "407664", nome: "Thalita Cristina Santos Jocojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "Primeiros Socorros", formacao: "24/07/2025", vencimento: "24/07/2026", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "407664", nome: "Thalita Cristina Santos Jacojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "24/07/2025", vencimento: "24/07/2027", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "407664", nome: "Thalita Cristina Santos Jacojaco", cargo: "Analista de Planejamento Jr", cipia: "Norte PR + Ramais", treinamento: "Primeiros Socorros", formacao: "24/07/2025", vencimento: "24/07/2026", status: "Válido", coordenacao: "Planejamento" },
 
   { cs: "331946", nome: "Nicholas Matheus Bachaus Stein", cargo: "Coordenador de Planejamento", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "18/07/2025", vencimento: "18/07/2026", status: "Válido", coordenacao: "Engenharia Infraestrutura" },
 
@@ -685,7 +967,7 @@
 
   { cs: "263684", nome: "Vitoria Araujo Dos Santos", cargo: "Analista de Planejamento Sr", cipia: "Central Serras", treinamento: "Primeiros Socorros", formacao: "30/06/2025", vencimento: "30/06/2026", status: "Válido", coordenacao: "Planejamento" },
 
-  { cs: "330762", nome: "Victor Hugo Santos Miranda de Souza", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "17/06/2025", vencimento: "17/06/2026", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "330762", nome: "Victor Hugo Miranda Oliveira", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "17/06/2025", vencimento: "17/06/2026", status: "Válido", coordenacao: "Planejamento" },
 
   { cs: "261095", nome: "Luis Felipe Martinelli Martins", cargo: "Coordenador de Planejamento", cipia: "RS", treinamento: "Direção Segura -  Teórico", formacao: "16/06/2025", vencimento: "16/06/2026", status: "Válido", coordenacao: "Execução Rio Grande do Sul" },
   { cs: "263851", nome: "Matias Alejandro Aduco", cargo: "Analista de Planejamento Sr", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "16/06/2025", vencimento: "16/06/2026", status: "Válido", coordenacao: "Institucional e Faixa de Domínio" },
@@ -738,7 +1020,7 @@
   { cs: "437045", nome: "Helder Da Silva Barbosa", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "07/05/2025", vencimento: "07/05/2026", status: "Válido", coordenacao: "Engenharia OAE's" },
   { cs: "437045", nome: "Helder Da Silva Barbosa", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Primeiros Socorros", formacao: "07/05/2025", vencimento: "07/05/2026", status: "Válido", coordenacao: "Engenharia OAE's" },
 
-  { cs: "330762", nome: "Victor Hugo Santos Miranda de Souza", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Direção Segura -  Teórico", formacao: "30/04/2025", vencimento: "30/04/2026", status: "Válido", coordenacao: "Planejamento" },
+  { cs: "330762", nome: "Victor Hugo Miranda Oliveira", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Direção Segura -  Teórico", formacao: "30/04/2025", vencimento: "30/04/2026", status: "Válido", coordenacao: "Planejamento" },
 
   { cs: "434612", nome: "Vitor Cerqueira Dos Santos", cargo: "Analista de Planejamento Pl", cipia: "Central Serras", treinamento: "Integração de Saúde e Segurança", formacao: "28/04/2025", vencimento: "28/04/2026", status: "Válido", coordenacao: "Planejamento" },
   { cs: "434612", nome: "Vitor Cerqueira Dos Santos", cargo: "Analista de Planejamento Pl", cipia: "Central Serras", treinamento: "7 Regras da Vida", formacao: "27/04/2025", vencimento: "27/04/2026", status: "Válido", coordenacao: "Planejamento" },
@@ -851,7 +1133,6 @@
 
   { cs: "415767", nome: "Priscyla Oliveira de Mello", cargo: "Analista de Planejamento Jr", cipia: "Central Serras", treinamento: "Não tem nada na base", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Engenharia Infraestrutura" },
 
-
   { cs: "448691", nome: "Vagner Henrique Dos Santos", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "7 Regras da Vida", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Execução Central Norte" },
   { cs: "448691", nome: "Vagner Henrique Dos Santos", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Execução Central Norte" },
   { cs: "448691", nome: "Vagner Henrique Dos Santos", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "Primeiros Socorros", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Execução Central Norte" },
@@ -867,7 +1148,7 @@
   { cs: "448635", nome: "Walter Kegler Filho", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "Direção Segura -  Teórico", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Execução Central Norte" },
   { cs: "448635", nome: "Walter Kegler Filho", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "Integração de Saúde e Segurança", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Execução Central Norte" },
   { cs: "448635", nome: "Walter Kegler Filho", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "RO Mód. III", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Execução Central Norte" },
-
+  
   { cs: "449274", nome: "Luiz Guilherme Herculano Dos Santos", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "7 Regras da Vida", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Engenharia OAE's" },
   { cs: "449274", nome: "Luiz Guilherme Herculano Dos Santos", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "Política sobre Uso de Álcool e Drogas", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Engenharia OAE's" },
   { cs: "449274", nome: "Luiz Guilherme Herculano Dos Santos", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "Primeiros Socorros", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Engenharia OAE's" },
@@ -884,6 +1165,7 @@
   { cs: "448910", nome: "Eduardo Wiezbicki", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "Direção Segura -  Teórico", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Engenharia Infraestrutura" },
   { cs: "448910", nome: "Eduardo Wiezbicki", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "Integração de Saúde e Segurança", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Engenharia Infraestrutura" },
   { cs: "448910", nome: "Eduardo Wiezbicki", cargo: "Fiscal", cipia: "Norte PR + Ramais", treinamento: "RO Mód. III", formacao: "xx/xx/xxxx", vencimento: "xx/xx/xxxx", status: "Integração", coordenacao: "Engenharia Infraestrutura" },
+
 ];
 
     /* ==================== FUNÇÕES AUXILIARES ==================== */
@@ -892,7 +1174,6 @@
         .normalize("NFD")
         .replace(/\p{Diacritic}/gu, "");
     }
-
     function trim1(s){
       return String(s || "").trim().replace(/\s+/g, " ");
     }
@@ -900,11 +1181,13 @@
     function normKey(s){
       const x = semAcento(String(s || "")).toLowerCase().trim();
       if(!x) return "";
+
       if(x.includes("nao") && x.includes("concl")) return "nao-concluido";
       if(x.includes("vencido")) return "vencido";
       if(x.includes("vencer")) return "a-vencer";
       if(x.includes("valido")) return "valido";
       if(x.includes("teste")) return "teste";
+      if(x.includes("integr")) return "integracao";
       return x.replace(/\s+/g, "-");
     }
 
@@ -915,11 +1198,12 @@
         case "vencido": return "Vencido";
         case "nao-concluido": return "Não Concluído";
         case "teste": return "Teste";
+        case "integracao": return "Integração";
         default: return key;
       }
     }
 
-    /* FOTO – mesma lógica */
+    /* FOTO */
     const EXTS = [".jpeg", ".jpg", ".png", ".webp"];
     const ICON_DEFAULT = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
@@ -1003,7 +1287,7 @@
       };
     }
 
-    /* Datas dd/mm/aaaa → objeto (ignora "xx/xx/xxxx") */
+    /* Datas dd/mm/aaaa */
     function parseDataBr(str){
       const s = String(str || "").trim();
       if(!s) return { dia:NaN, mes:NaN, ano:NaN, date:null };
@@ -1014,17 +1298,17 @@
       if(!d || !m || !a) return { dia:NaN, mes:NaN, ano:NaN, date:null };
 
       const dt = new Date(a, m - 1, d);
-
       if(dt.getFullYear() !== a || (dt.getMonth() + 1) !== m || dt.getDate() !== d){
         return { dia:NaN, mes:NaN, ano:NaN, date:null };
       }
-
       return { dia:d, mes:m, ano:a, date:dt };
     }
 
     /* STATUS FINAL */
     function calcularStatusFinal(t, vObj, hojeBase){
       const keyFromSheet = normKey(t.status);
+
+      if(keyFromSheet === "integracao") return { key: "integracao", label: "Integração" };
       if(keyFromSheet) return { key: keyFromSheet, label: normLabelFromKey(keyFromSheet) };
 
       const vDate = vObj.date;
@@ -1046,21 +1330,49 @@
         case "vencido": return "st-vencido";
         case "nao-concluido": return "st-nao-concluido";
         case "teste": return "st-teste";
+        case "integracao": return "st-nao-concluido";
         default: return "";
       }
     }
 
-    /* ====== CHAVE ÚNICA DO COLABORADOR (para contar "colaboradores") ======
-       - Se tiver CS, usa CS
-       - Se não tiver CS, usa o nome normalizado
-    */
+    /* ====== CHAVE ÚNICA DO COLABORADOR ====== */
     function keyColaborador(t){
       const cs = String(t.cs || "").trim();
       if(cs) return "CS:" + cs;
       return "NOME:" + semAcento(String(t.nome || "")).toLowerCase().trim().replace(/\s+/g, " ");
     }
 
-    /* Atualiza os KPIs baseado na lista filtrada */
+    /* ==================== DATALISTS (FILTROS PESQUISÁVEIS) ==================== */
+    function uniqSorted(arr){
+      const s = new Set();
+      for(const v of arr){
+        const x = trim1(v);
+        if(x) s.add(x);
+      }
+      return Array.from(s).sort((a,b) => semAcento(a).localeCompare(semAcento(b)));
+    }
+
+    function fillDatalist(id, values){
+      const dl = document.getElementById(id);
+      if(!dl) return;
+      dl.innerHTML = "";
+      for(const v of values){
+        const op = document.createElement("option");
+        op.value = v;
+        dl.appendChild(op);
+      }
+    }
+
+    function initDatalists(){
+      fillDatalist("dlCs", uniqSorted(TREINOS_RAW.map(x => String(x.cs || "").trim()).filter(Boolean)));
+      fillDatalist("dlNome", uniqSorted(TREINOS_RAW.map(x => x.nome)));
+      fillDatalist("dlCargo", uniqSorted(TREINOS_RAW.map(x => x.cargo)));
+      fillDatalist("dlCipia", uniqSorted(TREINOS_RAW.map(x => x.cipia)));
+      fillDatalist("dlCoord", uniqSorted(TREINOS_RAW.map(x => x.coordenacao)));
+      fillDatalist("dlTreino", uniqSorted(TREINOS_RAW.map(x => x.treinamento)));
+    }
+
+    /* ==================== KPIs ==================== */
     function atualizarKPIs(listaFiltrada){
       const setTotal = new Set();
       const setVencido = new Set();
@@ -1070,7 +1382,6 @@
       for(const t of listaFiltrada){
         const k = keyColaborador(t);
         setTotal.add(k);
-
         if(t._statusKey === "vencido") setVencido.add(k);
         if(t._statusKey === "a-vencer") setAVencer.add(k);
         if(t._statusKey === "valido") setValido.add(k);
@@ -1085,7 +1396,288 @@
       hint.textContent = setTotal.size === 1 ? "1 colaborador (com os filtros atuais)" : "considera os filtros atuais";
     }
 
-    /* =============== RENDERIZAÇÃO ================= */
+    /* ==================== GRÁFICOS STATUS (CONTAGEM + %) ==================== */
+    const STATUS_ORDER = ["valido","a-vencer","vencido","nao-concluido","integracao","teste"];
+    const STATUS_COLORS = {
+      "valido": getComputedStyle(document.documentElement).getPropertyValue("--c-valido").trim() || "#00223D",
+      "a-vencer": getComputedStyle(document.documentElement).getPropertyValue("--c-avencer").trim() || "#118DFF",
+      "vencido": getComputedStyle(document.documentElement).getPropertyValue("--c-vencido").trim() || "#E66C37",
+      "nao-concluido": "#9CA3AF",
+      "integracao": "#7C3AED",
+      "teste": "#111827"
+    };
+
+    function formatPct(p){
+      return (Math.round(p * 10) / 10).toFixed(1).replace(".", ",") + "%";
+    }
+
+    function atualizarGraficos(listaFiltrada){
+      const counts = {};
+      for(const t of listaFiltrada){
+        const k = t._statusKey || "nao-concluido";
+        counts[k] = (counts[k] || 0) + 1;
+      }
+
+      const totalRegs = listaFiltrada.length;
+      document.getElementById("chartCountTotal").textContent = totalRegs ? `${totalRegs} registros` : "";
+      document.getElementById("chartPctTotal").textContent = totalRegs ? `${totalRegs} registros` : "";
+      document.getElementById("donutCenterBig").textContent = String(totalRegs);
+      document.getElementById("donutCenterSub").textContent = totalRegs === 1 ? "registro" : "registros";
+
+      const keysPresentes = STATUS_ORDER.filter(k => (counts[k] || 0) > 0);
+
+      const barsEl = document.getElementById("bars");
+      const legendEl = document.getElementById("legendBars");
+      const donutEl = document.getElementById("donut");
+      const donutListEl = document.getElementById("donutList");
+
+      barsEl.innerHTML = "";
+      legendEl.innerHTML = "";
+      donutListEl.innerHTML = "";
+
+      if(!totalRegs){
+        donutEl.style.background = "conic-gradient(#e5e7eb 0 100%)";
+        return;
+      }
+
+      const max = Math.max(...keysPresentes.map(k => counts[k] || 0), 1);
+
+      for(const k of keysPresentes){
+        const qtd = counts[k] || 0;
+        const pctWidth = (qtd / max) * 100;
+
+        const row = document.createElement("div");
+        row.className = "bar-row";
+
+        const label = document.createElement("div");
+        label.className = "bar-label";
+        label.textContent = normLabelFromKey(k);
+
+        const track = document.createElement("div");
+        track.className = "bar-track";
+
+        const fill = document.createElement("div");
+        fill.className = "bar-fill";
+        fill.style.width = pctWidth + "%";
+        fill.style.background = STATUS_COLORS[k] || "#111827";
+
+        const bubble = document.createElement("span");
+        bubble.className = "bar-bubble";
+        bubble.textContent = String(qtd);
+
+        fill.appendChild(bubble);
+        track.appendChild(fill);
+
+        const value = document.createElement("div");
+        value.className = "bar-value";
+        value.textContent = String(qtd);
+
+        row.appendChild(label);
+        row.appendChild(track);
+        row.appendChild(value);
+        barsEl.appendChild(row);
+      }
+
+      for(const k of keysPresentes){
+        const item = document.createElement("div");
+        item.className = "leg-item";
+
+        const sw = document.createElement("span");
+        sw.className = "swatch";
+        sw.style.background = STATUS_COLORS[k] || "#111827";
+
+        const tx = document.createElement("span");
+        tx.textContent = normLabelFromKey(k);
+
+        item.appendChild(sw);
+        item.appendChild(tx);
+        legendEl.appendChild(item);
+      }
+
+      let acc = 0;
+      const parts = [];
+      for(const k of keysPresentes){
+        const qtd = counts[k] || 0;
+        const pct = (qtd / totalRegs) * 100;
+        const start = acc;
+        const end = acc + pct;
+        acc = end;
+        const color = STATUS_COLORS[k] || "#111827";
+        parts.push(`${color} ${start}% ${end}%`);
+      }
+      donutEl.style.background = `conic-gradient(${parts.join(",")})`;
+
+      for(const k of keysPresentes){
+        const qtd = counts[k] || 0;
+        const pct = (qtd / totalRegs) * 100;
+
+        const row = document.createElement("div");
+        row.className = "donut-row";
+
+        const left = document.createElement("div");
+        left.className = "left";
+
+        const sw = document.createElement("span");
+        sw.className = "swatch";
+        sw.style.background = STATUS_COLORS[k] || "#111827";
+
+        const nm = document.createElement("div");
+        nm.className = "name";
+        nm.textContent = normLabelFromKey(k);
+
+        left.appendChild(sw);
+        left.appendChild(nm);
+
+        const right = document.createElement("div");
+        right.style.display = "flex";
+        right.style.alignItems = "center";
+        right.style.gap = "10px";
+
+        const pctEl = document.createElement("div");
+        pctEl.className = "pct";
+        pctEl.textContent = formatPct(pct);
+
+        const qtdEl = document.createElement("div");
+        qtdEl.className = "qtd";
+        qtdEl.textContent = `${qtd}`;
+
+        right.appendChild(pctEl);
+        right.appendChild(qtdEl);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        donutListEl.appendChild(row);
+      }
+    }
+
+    /* ==================== NOVOS GRÁFICOS: TREINAMENTO x STATUS ==================== */
+    function buildTreinoAgg(lista){
+      const map = new Map(); // treino -> { total, byStatus: {k: qtd}}
+      for(const t of lista){
+        const treino = trim1(t.treinamento || "(Sem treinamento)");
+        const st = t._statusKey || "nao-concluido";
+
+        if(!map.has(treino)){
+          map.set(treino, { treino, total: 0, byStatus: {} });
+        }
+        const obj = map.get(treino);
+        obj.total += 1;
+        obj.byStatus[st] = (obj.byStatus[st] || 0) + 1;
+      }
+      const arr = Array.from(map.values());
+      arr.sort((a,b) => b.total - a.total || semAcento(a.treino).localeCompare(semAcento(b.treino)));
+      return arr;
+    }
+
+    function renderStackRow(container, item, modePct){
+      // modePct = false => largura proporcional ao TOTAL GERAL do topN
+      // modePct = true  => 100% por treinamento (percentual dentro do treinamento)
+      const row = document.createElement("div");
+      row.className = "stack-row";
+
+      const name = document.createElement("div");
+      name.className = "stack-name";
+      name.textContent = item.treino;
+
+      const bar = document.createElement("div");
+      bar.className = "stack-bar";
+
+      const total = item.total || 1;
+
+      for(const st of STATUS_ORDER){
+        const qtd = item.byStatus[st] || 0;
+        if(!qtd) continue;
+
+        const seg = document.createElement("div");
+        seg.className = "stack-seg";
+        seg.style.background = STATUS_COLORS[st] || "#111827";
+        seg.style.width = (modePct ? (qtd / total) * 100 : item._globalWidthPct[st]) + "%";
+
+        // label (só se tiver espaço)
+        const label = document.createElement("span");
+        label.className = "seg-label";
+
+        if(modePct){
+          const p = (qtd / total) * 100;
+          label.textContent = p >= 12 ? formatPct(p) : "";
+        } else {
+          label.textContent = qtd >= 3 ? String(qtd) : "";
+        }
+
+        seg.appendChild(label);
+        bar.appendChild(seg);
+      }
+
+      const totalEl = document.createElement("div");
+      totalEl.className = "stack-total";
+      totalEl.textContent = String(item.total);
+
+      row.appendChild(name);
+      row.appendChild(bar);
+      row.appendChild(totalEl);
+
+      container.appendChild(row);
+    }
+
+    function atualizarGraficosTreinamento(listaFiltrada){
+      const totalRegs = listaFiltrada.length;
+
+      const elCount = document.getElementById("treinoStackCount");
+      const elPct = document.getElementById("treinoStackPct");
+      const noteCount = document.getElementById("treinoNoteCount");
+      const notePct = document.getElementById("treinoNotePct");
+
+      elCount.innerHTML = "";
+      elPct.innerHTML = "";
+      noteCount.textContent = "";
+      notePct.textContent = "";
+
+      document.getElementById("chartTreinoCountTotal").textContent = totalRegs ? `${totalRegs} registros` : "";
+      document.getElementById("chartTreinoPctTotal").textContent = totalRegs ? `${totalRegs} registros` : "";
+
+      if(!totalRegs){
+        noteCount.textContent = "Sem dados para os filtros atuais.";
+        notePct.textContent = "Sem dados para os filtros atuais.";
+        return;
+      }
+
+      const agg = buildTreinoAgg(listaFiltrada);
+      const TOP_N = 8;
+      const top = agg.slice(0, TOP_N);
+
+      // Para o gráfico de QUANTIDADE: empilhar com escala baseada no MAIOR TOTAL do topN
+      const maxTotal = Math.max(...top.map(x => x.total), 1);
+
+      // pré-calcula largura "global" por status com base no total do treinamento vs maxTotal
+      // e dividindo proporcionalmente por status
+      for(const item of top){
+        item._globalWidthPct = {};
+        for(const st of STATUS_ORDER){
+          const qtd = item.byStatus[st] || 0;
+          const pctDoTreinoNoMax = (item.total / maxTotal) * 100;
+          const pctDoStatusDentroDoTreino = item.total ? (qtd / item.total) : 0;
+          item._globalWidthPct[st] = pctDoTreinoNoMax * pctDoStatusDentroDoTreino;
+        }
+      }
+
+      // Render
+      for(const item of top){
+        renderStackRow(elCount, item, false);
+      }
+      for(const item of top){
+        renderStackRow(elPct, item, true);
+      }
+
+      if(agg.length > TOP_N){
+        noteCount.textContent = `Mostrando TOP ${TOP_N} treinamentos por quantidade (com os filtros atuais).`;
+        notePct.textContent = `Mostrando TOP ${TOP_N} treinamentos por quantidade (com os filtros atuais).`;
+      } else {
+        noteCount.textContent = `Mostrando ${agg.length} treinamentos (com os filtros atuais).`;
+        notePct.textContent = `Mostrando ${agg.length} treinamentos (com os filtros atuais).`;
+      }
+    }
+
+    /* ==================== RENDERIZAÇÃO ==================== */
     function renderTreinos(){
       const mural = document.getElementById("mural");
       const vazio = document.getElementById("vazio");
@@ -1097,6 +1689,7 @@
       const mesHoje = hojeBase.getMonth() + 1;
       const anoHoje = hojeBase.getFullYear();
 
+      // filtros (agora todos são input, com datalist)
       const fCs = document.getElementById("fCs").value.trim();
       const fNome = semAcento(document.getElementById("fNome").value.toLowerCase());
       const fCargo = semAcento(document.getElementById("fCargo").value.toLowerCase());
@@ -1105,7 +1698,9 @@
       const fTreino = semAcento(document.getElementById("fTreino").value.toLowerCase());
       const fFormacao = document.getElementById("fFormacao").value.trim();
       const fVencimento = document.getElementById("fVencimento").value.trim();
-      const fStatus = document.getElementById("fStatus").value;
+
+      // status digitável (aceita "Válido", "valido", "à vencer"...)
+      const fStatusKey = normKey(document.getElementById("fStatus").value);
 
       const lista = TREINOS_RAW
         .map(t => {
@@ -1123,7 +1718,7 @@
           if(fTreino && !semAcento(t.treinamento || "").toLowerCase().includes(fTreino)) return false;
           if(fFormacao && !String(t.formacao || "").includes(fFormacao)) return false;
           if(fVencimento && !String(t.vencimento || "").includes(fVencimento)) return false;
-          if(fStatus && t._statusKey !== fStatus) return false;
+          if(fStatusKey && t._statusKey !== fStatusKey) return false;
           return true;
         })
         .sort((a, b) => {
@@ -1139,8 +1734,9 @@
             || semAcento(a.treinamento).localeCompare(semAcento(b.treinamento));
         });
 
-      /* Atualiza os cards de totais (sempre) */
       atualizarKPIs(lista);
+      atualizarGraficos(lista);
+      atualizarGraficosTreinamento(lista);
 
       if(!lista.length){
         vazio.style.display = "block";
@@ -1225,7 +1821,7 @@
       }
     }
 
-    /* Eventos de filtro – aplica na hora (com debounce leve) */
+    /* Eventos de filtro */
     let debounceId;
     function onFilterChange(){
       clearTimeout(debounceId);
@@ -1235,19 +1831,29 @@
     ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento","fStatus"]
       .forEach(id => {
         const el = document.getElementById(id);
-        el.addEventListener(id === "fStatus" ? "change" : "input", onFilterChange);
+        el.addEventListener("input", onFilterChange);
+        el.addEventListener("change", onFilterChange);
       });
 
-    /* Botão LIMPAR FILTROS */
     document.getElementById("btnLimpar").addEventListener("click", () => {
-      ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento"].forEach(id => {
-        document.getElementById(id).value = "";
-      });
-      document.getElementById("fStatus").value = "";
+      ["fCs","fNome","fCargo","fCipia","fCoord","fTreino","fFormacao","fVencimento","fStatus"]
+        .forEach(id => document.getElementById(id).value = "");
       renderTreinos();
     });
 
+    /* BOTÃO VOLTAR AO TOPO */
+    const btnTop = document.getElementById("btnTop");
+    function toggleTopButton(){
+      const y = window.scrollY || document.documentElement.scrollTop;
+      btnTop.classList.toggle("show", y > 500);
+    }
+    window.addEventListener("scroll", toggleTopButton, { passive:true });
+    btnTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+    // init
+    initDatalists();
     renderTreinos();
+    toggleTopButton();
   </script>
 </body>
 </html>
