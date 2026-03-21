@@ -1,0 +1,23 @@
+# Visual Studio / .NET
+.vs/
+.vscode/
+[Bb]in/
+[Oo]bj/
+TestResults/
+packages/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Publish artifacts
+publish/
+PublishScripts/
+
+# Local config and certificates
+app_config.txt
+*_TemporaryKey.pfx
+
+# Local backups
+backup/
