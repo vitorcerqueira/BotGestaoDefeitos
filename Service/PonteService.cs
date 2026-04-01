@@ -15,10 +15,9 @@ namespace BotGestaoDefeitos.Service
         public readonly string _pathaux;
         public static readonly ILog logInfo = LogManager.GetLogger("Processamento.Geral.Info");
         public static readonly ILog logErro = LogManager.GetLogger("Processamento.Geral.Erro");
-        public PonteService()
+        public PonteService(string pathaux = null)
         {
-
-            _pathaux = ConfigurationManager.AppSettings["pathaux"];
+            _pathaux = string.IsNullOrWhiteSpace(pathaux) ? ConfigurationManager.AppSettings["pathaux"] : pathaux;
         }
         public string LeArquivo(string path, string pathDefeito)
         {
@@ -304,17 +303,15 @@ namespace BotGestaoDefeitos.Service
                     }
                 }
 
-                // Salva o arquivo no disco
-                if (itensRemover.Any() || itensAnalise.Any())
-                    try
-                    {
-                        pacote.Save();
-                    }
-                    catch (Exception e)
-                    {
-                        logErro.Error("Erro ao salvar arquivo - GravaArquivoPonte", e);
-                        throw e;
-                    }
+                try
+                {
+                    pacote.Save();
+                }
+                catch (Exception e)
+                {
+                    logErro.Error("Erro ao salvar arquivo - GravaArquivoPonte", e);
+                    throw e;
+                }
             }
         }
 

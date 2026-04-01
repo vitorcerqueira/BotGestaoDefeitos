@@ -14,7 +14,8 @@ namespace BotGestaoDefeitos
     public class GestaoDefeitos
     {
         private readonly string _path;
-        private readonly string _pathaux;
+        private readonly string _pathauxBase;
+        private string _pathauxExecucao;
 
         private List<Tuple<int, string, string>> _itensFiles;
 
@@ -24,15 +25,12 @@ namespace BotGestaoDefeitos
         public GestaoDefeitos()
         {
             _path = ConfigurationManager.AppSettings["path"];
-            _pathaux = ConfigurationManager.AppSettings["pathaux"];
+            _pathauxBase = ConfigurationManager.AppSettings["pathaux"];
         }
 
         public void ExecutarGestaoDefeitos()
         {
-            if (!Directory.Exists(Path.GetDirectoryName(_pathaux)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(_pathaux));
-            }
+            _pathauxExecucao = ExcelBackupHelper.CriarArquivoExecucao(_pathauxBase);
 
             //new BaseService().EnviarEmail("Itens processados RUMO", "testeeee");
 
@@ -43,7 +41,7 @@ namespace BotGestaoDefeitos
         {
             try
             {
-                List<string> pathFileSource = Directory.GetFiles(_path, "*.*", SearchOption.AllDirectories).ToList();
+                List<string> pathFileSource = Directory.GetFiles(_path, "*.xlsx", SearchOption.AllDirectories).ToList();
                 _itensFiles = new List<Tuple<int, string, string>>();
                 foreach (string path in pathFileSource)
                 {
@@ -89,7 +87,7 @@ namespace BotGestaoDefeitos
                 new BaseService().AtualizarPowerQuery(pathGeral);
                 new BaseService().AtualizarPowerQuery(pathHistGeral);
 
-                new BaseService().EnviarEmail("Bot - Base Defeitos", email, new string[] { _pathaux });
+                new BaseService().EnviarEmail("Bot - Base Defeitos", email, new string[] { _pathauxExecucao });
                 logInfo.Info(new string('-', 200));
             }
             catch (Exception ex)
@@ -107,17 +105,17 @@ namespace BotGestaoDefeitos
                 switch (type)
                 {
                     case "Bueiros":
-                        return new BueiroService().LeArquivo(path, pathDefeito);
+                        return new BueiroService(_pathauxExecucao).LeArquivo(path, pathDefeito);
                     case "Contenções":
-                        return new ContencaoService().LeArquivo(path, pathDefeito);
+                        return new ContencaoService(_pathauxExecucao).LeArquivo(path, pathDefeito);
                     case "Infraestrutura":
-                        return new InfraestruturaService().LeArquivo(path, pathDefeito);
+                        return new InfraestruturaService(_pathauxExecucao).LeArquivo(path, pathDefeito);
                     case "PN":
-                        return new PNService().LeArquivo(path, pathDefeito);
+                        return new PNService(_pathauxExecucao).LeArquivo(path, pathDefeito);
                     case "Túneis":
-                        return new TunelService().LeArquivo(path, pathDefeito);
+                        return new TunelService(_pathauxExecucao).LeArquivo(path, pathDefeito);
                     case "Pontes":
-                        return new PonteService().LeArquivo(path, pathDefeito);
+                        return new PonteService(_pathauxExecucao).LeArquivo(path, pathDefeito);
                 }
 
                 logInfo.Info(new string('-', 200));

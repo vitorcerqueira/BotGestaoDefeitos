@@ -11,9 +11,9 @@ namespace BotGestaoDefeitos.Service
     {
         private readonly string _pathaux;
 
-        public PNService()
+        public PNService(string pathaux = null)
         {
-            _pathaux = ConfigurationManager.AppSettings["pathaux"];
+            _pathaux = string.IsNullOrWhiteSpace(pathaux) ? ConfigurationManager.AppSettings["pathaux"] : pathaux;
         }
 
         public string LeArquivo(string path, string pathDefeito)
@@ -291,17 +291,15 @@ namespace BotGestaoDefeitos.Service
                     }
                 }
 
-                // Salva o arquivo no disco
-                if (itensRemover.Any() || itensAnalise.Any())
-                    try
-                    {
-                        pacote.Save();
-                    }
-                    catch (Exception e)
-                    {
-                        logErro.Error("Erro ao salvar arquivo - GravaArquivoPN", e);
-                        throw e;
-                    }
+                try
+                {
+                    pacote.Save();
+                }
+                catch (Exception e)
+                {
+                    logErro.Error("Erro ao salvar arquivo - GravaArquivoPN", e);
+                    throw e;
+                }
             }
         }
 
