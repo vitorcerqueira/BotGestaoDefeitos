@@ -21,3 +21,4 @@ app_config.txt
 
 # Local backups
 backup/
+/App.config
