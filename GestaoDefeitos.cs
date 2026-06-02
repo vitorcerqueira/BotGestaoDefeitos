@@ -13,7 +13,7 @@ namespace BotGestaoDefeitos
 {
     public class GestaoDefeitos
     {
-        private readonly string _path;
+        private readonly List<string> _paths;
         private readonly string _pathauxBase;
         private string _pathauxExecucao;
 
@@ -24,7 +24,16 @@ namespace BotGestaoDefeitos
 
         public GestaoDefeitos()
         {
-            _path = ConfigurationManager.AppSettings["path"];
+            _paths = new List<string>();
+
+            string path1 = ConfigurationManager.AppSettings["path1"];
+            if (!string.IsNullOrWhiteSpace(path1))
+                _paths.Add(path1);
+
+            string path2 = ConfigurationManager.AppSettings["path2"];
+            if (!string.IsNullOrWhiteSpace(path2))
+                _paths.Add(path2);
+
             _pathauxBase = ConfigurationManager.AppSettings["pathaux"];
         }
 
@@ -41,7 +50,9 @@ namespace BotGestaoDefeitos
         {
             try
             {
-                List<string> pathFileSource = Directory.GetFiles(_path, "*.xlsx", SearchOption.AllDirectories).ToList();
+                List<string> pathFileSource = _paths
+                    .SelectMany(p => Directory.GetFiles(p, "*.xlsx", SearchOption.AllDirectories))
+                    .ToList();
                 _itensFiles = new List<Tuple<int, string, string>>();
                 foreach (string path in pathFileSource)
                 {

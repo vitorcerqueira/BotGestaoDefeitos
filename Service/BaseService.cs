@@ -30,7 +30,7 @@ namespace BotGestaoDefeitos.Service
 
         public BaseService()
         {
-            _path = ConfigurationManager.AppSettings["path"];
+            _path = ConfigurationManager.AppSettings["path1"];
             _pathaux = ConfigurationManager.AppSettings["pathaux"];
             _user = ConfigurationManager.AppSettings["user"];
             _password = ConfigurationManager.AppSettings["password"];
